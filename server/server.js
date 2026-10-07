@@ -106,6 +106,104 @@ app.get("/api/admin/products",auth,asyncHandler(async(req,res)=>{
   const [rows]=await db.query("SELECT * FROM products ORDER BY id DESC");
   res.json({products:rows});
 }));
+app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(async(req,res)=>{
+  if(!req.file)return res.status(400).json({message:"CSV file is required"});
+  const csv=fs.readFileSync(req.file.path,"utf8");
+  try{fs.unlinkSync(req.file.path)}catch{}
+  const parseCSV=(text)=>{
+    const rows=[];let row=[],cell="",quoted=false;
+    for(let i=0;i<text.length;i++){
+      const ch=text[i],next=text[i+1];
+      if(quoted){
+        if(ch==='"'&&next==='"'){cell+='"';i++}
+        else if(ch==='"')quoted=false;
+        else cell+=ch;
+      }else{
+        if(ch==='"')quoted=true;
+        else if(ch===','){row.push(cell);cell=""}
+        else if(ch==='\n'){row.push(cell.replace(/\r$/,""));rows.push(row);row=[];cell=""}
+        else cell+=ch;
+      }
+    }
+    if(cell.length||row.length){row.push(cell.replace(/\r$/,""));rows.push(row)}
+    if(!rows.length)return [];
+    const headers=rows.shift().map(x=>String(x||"").trim());
+    return rows.filter(r=>r.some(x=>String(x||"").trim()!=="")).map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]??""])));
+  };
+  const rows=parseCSV(csv);
+  if(!rows.length)return res.status(400).json({message:"CSV contains no product rows"});
+  const groups=new Map();
+  for(const row of rows){
+    const handle=String(row.Handle||row["Variant SKU"]||row.Title||"").trim();
+    if(!handle)continue;
+    if(!groups.has(handle))groups.set(handle,{first:row,images:[]});
+    const g=groups.get(handle);
+    if(row["Image Src"]&&String(row["Image Src"]).trim()&&!g.images.includes(String(row["Image Src"]).trim()))g.images.push(String(row["Image Src"]).trim());
+  }
+  const productCols=await columns("products");
+  const categoryCols=await columns("categories");
+  const subcategoryCols=await columns("subcategories");
+  const connection=await db.getConnection();
+  let created=0,updated=0,skipped=0;
+  try{
+    await connection.beginTransaction();
+    for(const {first,images} of groups.values()){
+      const name=String(first.Title||"").trim();
+      if(!name){skipped++;continue}
+      const sku=String(first["Variant SKU"]||first.SKU||"").trim();
+      const categoryPath=String(first["Product Category"]||"").split(">").map(x=>x.trim()).filter(Boolean);
+      let categoryName=categoryPath.length>1?categoryPath[1]:String(first.Type||"Furniture").trim()||"Furniture";
+      let subcategoryName=categoryPath.length>2?categoryPath[2]:String(first.Type||"").trim();
+      const findOrCreate=async(table,name,parentId=null)=>{
+        if(!name)return null;
+        const [found]=await connection.query(parentId===null?"SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1":"SELECT id FROM subcategories WHERE category_id=? AND LOWER(name)=LOWER(?) LIMIT 1",parentId===null?[name]:[parentId,name]);
+        if(found[0])return found[0].id;
+        if(table==="categories"){
+          const slug=String(name).toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+          const [r]=await connection.query("INSERT INTO categories (name,slug) VALUES (?,?)",[name,slug]);
+          return r.insertId;
+        }
+        const slug=String(name).toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+        const [r]=await connection.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[parentId,name,slug]);
+        return r.insertId;
+      };
+      const categoryId=await findOrCreate("categories",categoryName);
+      const subcategoryId=subcategoryName?await findOrCreate("subcategories",subcategoryName,categoryId):null;
+      const grams=Number(first["Variant Grams"]||0);
+      const weightKg=grams?grams/1000:null;
+      const price=Number(first["Variant Price"]||0)||0;
+      const oldPrice=Number(first["Variant Compare At Price"]||0)||0;
+      const qty=Number(first["Variant Inventory Qty"]||0)||0;
+      const bodyHtml=String(first["Body (HTML)"]||"").trim();
+      const bodyText=bodyHtml.replace(/<[^>]+>/g," ").replace(/&nbsp;/gi," ").replace(/\s+/g," ").trim();
+      const payload={
+        name,sku,description:bodyHtml,short_description:bodyText.slice(0,200),
+        brand:String(first.Vendor||"").trim(),material:"",tags:String(first.Tags||"").trim(),
+        image:images[0]||String(first["Image Src"]||"").trim(),image_2:images[1]||"",image_3:images[2]||"",image_4:images[3]||"",image_5:images[4]||"",
+        price,old_price:oldPrice,qty,status:String(first.Status||"active").trim()||"active",
+        category_id:categoryId,subcategory_id:subcategoryId,weight_kg:weightKg,
+        seo_title:String(first["SEO Title"]||name).trim(),meta_description:String(first["SEO Description"]||bodyText).trim().slice(0,500),
+        slug:String(first.Handle||name).trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")
+      };
+      const data={}; for(const key of productCols) if(Object.prototype.hasOwnProperty.call(payload,key))data[key]=payload[key];
+      let existingId=null;
+      if(sku){const [found]=await connection.query("SELECT id FROM products WHERE sku=? LIMIT 1",[sku]);existingId=found[0]?.id||null}
+      if(!existingId&&payload.slug){const [found]=await connection.query("SELECT id FROM products WHERE slug=? LIMIT 1",[payload.slug]);existingId=found[0]?.id||null}
+      const keys=Object.keys(data);
+      if(existingId){
+        await connection.query("UPDATE products SET "+keys.map(k+"= ?").join("," )+" WHERE id=?",[...keys.map(k=>data[k]),existingId]);
+        updated++;
+      }else{
+        await connection.query("INSERT INTO products ("+keys.map(k=>"`"+k+"`").join(",")+") VALUES ("+keys.map(()=>"?").join(",")+")",keys.map(k=>data[k]));
+        created++;
+      }
+    }
+    await connection.commit();
+    res.json({ok:true,rows:rows.length,products:groups.size,created,updated,skipped});
+  }catch(err){await connection.rollback();throw err}
+  finally{connection.release()}
+}));
+
 app.post("/api/admin/products",auth,asyncHandler(async(req,res)=>{
   const cols=await columns("products");
   const body=pick(req.body||{},cols.filter(c=>c!=="id"&&c!=="created_at"&&c!=="updated_at"));
