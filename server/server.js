@@ -4,11 +4,19 @@ import {fileURLToPath} from "url";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import mysql from "mysql2/promise";
+import multer from "multer";
+import fs from "fs";
 
 dotenv.config();
 
 const app=express();
-app.use(express.json({limit:"2mb"}));
+const __filename=fileURLToPath(import.meta.url);
+const __dirname=path.dirname(__filename);
+const uploadDir=path.join(__dirname,"uploads");
+fs.mkdirSync(uploadDir,{recursive:true});
+const upload=multer({dest:uploadDir,limits:{fileSize:50*1024*1024}});
+app.use(express.json({limit:"20mb"}));
+app.use("/uploads",express.static(uploadDir));
 
 const PORT=process.env.PORT||3000;
 const JWT_SECRET=process.env.JWT_SECRET||"change-this-jwt-secret";
@@ -46,6 +54,12 @@ function auth(req,res,next){
     next();
   }catch{res.status(401).json({message:"Unauthorized"});}
 }
+async function ensureProductFields(){
+  const defs={category_id:"INT NULL",subcategory_id:"INT NULL",short_description:"TEXT",brand:"VARCHAR(255)",material:"VARCHAR(255)",tags:"VARCHAR(1000)",video:"VARCHAR(500)",image_2:"VARCHAR(500)",image_3:"VARCHAR(500)",image_4:"VARCHAR(500)",image_5:"VARCHAR(500)",length_in:"DECIMAL(10,2)",width_in:"DECIMAL(10,2)",height_in:"DECIMAL(10,2)",length_cm:"DECIMAL(10,2)",width_cm:"DECIMAL(10,2)",height_cm:"DECIMAL(10,2)",weight_kg:"DECIMAL(10,2)",color:"VARCHAR(255)",finish:"VARCHAR(255)",care_instructions:"TEXT",assembly_info:"TEXT",featured:"TINYINT(1) DEFAULT 0",best_seller:"TINYINT(1) DEFAULT 0",new_arrival:"TINYINT(1) DEFAULT 0",seo_title:"VARCHAR(255)",meta_description:"VARCHAR(500)",slug:"VARCHAR(255)"};
+  const existing=new Set(await columns("products"));
+  for(const [name,type] of Object.entries(defs)) if(!existing.has(name)) await db.query("ALTER TABLE products ADD COLUMN "+name+" "+type);
+}
+
 async function ensureSettings(){
   await db.query("CREATE TABLE IF NOT EXISTS store_settings (id INT PRIMARY KEY DEFAULT 1, store_name VARCHAR(255) NOT NULL DEFAULT 'Balaji Handicraft', currency VARCHAR(10) NOT NULL DEFAULT 'INR', shipping_threshold DECIMAL(12,2) NOT NULL DEFAULT 42000, phone VARCHAR(100) DEFAULT '', email VARCHAR(255) DEFAULT '', address VARCHAR(500) DEFAULT '', announcement VARCHAR(500) DEFAULT 'Free shipping on orders over ₹42,000') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
   await db.query("INSERT IGNORE INTO store_settings (id) VALUES (1)");
@@ -66,6 +80,15 @@ app.post("/api/admin/login",(req,res)=>{
   return res.status(401).json({message:"Invalid admin email or password"});
 });
 app.get("/api/admin/me",auth,(req,res)=>res.json({user:req.admin}));
+
+app.post("/api/admin/upload",auth,upload.single("file"),asyncHandler(async(req,res)=>{
+  if(!req.file)return res.status(400).json({message:"No file uploaded"});
+  const ext=path.extname(req.file.originalname).toLowerCase().replace(/[^a-z0-9.]/g,"");
+  const safeName=Date.now()+"-"+Math.random().toString(36).slice(2,9)+(ext||"");
+  const finalPath=path.join(uploadDir,safeName);
+  fs.renameSync(req.file.path,finalPath);
+  res.json({url:"/uploads/"+safeName,name:req.file.originalname,size:req.file.size});
+}));
 
 app.get("/api/admin/stats",auth,asyncHandler(async(req,res)=>{
   const [p]=await db.query("SELECT COUNT(*) count FROM products");
@@ -177,13 +200,11 @@ app.use((err,req,res,next)=>{
   res.status(500).json({message:"Server error",detail:process.env.NODE_ENV==="development"?err.message:undefined});
 });
 
-const __filename=fileURLToPath(import.meta.url);
-const __dirname=path.dirname(__filename);
 const dist=path.resolve(__dirname,"../dist");
 app.use(express.static(dist));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
 app.listen(PORT,async()=>{
-  try{await ensureSettings();console.log("Store settings ready");}catch(e){console.error("Settings table setup failed:",e.message);}
+  try{await ensureProductFields();await ensureSettings();console.log("Store settings ready");}catch(e){console.error("Settings table setup failed:",e.message);}
   console.log("Balaji Handicraft server running on port "+PORT);
 });
