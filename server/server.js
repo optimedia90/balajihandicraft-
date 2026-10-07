@@ -154,6 +154,32 @@ app.put("/api/admin/categories/:id",auth,asyncHandler(async(req,res)=>{
   await db.query("UPDATE categories SET "+keys.map(k=>"\`"+k+"\`=?").join(",")+" WHERE id=?",[...keys.map(k=>body[k]),req.params.id]);
   res.json({ok:true});
 }));
+app.get("/api/admin/subcategories",auth,asyncHandler(async(req,res)=>{
+  const [subcategories]=await db.query("SELECT s.*,c.name AS category_name FROM subcategories s LEFT JOIN categories c ON c.id=s.category_id ORDER BY s.id ASC");
+  res.json({subcategories});
+}));
+app.post("/api/admin/subcategories",auth,asyncHandler(async(req,res)=>{
+  const cols=await columns("subcategories");
+  const body=pick(req.body||{},cols.filter(c=>c!=="id"&&c!=="created_at"&&c!=="updated_at"));
+  if(!body.name)return res.status(400).json({message:"Subcategory name is required"});
+  if(!body.category_id)return res.status(400).json({message:"Parent category is required"});
+  if(!body.slug)body.slug=String(body.name).toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  const keys=Object.keys(body);
+  const [result]=await db.query("INSERT INTO subcategories ("+keys.join(",")+") VALUES ("+keys.map(()=>"?").join(",")+")",keys.map(k=>body[k]));
+  res.status(201).json({id:result.insertId});
+}));
+app.put("/api/admin/subcategories/:id",auth,asyncHandler(async(req,res)=>{
+  const cols=await columns("subcategories");
+  const body=pick(req.body||{},cols.filter(c=>c!=="id"&&c!=="created_at"&&c!=="updated_at"));
+  const keys=Object.keys(body);
+  if(!keys.length)return res.status(400).json({message:"No changes supplied"});
+  await db.query("UPDATE subcategories SET "+keys.map(k=>k+"=?").join(",")+" WHERE id=?",[...keys.map(k=>body[k]),req.params.id]);
+  res.json({ok:true});
+}));
+app.delete("/api/admin/subcategories/:id",auth,asyncHandler(async(req,res)=>{
+  await db.query("DELETE FROM subcategories WHERE id=?",[req.params.id]);
+  res.json({ok:true});
+}));
 app.delete("/api/admin/categories/:id",auth,asyncHandler(async(req,res)=>{
   await db.query("DELETE FROM categories WHERE id=?",[req.params.id]);
   res.json({ok:true});
