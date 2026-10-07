@@ -153,7 +153,7 @@ function Admin(){
  const navigate=useNavigate();
  const token=localStorage.getItem("bh_admin_token");
  const api=async(path,options={})=>{
-   const res=await fetch(path,{...options,headers:{"Content-Type":"application/json","Authorization:"Bearer "+token,...(options.headers||{})}});
+   const res=await fetch(path,{...options,headers:{"Content-Type":"application/json","Authorization":"Bearer "+token,...(options.headers||{})}});
    const text=await res.text();let data={};try{data=text?JSON.parse(text):{};}catch{data={message:text};}
    if(!res.ok)throw new Error(data.message||"Request failed");
    return data;
