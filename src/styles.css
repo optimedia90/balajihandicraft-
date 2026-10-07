@@ -21,3 +21,20 @@
 .currencySwitcher span{font-size:14px;line-height:1}
 .currencySwitcher select{border:0!important;padding:0 12px 0 0!important;background:transparent!important;font-size:10px;font-weight:700;color:var(--ink);outline:0;cursor:pointer}
 @media(max-width:900px){.currencySwitcher{height:32px}.currencySwitcher select{font-size:9px;max-width:82px}.navicons{gap:3px}}
+
+/* Authentication */
+.authPage{min-height:620px}
+.authPage>h1{text-align:center;margin-bottom:35px}
+.authCard{max-width:480px!important;margin:0 auto!important}
+.authTabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line);margin:22px 0}
+.authTabs button{border:0;background:transparent;padding:12px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer}
+.authTabs button.active{color:var(--ink);border-bottom:2px solid var(--ink)}
+.authCard form{display:grid;gap:11px}
+.authCard form input{width:100%;border:1px solid var(--line);padding:14px;background:#fff;outline:0;font-size:11px}
+.authName{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.authLink{display:block;text-align:right;margin-top:14px;font-size:10px;font-weight:700}
+.authBottom{font-size:10px!important;margin-top:22px!important}
+.authBottom a,.authLink{color:var(--accent);font-weight:700}
+.authMessage{font-size:10px;padding:10px;background:var(--cream);color:var(--ink);line-height:1.5}
+.authTextBtn{border:0;background:none;text-decoration:underline;margin-top:18px;font-size:10px;cursor:pointer}
+@media(max-width:600px){.authName{grid-template-columns:1fr}.authCard{padding:28px!important}}
