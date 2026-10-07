@@ -4,7 +4,7 @@ import {HashRouter,useLocation,useNavigate,useParams,Link} from "react-router-do
 import {Search,ShoppingBag,Heart,User,Menu,X,ChevronDown,ArrowRight,Star,SlidersHorizontal,Trash2,Minus,Plus,Check,Truck,ShieldCheck,RotateCcw,Instagram,Facebook,Youtube} from "lucide-react";
 import "./styles.css";
 
-const products=[
+const demoProducts=[
 {id:1,name:"Sheesham Wood Lattice Bed",category:"Beds",sub:"King Beds",price:699,old:899,rating:4.9,img:"https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=900",tag:"Bestseller"},
 {id:2,name:"Solid Wood Scandinavian Sofa",category:"Sofas",sub:"3 Seater Sofas",price:549,old:699,rating:4.8,img:"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900",tag:"New"},
 {id:3,name:"Handcrafted Sheesham Dining Table",category:"Dining",sub:"Dining Tables",price:429,old:529,rating:4.9,img:"https://images.unsplash.com/photo-1617806118233-18e1de247200?w=900",tag:"Popular"},
@@ -17,7 +17,9 @@ const products=[
 {id:10,name:"Handcrafted Bookshelf",category:"Storage",sub:"Bookshelves",price:259,old:329,rating:4.8,img:"https://images.unsplash.com/photo-1594620302200-9a762244a156?w=900"},
 {id:11,name:"Classic 4 Seater Dining Set",category:"Dining",sub:"Dining Sets",price:649,old:799,rating:4.9,img:"https://images.unsplash.com/photo-1604578762246-41134e37f9cc?w=900"},
 {id:12,name:"Boucle Round Coffee Table",category:"Tables",sub:"Coffee Tables",price:199,old:249,rating:4.6,img:"https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=900"}
-];
+ ];
+let products=[...demoProducts];
+const normalizeProduct=(p)=>({id:Number(p.id),name:p.name||p.title||"Furniture Product",category:p.category_name||p.category||"Furniture",sub:p.subcategory_name||p.sub||"",price:Number(p.price||0),old:Number(p.old_price||p.old||p.price||0),rating:Number(p.rating||4.8),img:p.image||p.img||"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900",tag:p.featured?"Featured":""});
 const cats=[["All Furniture",""],["Beds","Beds"],["Sofas","Sofas"],["Dining","Dining"],["Chairs","Chairs"],["Tables","Tables"],["Storage","Storage"]];
 const categoryMenus=[
  {name:"Beds",slug:"Beds",subs:["King Beds","Queen Beds","Double Beds","Single Beds","Storage Beds","Canopy Beds","Kids Beds"]},
@@ -33,10 +35,16 @@ function App(){
  const [cart,setCart]=useState(()=>JSON.parse(localStorage.getItem("bh_cart")||"[]"));
  const [wish,setWish]=useState(()=>JSON.parse(localStorage.getItem("bh_wish")||"[]"));
  const [currency,setCurrency]=useState(()=>localStorage.getItem("bh_currency")||"USD");
+ const [,setStoreVersion]=useState(0);
  activeCurrency=currency;
  useEffect(()=>localStorage.setItem("bh_currency",currency),[currency]);
  useEffect(()=>localStorage.setItem("bh_cart",JSON.stringify(cart)),[cart]);
  useEffect(()=>localStorage.setItem("bh_wish",JSON.stringify(wish)),[wish]);
+ useEffect(()=>{
+   fetch("/api/store/products").then(r=>r.ok?r.json():Promise.reject()).then(data=>{
+     if(Array.isArray(data.products)&&data.products.length){products=data.products.map(normalizeProduct);setStoreVersion(v=>v+1);}
+   }).catch(()=>{});
+ },[]);
  const add=(p)=>setCart(c=>{const x=c.find(i=>i.id===p.id);return x?c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...c,{...p,qty:1}]});
  const toggleWish=(p)=>setWish(w=>w.some(x=>x.id===p.id)?w.filter(x=>x.id!==p.id):[...w,p]);
  return <><Header cart={cart.length} wish={wish.length} currency={currency} setCurrency={setCurrency}/><main><RoutesView cart={cart} setCart={setCart} wish={wish} toggleWish={toggleWish} add={add}/></main><Footer/></>
