@@ -144,7 +144,7 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
   const categoryCols=await columns("categories");
   const subcategoryCols=await columns("subcategories");
   const connection=await db.getConnection();
-  let created=0,updated=0,skipped=0;
+  let created=0,updated=0,skipped=0; const reservedSlugs=new Set();
   try{
     await connection.beginTransaction();
     for(const {first,images} of groups.values()){
@@ -189,19 +189,20 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
       let existingId=null;
       if(sku){const [found]=await connection.query("SELECT id FROM products WHERE sku=? LIMIT 1",[sku]);existingId=found[0]?.id||null}
       if(payload.slug){
-        const [slugRows]=await connection.query("SELECT id,sku FROM products WHERE slug=? LIMIT 1",[payload.slug]);
-        if(slugRows[0] && (!existingId || Number(slugRows[0].id)!==Number(existingId))){
+        const baseSlug=payload.slug;
+        const [slugRows]=await connection.query("SELECT id FROM products WHERE slug=? LIMIT 1",[baseSlug]);
+        const slugTakenByOther=slugRows[0] && (!existingId || Number(slugRows[0].id)!==Number(existingId));
+        if(slugTakenByOther || reservedSlugs.has(baseSlug)){
           const suffix=sku?String(sku).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40):"product";
-          let candidate=payload.slug+"-"+(suffix||"product");
+          let candidate=baseSlug+"-"+(suffix||"product");
           let n=2;
-          while(true){
-            const [collision]=await connection.query("SELECT id FROM products WHERE slug=? LIMIT 1",[candidate]);
-            if(!collision[0])break;
-            candidate=payload.slug+"-"+(suffix||"product")+"-"+n++;
+          while(reservedSlugs.has(candidate) || (await connection.query("SELECT id FROM products WHERE slug=? LIMIT 1",[candidate]))[0][0]){
+            candidate=baseSlug+"-"+(suffix||"product")+"-"+n++;
           }
           payload.slug=candidate;
           data.slug=candidate;
         }
+        reservedSlugs.add(payload.slug);
       }
       const keys=Object.keys(data);
       if(existingId){
