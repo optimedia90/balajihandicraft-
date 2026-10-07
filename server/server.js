@@ -200,7 +200,7 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
     }
     await connection.commit();
     res.json({ok:true,rows:rows.length,products:groups.size,created,updated,skipped});
-  }catch(err){await connection.rollback();res.status(400).json({message:"Bulk import failed",detail:err.message||"Database import error"});return}
+  }catch(err){await connection.rollback();res.status(400).json({message:"Bulk import failed: "+(err.message||"Database import error")});return}
   finally{connection.release()}
 }));
 
