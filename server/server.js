@@ -190,7 +190,7 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
       if(sku){const [found]=await connection.query("SELECT id FROM products WHERE sku=? LIMIT 1",[sku]);existingId=found[0]?.id||null}
       if(payload.slug){
         const [slugRows]=await connection.query("SELECT id,sku FROM products WHERE slug=? LIMIT 1",[payload.slug]);
-        if(slugRows[0] && !existingId){
+        if(slugRows[0] && (!existingId || Number(slugRows[0].id)!==Number(existingId))){
           const suffix=sku?String(sku).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40):"product";
           let candidate=payload.slug+"-"+(suffix||"product");
           let n=2;
