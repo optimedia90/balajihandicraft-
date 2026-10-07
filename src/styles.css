@@ -143,3 +143,153 @@
  .peFooter{display:block}
  .peFooter>div{margin-top:10px;justify-content:flex-end}
 }
+
+
+/* Full admin dashboard workspace */
+.adminApp{min-height:100vh;background:#fbfaf7;color:#171511;display:flex;font-family:"DM Sans",sans-serif}
+.adminSidebar{width:208px;flex:0 0 208px;background:#f8f6f1;border-right:1px solid #e8e3da;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:60}
+.adminBrand{height:65px;padding:0 17px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e8e3da}
+.adminBrand>span{width:34px;height:34px;border-radius:50%;background:#171511;color:white;display:grid;place-items:center;font-size:11px;font-weight:700}
+.adminBrand b{display:block;font-size:13px;letter-spacing:1.5px}
+.adminBrand small{display:block;font-size:7px;letter-spacing:2px;color:#777;margin-top:2px}
+.adminBrand button{margin-left:auto;border:0;background:none;color:#777;cursor:pointer}
+.adminBrand button svg{width:15px}
+.adminSidebar nav{padding:16px 10px;overflow:auto;flex:1}
+.adminSidebar nav>button,.adminLogout{width:100%;border:0;background:transparent;height:36px;padding:0 11px;display:flex;align-items:center;gap:12px;border-radius:6px;font-size:11px;text-align:left;color:#3d3a35;cursor:pointer}
+.adminSidebar nav>button:hover{background:#eeeae2}
+.adminSidebar nav>button.active{background:#171511;color:white}
+.adminSidebar nav>button svg{width:16px;height:16px;flex:none}
+.adminSidebar nav>button svg:last-child{margin-left:auto;width:13px}
+.adminSubnav{padding:2px 0 8px}
+.adminSubnav button{display:block;width:100%;border:0;background:transparent;text-align:left;padding:9px 12px 9px 44px;font-size:10px;color:#5e5a54;cursor:pointer;border-radius:6px}
+.adminSubnav button:hover,.adminSubnav button.active{background:#eee8df;color:#171511}
+.adminLogout{margin:10px;padding:10px 11px;width:calc(100% - 20px);border-top:1px solid #e8e3da;border-radius:0;color:#555}
+.adminLogout svg{width:16px}
+.sidebarCollapsed .adminSidebar{width:68px;flex-basis:68px}
+.sidebarCollapsed .adminBrand{padding:0 16px}
+.sidebarCollapsed .adminBrand>div,.sidebarCollapsed .adminBrand button{display:none}
+.sidebarCollapsed .adminSidebar nav>button span,.sidebarCollapsed .adminSidebar nav>button>svg:last-child,.sidebarCollapsed .adminSubnav,.sidebarCollapsed .adminLogout span{display:none}
+.sidebarCollapsed .adminSidebar nav>button,.sidebarCollapsed .adminLogout{justify-content:center;padding:0}
+.adminWorkspace{min-width:0;flex:1}
+.adminHeader{height:65px;background:#fff;border-bottom:1px solid #e8e3da;display:flex;align-items:center;padding:0 20px;gap:20px;position:sticky;top:0;z-index:50}
+.adminSearch{height:34px;background:#f5f3ef;border-radius:5px;display:flex;align-items:center;gap:8px;width:340px;padding:0 11px}
+.adminSearch svg{width:15px;color:#8b867e}
+.adminSearch input{border:0;background:transparent;outline:0;width:100%;font-size:10px}
+.adminHeaderRight{margin-left:auto;display:flex;align-items:center;gap:10px}
+.adminHeaderRight>button{width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+.adminHeaderRight>button svg{width:17px}
+.viewStore{height:34px;border:1px solid #bdb7ad;padding:0 12px;display:flex;align-items:center;gap:7px;border-radius:5px;font-size:10px;font-weight:700;background:white}
+.viewStore svg{width:12px}
+.bell{position:relative}
+.bell i{position:absolute;right:3px;top:1px;background:#e53935;color:#fff;border-radius:10px;min-width:14px;height:14px;font-size:8px;font-style:normal;display:grid;place-items:center}
+.adminUser{display:flex;align-items:center;gap:7px;font-size:10px}
+.adminUser>span{width:28px;height:28px;background:#171511;color:#fff;border-radius:50%;display:grid;place-items:center}
+.adminUser svg{width:12px}
+.mobileSideBtn{display:none;border:0;background:transparent}
+.adminMain{padding:26px 30px 60px;max-width:1500px;margin:auto}
+.adminPageTitle{display:flex;justify-content:space-between;align-items:end;margin-bottom:22px}
+.pageCrumb{display:flex;align-items:center;gap:5px;color:#938d84;font-size:10px;margin-bottom:8px}
+.pageCrumb svg{width:11px}
+.adminPageTitle h1{font-size:35px;margin:0 0 6px}
+.adminPageTitle p{font-size:11px;color:#89837a;margin:0}
+.dashboardStats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.dashboardStats>div{background:#fff;border:1px solid #e7e1d7;border-radius:7px;padding:20px}
+.dashboardStats span,.dashboardStats small{display:block;font-size:10px;color:#8c867d}
+.dashboardStats b{display:block;font:600 29px "Playfair Display";margin:8px 0}
+.dashboardQuick{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.dashboardQuick button{border:1px solid #e2ddd4;background:white;border-radius:6px;padding:17px;text-align:left;font-size:11px;font-weight:700;display:flex;align-items:center;gap:8px;cursor:pointer}
+.dashboardQuick svg{width:15px}
+.listCard,.settingsAdminCard{background:#fff;border:1px solid #e7e1d7;border-radius:7px;overflow:hidden}
+.listToolbar{padding:14px 16px;display:flex;justify-content:space-between;border-bottom:1px solid #eee9e1;align-items:center;font-size:11px}
+.listToolbar>div{display:flex;gap:8px}
+.listToolbar input,.listToolbar button{border:1px solid #ddd7ce;background:white;padding:9px;font-size:10px;outline:0}
+.productListRow,.simpleRow{display:grid;grid-template-columns:55px 1fr 100px 80px 60px 35px;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid #eee9e1;font-size:10px}
+.productListRow:last-child,.simpleRow:last-child{border-bottom:0}
+.productListRow img{width:48px;height:58px;object-fit:cover;border-radius:3px}
+.productListRow b,.productListRow span{display:block}
+.productListRow span{color:#8c867d;margin-top:4px}
+.productListRow>button,.simpleRow>button{border:1px solid #ddd7ce;background:#fff;padding:7px;font-size:9px;cursor:pointer}
+.pill{background:#edf4ed;color:#46704d;padding:5px 8px;border-radius:20px;width:max-content}
+.adminLoading,.adminEmpty{padding:60px;text-align:center;color:#8b857c;font-size:11px}
+.quickEdit{padding:16px;border-bottom:1px solid #eee9e1;background:#fbfaf7}
+.quickEdit label{display:flex;gap:10px;align-items:end;font-size:10px;font-weight:700}
+.quickEdit input{display:block;width:280px;border:1px solid #ddd7ce;padding:10px;margin-top:6px;outline:0}
+.simpleRow{grid-template-columns:1fr 1fr 70px}
+.settingsAdminCard{max-width:700px;padding:22px;display:grid;gap:14px}
+.settingsAdminCard label{text-transform:capitalize;font-size:10px;font-weight:700;display:grid;gap:6px}
+.settingsAdminCard input{border:1px solid #ddd7ce;padding:12px;background:white;outline:0}
+.adminPlaceholder{min-height:560px;background:#fff;border:1px solid #e7e1d7;border-radius:7px;display:grid;place-items:center;text-align:center}
+.adminPlaceholder svg{width:38px;height:38px;color:#b18a58}
+.adminPlaceholder h2{font-size:27px;margin:12px 0 6px}
+.adminPlaceholder p{font-size:11px;color:#8b857c;margin-bottom:20px}
+.adminNotice{margin-bottom:15px;padding:11px 14px;background:#f2ede5;border-left:3px solid #b18a58;font-size:10px}
+
+/* Screenshot-style product editor */
+.productEditor{background:transparent;box-shadow:none;border:0}
+.peHead{padding:0 0 18px;border:0;display:flex;justify-content:space-between;align-items:end}
+.peCrumb{display:flex;align-items:center;gap:4px;font-size:10px;color:#948d84;margin-bottom:7px}
+.peCrumb svg{width:12px;height:12px}
+.peHead h3{font:600 34px "Playfair Display";margin:0 0 5px}
+.peHead p{font-size:11px;color:#8b857c;margin:0}
+.peHeadActions{display:flex;gap:8px}
+.peHeadActions .btn{border:1px solid #ddd7ce;padding:11px 15px}
+.peHeadActions .btn.dark{border-color:#171511}
+.peHeadActions svg,.peBottomActions svg{width:14px}
+.peTabs{display:flex;background:#fff;border:1px solid #e7e1d7;border-radius:6px;overflow:auto;margin-bottom:10px}
+.peTabs button{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;border:0;background:white;padding:13px 11px;font-size:10px;font-weight:700;color:#66605a;border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer}
+.peTabs button svg{width:15px}
+.peTabs button.active{color:#171511;border-bottom-color:#171511}
+.peCanvas{display:grid;grid-template-columns:minmax(0,1fr) 295px;gap:12px}
+.peMain{min-width:0}
+.peCard{background:#fff;border:1px solid #e7e1d7;border-radius:6px;padding:16px;margin-bottom:12px}
+.peCard h4{font:600 17px "Playfair Display";margin:0 0 15px;display:flex;align-items:center;gap:9px}
+.peCard h4 svg{width:16px;height:16px}
+.peBasicGrid{display:grid;grid-template-columns:1.55fr .75fr;gap:16px}
+.peLeft,.peRight{display:grid;align-content:start;gap:11px}
+.peField{display:grid;gap:6px;font-size:9px;font-weight:700}
+.peField span{display:block}
+.peField input,.peField select,.peField textarea{border:1px solid #ded8cf;border-radius:4px;background:white;padding:10px;font-size:10px;outline:0;width:100%;color:#25221e}
+.peField textarea{resize:vertical;line-height:1.55}
+.peField small{font-size:8px;color:#999;text-align:right;margin-top:-3px}
+.richText{min-height:130px}
+.mediaLayout{display:grid;grid-template-columns:1.8fr 1fr;gap:20px}
+.fieldTitle{font-size:9px;font-weight:700;margin-bottom:8px}
+.fieldTitle b{color:#e14c45}.fieldTitle span{color:#999;font-weight:400}
+.uploadGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.uploadBox{width:100%;height:105px;border:1px dashed #cfc7bb;background:#fff;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:#777;overflow:hidden}
+.uploadBox svg{width:20px}
+.uploadBox b{font-size:9px;color:#4e4a45}
+.uploadBox small,.uploadBox em{font-size:7px;color:#999;font-style:normal}
+.uploadBox.hasImage{position:relative;padding:0}
+.uploadBox.hasImage img{width:100%;height:100%;object-fit:cover}
+.uploadBox.hasImage span{position:absolute;bottom:5px;background:#171511dd;color:white;padding:5px;font-size:8px}
+.videoBox{width:100%;height:105px;border:1px dashed #cfc7bb;background:white;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;color:#777}
+.videoBox svg{width:22px}
+.videoBox b{font-size:9px;color:#4e4a45}.videoBox small,.videoBox em{font-size:8px;color:#999;font-style:normal}
+.bottomGrid{display:grid;grid-template-columns:1.45fr 1fr;gap:12px}
+.specInputs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.specInputs>div{display:grid;gap:5px}
+.specInputs span{font-size:8px;font-weight:700;color:#5c5750}
+.specInputs input{border:1px solid #ded8cf;border-radius:4px;padding:9px;font-size:9px;width:100%;outline:0}
+.addSpecBtn{border:1px solid #ded8cf;background:#f5f0e8;padding:8px 11px;font-size:9px;font-weight:700;margin-top:10px;cursor:pointer}
+.priceGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.peSide .peCard{padding:16px}
+.toggleRow{display:flex;justify-content:space-between;align-items:center;font-size:10px;margin-bottom:15px}
+.switch{width:36px;height:21px;border:0;border-radius:20px;background:#c7c3bd;padding:3px;cursor:pointer}
+.switch i{display:block;width:15px;height:15px;background:white;border-radius:50%;transition:.2s}
+.switch.on{background:#171511}.switch.on i{margin-left:15px}
+.checkRow{display:flex;align-items:center;gap:8px;font-size:10px;margin:12px 0}
+.checkRow input{width:15px;height:15px}.checkRow svg{width:12px;color:#888}
+.twoFields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.previewBox{display:flex;gap:10px}.previewBox img{width:92px;height:70px;object-fit:cover;border-radius:3px}.previewBox div{display:grid;align-content:center;gap:4px}.previewBox b{font-size:10px}.previewBox span{font-size:8px;color:#999}.previewBox button{border:0;background:#f5eee4;padding:7px;font-size:8px;font-weight:700;display:flex;gap:4px;align-items:center}.previewBox svg{width:10px}
+.peWide{grid-column:span 2}
+.tabPage{max-width:1000px}
+.uploadGrid.large{grid-template-columns:repeat(5,1fr)}
+.wideVideo{height:130px;margin-top:10px}
+.specLarge{display:grid;gap:10px}.specLargeRow{display:grid;grid-template-columns:150px 1fr 1fr;gap:10px;align-items:center}.specLargeRow b{font-size:10px}.specLargeRow input{border:1px solid #ddd7ce;padding:12px;font-size:10px}.specLargeRow span{font-size:10px;color:#777}
+.peSettings{display:grid;gap:12px}.peSettings label{display:grid;grid-template-columns:20px 1fr;column-gap:10px;border:1px solid #e5dfd6;padding:15px}.peSettings input{grid-row:span 2}.peSettings span{font-size:11px;font-weight:700}.peSettings small{grid-column:2;color:#888;font-size:9px}
+.peBottomActions{display:flex;justify-content:flex-end;gap:8px;padding:5px 0 30px}
+.adminDark{filter:invert(.88) hue-rotate(180deg)}
+@media(max-width:1100px){.peCanvas{grid-template-columns:1fr}.peSide{display:grid;grid-template-columns:1fr 1fr}.peSide .peCard:last-child{grid-column:span 2}.adminMain{padding:22px}.adminSidebar{width:190px;flex-basis:190px}}
+@media(max-width:800px){.adminSidebar{position:fixed;left:0;transform:translateX(-100%);transition:.2s}.sidebarCollapsed .adminSidebar{transform:translateX(0);width:208px}.mobileSideBtn{display:grid}.adminSearch{width:min(340px,50vw)}.adminHeader{padding:0 12px}.viewStore{display:none}.dashboardStats{grid-template-columns:1fr 1fr}.dashboardQuick{grid-template-columns:1fr 1fr}.peHead{display:block}.peHeadActions{margin-top:12px}.peBasicGrid,.mediaLayout,.bottomGrid{grid-template-columns:1fr}.peSide{grid-template-columns:1fr}.peSide .peCard:last-child{grid-column:auto}.uploadGrid{grid-template-columns:repeat(3,1fr)}.productListRow{grid-template-columns:45px 1fr 70px 35px}.productListRow .pill{display:none}.productListRow>button{display:none}.peTabs button{flex:none}.adminPageTitle h1{font-size:30px}}
+@media(max-width:600px){.adminMain{padding:16px 10px 40px}.adminHeader{gap:8px}.adminSearch{width:100%}.adminHeaderRight{display:none}.dashboardStats{grid-template-columns:1fr 1fr}.dashboardQuick{grid-template-columns:1fr}.adminPageTitle{display:block}.adminPageTitle .btn{margin-top:12px}.peHead h3{font-size:28px}.peHeadActions{display:grid;grid-template-columns:1fr 1fr}.peTabs{border-radius:4px}.peTabs button{padding:11px 12px}.peCard{padding:12px}.peBasicGrid{grid-template-columns:1fr}.peWide{grid-column:auto}.uploadGrid{grid-template-columns:repeat(2,1fr)}.specInputs{grid-template-columns:1fr 1fr}.priceGrid{grid-template-columns:1fr}.simpleRow{grid-template-columns:1fr auto}.simpleRow span{display:none}}
