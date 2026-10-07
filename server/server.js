@@ -156,14 +156,16 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
       let subcategoryName=categoryPath.length>2?categoryPath[2]:String(first.Type||"").trim();
       const findOrCreate=async(table,name,parentId=null)=>{
         if(!name)return null;
-        const [found]=await connection.query(parentId===null?"SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1":"SELECT id FROM subcategories WHERE category_id=? AND LOWER(name)=LOWER(?) LIMIT 1",parentId===null?[name]:[parentId,name]);
+        const slug=String(name).toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+        const [found]=await connection.query(parentId===null
+          ? "SELECT id FROM categories WHERE LOWER(name)=LOWER(?) OR LOWER(slug)=LOWER(?) LIMIT 1"
+          : "SELECT id FROM subcategories WHERE category_id=? AND (LOWER(name)=LOWER(?) OR LOWER(slug)=LOWER(?)) LIMIT 1",
+          parentId===null?[name,slug]:[parentId,name,slug]);
         if(found[0])return found[0].id;
         if(table==="categories"){
-          const slug=String(name).toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
           const [r]=await connection.query("INSERT INTO categories (name,slug) VALUES (?,?)",[name,slug]);
           return r.insertId;
         }
-        const slug=String(name).toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
         const [r]=await connection.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[parentId,name,slug]);
         return r.insertId;
       };
