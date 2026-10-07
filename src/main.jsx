@@ -208,7 +208,8 @@ function AdminReports({api,setNotice}){
  const [data,setData]=useState({daily:[],status:[]}); useEffect(()=>{api("/api/admin/reports").then(setData).catch(e=>setNotice(e.message))},[]);
  return <><div className="adminPageTitle"><div><div className="pageCrumb">Analytics <ChevronDown/> Reports</div><h1>Reports</h1><p>Real order and revenue reports from the database.</p></div></div><div className="dashboardStats"><div><span>Total Orders</span><b>{data.status.reduce((a,x)=>a+Number(x.count||0),0)}</b></div><div><span>Total Revenue</span><b>₹{data.status.reduce((a,x)=>a+Number(x.revenue||0),0).toLocaleString("en-IN")}</b></div><div><span>Report Days</span><b>{data.daily.length}</b></div><div><span>Statuses</span><b>{data.status.length}</b></div></div><section className="listCard" style={{marginTop:"16px"}}>{data.daily.map(x=><div className="simpleRow" key={x.day}><b>{String(x.day).slice(0,10)}</b><span>{x.orders} orders</span><strong>₹{Number(x.revenue||0).toLocaleString("en-IN")}</strong></div>)}</section></>;
 }
-\nfunction Admin(){
+
+function Admin(){
  const [section,setSection]=useState("products"); const [productView,setProductView]=useState("add");
  const [allowed,setAllowed]=useState(Boolean(localStorage.getItem("bh_admin_token")));
  const [stats,setStats]=useState({products:0,orders:0,customers:0,revenue:0}); const [rows,setRows]=useState([]);
