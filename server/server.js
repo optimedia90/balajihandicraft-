@@ -191,7 +191,7 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
       if(!existingId&&payload.slug){const [found]=await connection.query("SELECT id FROM products WHERE slug=? LIMIT 1",[payload.slug]);existingId=found[0]?.id||null}
       const keys=Object.keys(data);
       if(existingId){
-        await connection.query("UPDATE products SET "+keys.map(k+"= ?").join("," )+" WHERE id=?",[...keys.map(k=>data[k]),existingId]);
+        await connection.query("UPDATE products SET "+keys.map(k=>"`"+k+"`=?").join(",")+" WHERE id=?",[...keys.map(k=>data[k]),existingId]);
         updated++;
       }else{
         await connection.query("INSERT INTO products ("+keys.map(k=>"`"+k+"`").join(",")+") VALUES ("+keys.map(()=>"?").join(",")+")",keys.map(k=>data[k]));
