@@ -471,3 +471,30 @@
  .statementTrack{animation:none}
  *{scroll-behavior:auto!important;transition:none!important}
 }
+
+
+/* ===== Header: centered, zoom-safe, no category overflow ===== */
+.navwrap{display:grid;grid-template-columns:190px minmax(0,1fr) auto;align-items:center;justify-content:initial;gap:22px}
+.navwrap nav{min-width:0;justify-content:center;gap:clamp(14px,1.55vw,27px);overflow:hidden;white-space:nowrap}
+.navwrap nav>a,.navMenu{flex:0 1 auto}
+.navMenuTitle{font-size:clamp(10px,.72vw,13px)}
+.navicons{flex:none}
+@media(max-width:1450px) and (min-width:901px){
+ .navwrap{grid-template-columns:170px minmax(0,1fr) auto;gap:14px;padding:0 2.5%}
+ .navwrap nav{gap:14px}
+ .logo{min-width:170px}.logo b{font-size:13px}.logo small{font-size:7px}
+ .navicons{gap:3px}.navicons button,.navicons a{width:34px;height:34px}
+ .currencySwitcher{padding:0 5px}.currencySwitcher select{font-size:9px;padding-right:7px!important}
+}
+@media(max-width:1180px) and (min-width:901px){
+ .navwrap{grid-template-columns:150px minmax(0,1fr) auto;gap:10px}
+ .navwrap nav{gap:10px}
+ .logo{min-width:150px}.logo b{font-size:12px}.logo small{font-size:6px;letter-spacing:2px}
+ .navMenuTitle{font-size:9px}.navMenuTitle svg{width:9px}
+ .navicons{gap:0}.navicons button,.navicons a{width:30px;height:30px}.navicons svg{width:16px}
+ .currencySwitcher{height:30px}.currencySwitcher select{font-size:8px;max-width:55px}
+}
+@media(max-width:900px){
+ .navwrap{display:flex;justify-content:space-between;gap:8px}
+ .navwrap nav{overflow:visible}
+}
