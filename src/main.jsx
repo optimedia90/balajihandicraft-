@@ -129,12 +129,70 @@ function AdminLogin(){
  return <div className="container page adminAuth"><span className="eyebrow">STORE CONTROL</span><h1>Admin Login</h1><div className="accountCard authCard"><ShieldCheck/><h2>Balaji Handicraft Admin</h2><p>Authorized staff only. Sign in to manage the store.</p><form onSubmit={submit} noValidate><input type="email" placeholder="Admin email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} autoComplete="username" required/><input type="password" placeholder="Password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} autoComplete="current-password" required/>{error&&<div className="authMessage">{error}</div>}<button className="btn dark full" type="submit" disabled={loading}>{loading?"Signing in…":"Sign in to Admin"}</button></form><Link className="authBottom" to="/">← Back to store</Link></div></div>
 }
 function Admin(){
- const [tab,setTab]=useState("products");
+ const [tab,setTab]=useState("overview");
  const [allowed,setAllowed]=useState(Boolean(localStorage.getItem("bh_admin_token")));
+ const [stats,setStats]=useState({products:0,orders:0,customers:0,revenue:0});
+ const [rows,setRows]=useState([]);
+ const [categories,setCategories]=useState([]);
+ const [orders,setOrders]=useState([]);
+ const [settings,setSettings]=useState({store_name:"Balaji Handicraft",currency:"INR",shipping_threshold:42000,phone:"",email:"",address:"",announcement:""});
+ const [editing,setEditing]=useState(null);
+ const [notice,setNotice]=useState("");
+ const [loading,setLoading]=useState(false);
  const navigate=useNavigate();
+ const token=localStorage.getItem("bh_admin_token");
+ const api=async(path,options={})=>{
+   const res=await fetch(path,{...options,headers:{"Content-Type":"application/json","Authorization:"Bearer "+token,...(options.headers||{})}});
+   const text=await res.text();let data={};try{data=text?JSON.parse(text):{};}catch{data={message:text};}
+   if(!res.ok)throw new Error(data.message||"Request failed");
+   return data;
+ };
+ const load=async()=>{
+   setLoading(true);setNotice("");
+   try{
+     const [s,p,c,o,st]=await Promise.all([api("/api/admin/stats"),api("/api/admin/products"),api("/api/admin/categories"),api("/api/admin/orders"),api("/api/admin/settings")]);
+     setStats(s);setRows(p.products||[]);setCategories(c.categories||[]);setOrders(o.orders||[]);setSettings(st.settings||settings);
+   }catch(e){setNotice(e.message||"Could not load admin data");}
+   finally{setLoading(false);}
+ };
+ useEffect(()=>{if(allowed)load();},[allowed]);
  if(!allowed)return <AdminLogin/>;
- const logout=()=>{localStorage.removeItem("bh_admin_token");setAllowed(false);navigate("/admin");};
- return <div className="container admin"><div className="adminTop"><div><span className="eyebrow">STORE CONTROL</span><h1>Furniture Admin</h1><p>Manage the Balaji Handicraft storefront.</p></div><div className="adminTopActions"><button className="btn light" onClick={logout}>Sign out</button><Link className="btn dark" to="/">View store <ArrowRight/></Link></div></div><div className="adminStats"><div><span>Total Products</span><b>248</b><small>+12 this month</small></div><div><span>Orders</span><b>126</b><small>+18.4% this month</small></div><div><span>Revenue</span><b>$48.2k</b><small>+9.7% this month</small></div><div><span>Customers</span><b>1,842</b><small>+7.2% this month</small></div></div><div className="adminLayout"><aside><button className={tab==="products"?"on":""} onClick={()=>setTab("products")}>Products</button><button className={tab==="orders"?"on":""} onClick={()=>setTab("orders")}>Orders</button><button className={tab==="categories"?"on":""} onClick={()=>setTab("categories")}>Categories</button><button className={tab==="settings"?"on":""} onClick={()=>setTab("settings")}>Store settings</button></aside><section className="adminPanel">{tab==="products"?<><div className="panelHead"><h2>Furniture products</h2><button className="btn dark">+ Add product</button></div><div className="adminTable">{products.map(x=><div className="adminRow" key={x.id}><img src={x.img}/><div><b>{x.name}</b><span>{x.category} · {x.sub}</span></div><strong>{fmt(x.price)}</strong><span className="stock">In stock</span><button><Trash2/></button></div>)}</div></>:tab==="orders"?<><div className="panelHead"><h2>Recent orders</h2></div><div className="orderMock"><b>#BH-1048</b><span>Today · 3 items</span><strong>$1,248</strong><i>Paid</i></div><div className="orderMock"><b>#BH-1047</b><span>Yesterday · 1 item</span><strong>$429</strong><i>Processing</i></div><div className="orderMock"><b>#BH-1046</b><span>Yesterday · 2 items</span><strong>$768</strong><i>Shipped</i></div></>:tab==="categories"?<><div className="panelHead"><h2>Furniture categories</h2><button className="btn dark">+ Add category</button></div>{cats.slice(1).map(x=><div className="categoryRow"><b>{x[0]}</b><span>{products.filter(p=>p.category===x[1]).length} demo products</span><button>Edit</button></div>)}</>:<><div className="panelHead"><h2>Store settings</h2></div><div className="settingsBox"><label>Store name<input value="Balaji Handicraft" readOnly/></label><label>Currency<select><option>USD ($)</option><option>INR (₹)</option></select></label><label>Shipping threshold<input value="$500" readOnly/></label></div></>}</section></div></div>}
+ const logout=()=>{localStorage.removeItem("bh_admin_token");setAllowed(false);navigate("/admin",{replace:true});};
+ const removeProduct=async(id)=>{if(!confirm("Delete this product permanently?"))return;try{await api("/api/admin/products/"+id,{method:"DELETE"});setNotice("Product deleted.");load();}catch(e){setNotice(e.message);}};
+ const saveSettings=async()=>{try{await api("/api/admin/settings",{method:"PUT",body:JSON.stringify(settings)});setNotice("Store settings saved. Refresh the storefront to see changes.");}catch(e){setNotice(e.message);}};
+ const saveProduct=async()=>{
+   if(!editing?.name)return setNotice("Product name is required.");
+   const payload={...editing,price:Number(editing.price||0),old_price:Number(editing.old_price||0),qty:Number(editing.qty||0),status:editing.status||"active"};
+   try{
+     if(editing.id)await api("/api/admin/products/"+editing.id,{method:"PUT",body:JSON.stringify(payload)});
+     else await api("/api/admin/products",{method:"POST",body:JSON.stringify(payload)});
+     setEditing(null);setNotice("Product saved successfully.");load();
+   }catch(e){setNotice(e.message);}
+ };
+ const saveCategory=async()=>{
+   if(!editing?.name)return setNotice("Category name is required.");
+   try{
+     if(editing.id)await api("/api/admin/categories/"+editing.id,{method:"PUT",body:JSON.stringify(editing)});
+     else await api("/api/admin/categories",{method:"POST",body:JSON.stringify(editing)});
+     setEditing(null);setNotice("Category saved successfully.");load();
+   }catch(e){setNotice(e.message);}
+ };
+ const tabs=[["overview","Dashboard"],["products","Products"],["orders","Orders"],["categories","Categories"],["settings","Store settings"]];
+ return <div className="container admin">
+   <div className="adminTop"><div><span className="eyebrow">STORE CONTROL</span><h1>Furniture Admin</h1><p>Central control panel for products, orders, categories and website settings.</p></div><div className="adminTopActions"><button className="btn light" onClick={logout}>Sign out</button><Link className="btn dark" to="/">View store <ArrowRight/></Link></div></div>
+   {notice&&<div className="adminNotice">{notice}</div>}
+   <div className="adminLayout">
+     <aside>{tabs.map(([id,label])=><button key={id} className={tab===id?"on":""} onClick={()=>{setTab(id);setEditing(null)}}>{label}</button>)}</aside>
+     <section className="adminPanel">
+       {tab==="overview"&&<><div className="panelHead"><div><h2>Dashboard</h2><p className="adminMuted">Live data from your MySQL database.</p></div><button className="btn light" onClick={load}>Refresh</button></div><div className="adminStats"><div><span>Products</span><b>{stats.products}</b><small>Live catalog</small></div><div><span>Orders</span><b>{stats.orders}</b><small>Latest orders</small></div><div><span>Revenue</span><b>{fmt(stats.revenue/84)}</b><small>Database total</small></div><div><span>Customers</span><b>{stats.customers}</b><small>Registered users</small></div></div><div className="adminQuick"><button onClick={()=>{setTab("products");setEditing({name:"",sku:"",price:"",old_price:"",qty:"",image:"",description:"",status:"active"})}}>+ Add product</button><button onClick={()=>setTab("orders")}>View orders</button><button onClick={()=>setTab("categories")}>Manage categories</button><button onClick={()=>setTab("settings")}>Edit website settings</button></div></>}
+       {tab==="products"&&<><div className="panelHead"><div><h2>Products</h2><p className="adminMuted">{rows.length} products in database</p></div><button className="btn dark" onClick={()=>setEditing({name:"",sku:"",price:"",old_price:"",qty:"",image:"",description:"",status:"active"})}>+ Add product</button></div>{editing&&<div className="adminForm"><h3>{editing.id?"Edit product":"Add product"}</h3><div className="adminFormGrid"><input placeholder="Product name *" value={editing.name||""} onChange={e=>setEditing({...editing,name:e.target.value})}/><input placeholder="SKU" value={editing.sku||""} onChange={e=>setEditing({...editing,sku:e.target.value})}/><input placeholder="Price" type="number" value={editing.price||""} onChange={e=>setEditing({...editing,price:e.target.value})}/><input placeholder="Old price" type="number" value={editing.old_price||""} onChange={e=>setEditing({...editing,old_price:e.target.value})}/><input placeholder="Stock quantity" type="number" value={editing.qty||""} onChange={e=>setEditing({...editing,qty:e.target.value})}/><input placeholder="Image URL" value={editing.image||""} onChange={e=>setEditing({...editing,image:e.target.value})}/><textarea className="wideField" placeholder="Description" value={editing.description||""} onChange={e=>setEditing({...editing,description:e.target.value})}/><select value={editing.status||"active"} onChange={e=>setEditing({...editing,status:e.target.value})}><option value="active">Active</option><option value="inactive">Inactive</option></select></div><div className="formActions"><button className="btn light" onClick={()=>setEditing(null)}>Cancel</button><button className="btn dark" onClick={saveProduct}>Save product</button></div></div>}{loading?<p>Loading…</p>:rows.map(x=><div className="adminRow" key={x.id}><img src={x.image||"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300"}/><div><b>{x.name}</b><span>{x.sku||"No SKU"} · Stock {x.qty??"—"}</span></div><strong>{x.price!=null?fmt(Number(x.price)/84):"—"}</strong><span className="stock">{String(x.status||"active")}</span><button onClick={()=>setEditing({...x})}>Edit</button><button onClick={()=>removeProduct(x.id)}><Trash2/></button></div>)}</>}
+       {tab==="orders"&&<><div className="panelHead"><div><h2>Orders</h2><p className="adminMuted">Latest 100 orders from database.</p></div><button className="btn light" onClick={load}>Refresh</button></div>{orders.length?orders.map(o=><div className="orderMock" key={o.id}><b>#{o.order_number||o.id}</b><span>{o.created_at||o.date||"Order"} · {o.status||"Pending"}</span><strong>{o.total!=null?fmt(Number(o.total)/84):"—"}</strong><i>{o.payment_status||o.status||"Pending"}</i></div>):<div className="emptyAdmin">No orders found yet.</div>}</>}
+       {tab==="categories"&&<><div className="panelHead"><div><h2>Categories</h2><p className="adminMuted">Changes here control the catalog structure.</p></div><button className="btn dark" onClick={()=>setEditing({name:"",slug:""})}>+ Add category</button></div>{editing&&<div className="adminForm"><h3>{editing.id?"Edit category":"Add category"}</h3><div className="adminFormGrid"><input placeholder="Category name *" value={editing.name||""} onChange={e=>setEditing({...editing,name:e.target.value})}/><input placeholder="Slug" value={editing.slug||""} onChange={e=>setEditing({...editing,slug:e.target.value})}/></div><div className="formActions"><button className="btn light" onClick={()=>setEditing(null)}>Cancel</button><button className="btn dark" onClick={saveCategory}>Save category</button></div></div>}{categories.map(c=><div className="categoryRow" key={c.id}><b>{c.name}</b><span>{c.slug||""}</span><button onClick={()=>setEditing({...c})}>Edit</button></div>)}</>}
+       {tab==="settings"&&<><div className="panelHead"><div><h2>Website settings</h2><p className="adminMuted">These values are stored in MySQL and exposed to the storefront.</p></div></div><div className="settingsBox"><label>Store name<input value={settings.store_name||""} onChange={e=>setSettings({...settings,store_name:e.target.value})}/></label><label>Currency<select value={settings.currency||"INR"} onChange={e=>setSettings({...settings,currency:e.target.value})}><option value="INR">INR (₹)</option><option value="USD">USD ($)</option></select></label><label>Free shipping threshold<input type="number" value={settings.shipping_threshold||""} onChange={e=>setSettings({...settings,shipping_threshold:e.target.value})}/></label><label>Announcement<input value={settings.announcement||""} onChange={e=>setSettings({...settings,announcement:e.target.value})}/></label><label>Phone<input value={settings.phone||""} onChange={e=>setSettings({...settings,phone:e.target.value})}/></label><label>Email<input value={settings.email||""} onChange={e=>setSettings({...settings,email:e.target.value})}/></label><label>Address<input value={settings.address||""} onChange={e=>setSettings({...settings,address:e.target.value})}/></label><button className="btn dark" onClick={saveSettings}>Save website settings</button></div></>}
+     </section>
+   </div>
+ </div>
+}
 function AuthPage({mode}){
  const navigate=useNavigate();
  const [method,setMethod]=useState("email");
