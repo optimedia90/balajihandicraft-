@@ -1,7 +1,7 @@
 import React,{useEffect,useMemo,useState} from "react";
 import {createRoot} from "react-dom/client";
 import {HashRouter,useLocation,useNavigate,useParams,Link} from "react-router-dom";
-import {Search,ShoppingBag,Heart,User,Menu,X,ChevronDown,ArrowRight,Star,SlidersHorizontal,Trash2,Minus,Plus,Check,Truck,ShieldCheck,RotateCcw,Instagram,Facebook,Youtube,Home,LayoutDashboard,Package,ShoppingCart,Users,Image as ImageIcon,FileText,Tag,MessageSquare,Settings,BarChart3,LogOut,Sun,Moon,Bell,ExternalLink,Save,Video,FileImage,Boxes,Ticket,StarHalf,PanelLeftClose,PanelLeftOpen,CalendarDays,Info} from "lucide-react";
+import {Search,ShoppingBag,Heart,User,Menu,X,ChevronDown,ArrowRight,Star,SlidersHorizontal,Trash2,Minus,Plus,Check,Truck,ShieldCheck,RotateCcw,Instagram,Facebook,Youtube,Home as HomeIcon,LayoutDashboard,Package,ShoppingCart,Users,Image as ImageIcon,FileText,Tag,MessageSquare,Settings,BarChart3,LogOut,Sun,Moon,Bell,ExternalLink,Save,Video,FileImage,Boxes,Ticket,StarHalf,PanelLeftClose,PanelLeftOpen,CalendarDays,Info} from "lucide-react";
 import "./styles.css";
 
 const demoProducts=[
@@ -198,7 +198,7 @@ function Admin(){
  const saveSettings=async()=>{try{await api("/api/admin/settings",{method:"PUT",body:JSON.stringify(settings)});setNotice("Store settings saved.")}catch(e){setNotice(e.message)}};
  const saveCategory=async()=>{if(!editing?.name)return setNotice("Category name is required.");try{if(editing.id)await api("/api/admin/categories/"+editing.id,{method:"PUT",body:JSON.stringify(editing)});else await api("/api/admin/categories",{method:"POST",body:JSON.stringify(editing)});setEditing(null);setNotice("Category saved.");load()}catch(e){setNotice(e.message)}};
  const logout=()=>{localStorage.removeItem("bh_admin_token");setAllowed(false);navigate("/admin",{replace:true})};
- const nav=[["dashboard","Dashboard",LayoutDashboard],["products","Products",Package,true],["categories","Categories",FileText],["orders","Orders",ShoppingCart],["customers","Customers",Users],["banners","Banners",ImageIcon],["homepage","Homepage",Home],["blog","Blog",FileText],["coupons","Coupons",Ticket],["reviews","Reviews",Star],["messages","Messages",MessageSquare],["seo","SEO Settings",Search],["store","Store Settings",Settings],["users","Users",User],["reports","Reports",BarChart3]];
+ const nav=[["dashboard","Dashboard",LayoutDashboard],["products","Products",Package,true],["categories","Categories",FileText],["orders","Orders",ShoppingCart],["customers","Customers",Users],["banners","Banners",ImageIcon],["homepage","Homepage",HomeIcon],["blog","Blog",FileText],["coupons","Coupons",Ticket],["reviews","Reviews",Star],["messages","Messages",MessageSquare],["seo","SEO Settings",Search],["store","Store Settings",Settings],["users","Users",User],["reports","Reports",BarChart3]];
  const sectionTitle=nav.find(x=>x[0]===section)?.[1]||"Dashboard";
  const Placeholder=({title})=><div className="adminPlaceholder"><div><Settings/><h2>{title}</h2><p>This admin module is ready for the next database-connected step.</p><button className="btn dark" onClick={()=>setSection("products")}>Go to Products</button></div></div>;
  return <div className={"adminApp "+(collapsed?"sidebarCollapsed ":"")+(dark?"adminDark":"")}>
