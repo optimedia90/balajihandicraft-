@@ -205,6 +205,28 @@ app.put("/api/admin/settings",auth,asyncHandler(async(req,res)=>{
   res.json({ok:true});
 }));
 
+async function ensureAdminContent(){
+  await db.query("CREATE TABLE IF NOT EXISTS coupons (id INT AUTO_INCREMENT PRIMARY KEY, code VARCHAR(100) UNIQUE, discount_type VARCHAR(20) DEFAULT 'percent', discount_value DECIMAL(12,2) DEFAULT 0, min_order DECIMAL(12,2) DEFAULT 0, expires_at DATE NULL, status VARCHAR(30) DEFAULT 'active', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+  const defs={homepage_hero:"VARCHAR(500)",homepage_subtitle:"TEXT",homepage_image:"VARCHAR(500)",seo_title:"VARCHAR(255)",meta_description:"VARCHAR(500)",seo_keywords:"VARCHAR(500)",favicon:"VARCHAR(500)"};
+  const existing=new Set(await columns("store_settings"));
+  for(const [name,type] of Object.entries(defs)) if(!existing.has(name)) await db.query("ALTER TABLE store_settings ADD COLUMN "+name+" "+type);
+}
+async function adminRows(table){ const [rows]=await db.query("SELECT * FROM "+table+" ORDER BY id DESC"); return rows; }
+async function adminCreate(table,body){ const cols=await columns(table); const data=pick(body||{},cols.filter(c=>c!=="id"&&c!=="created_at"&&c!=="updated_at")); const keys=Object.keys(data); if(!keys.length) throw new Error("No data supplied"); const [result]=await db.query("INSERT INTO "+table+" ("+keys.join(",")+") VALUES ("+keys.map(()=>"?").join(",")+")",keys.map(k=>data[k])); return result.insertId; }
+async function adminUpdate(table,id,body){ const cols=await columns(table); const data=pick(body||{},cols.filter(c=>c!=="id"&&c!=="created_at"&&c!=="updated_at")); const keys=Object.keys(data); if(!keys.length) throw new Error("No changes supplied"); await db.query("UPDATE "+table+" SET "+keys.map(k=>k+"=?").join(",")+" WHERE id=?",[...keys.map(k=>data[k]),id]); }
+for(const table of ["banners","blog_posts","coupons","reviews","contact_messages"]){
+  app.get("/api/admin/"+table,auth,asyncHandler(async(req,res)=>res.json({items:await adminRows(table)})));
+  app.post("/api/admin/"+table,auth,asyncHandler(async(req,res)=>res.status(201).json({id:await adminCreate(table,req.body)})));
+  app.put("/api/admin/"+table+"/:id",auth,asyncHandler(async(req,res)=>{await adminUpdate(table,req.params.id,req.body);res.json({ok:true})}));
+  app.delete("/api/admin/"+table+"/:id",auth,asyncHandler(async(req,res)=>{await db.query("DELETE FROM "+table+" WHERE id=?",[req.params.id]);res.json({ok:true})}));
+}
+app.get("/api/admin/customers",auth,asyncHandler(async(req,res)=>{ const [items]=await db.query("SELECT id,name,email,phone,created_at FROM users ORDER BY id DESC"); res.json({items}); }));
+app.get("/api/admin/users",auth,asyncHandler(async(req,res)=>{ const cols=await columns("users"); const safe=cols.filter(c=>!["password","password_hash"].includes(c)); const [items]=await db.query("SELECT "+safe.join(",")+" FROM users ORDER BY id DESC"); res.json({items}); }));
+app.get("/api/admin/reports",auth,asyncHandler(async(req,res)=>{ const [daily]=await db.query("SELECT DATE(created_at) day,COUNT(*) orders,COALESCE(SUM(total),0) revenue FROM orders GROUP BY DATE(created_at) ORDER BY day DESC LIMIT 30"); const [status]=await db.query("SELECT status,COUNT(*) count,COALESCE(SUM(total),0) revenue FROM orders GROUP BY status"); res.json({daily,status}); }));
+app.get("/api/admin/homepage",auth,asyncHandler(async(req,res)=>{ await ensureAdminContent(); const [rows]=await db.query("SELECT * FROM store_settings WHERE id=1 LIMIT 1"); res.json({settings:rows[0]||{}}); }));
+app.put("/api/admin/homepage",auth,asyncHandler(async(req,res)=>{ await ensureAdminContent(); await adminUpdate("store_settings",1,pick(req.body||{},["homepage_hero","homepage_subtitle","homepage_image"])); res.json({ok:true}); }));
+app.get("/api/admin/seo",auth,asyncHandler(async(req,res)=>{ await ensureAdminContent(); const [rows]=await db.query("SELECT * FROM store_settings WHERE id=1 LIMIT 1"); res.json({settings:rows[0]||{}}); }));
+app.put("/api/admin/seo",auth,asyncHandler(async(req,res)=>{ await ensureAdminContent(); await adminUpdate("store_settings",1,pick(req.body||{},["seo_title","meta_description","seo_keywords","favicon"])); res.json({ok:true}); }));
 app.get("/api/store/products",asyncHandler(async(req,res)=>{
   const [rows]=await db.query("SELECT p.*, c.name AS category_name, s.name AS subcategory_name FROM products p LEFT JOIN categories c ON c.id=p.category_id LEFT JOIN subcategories s ON s.id=p.subcategory_id WHERE p.status IS NULL OR p.status=1 OR p.status=\'active\' ORDER BY p.id DESC");
   res.json({products:rows});
