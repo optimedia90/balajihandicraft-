@@ -157,7 +157,7 @@ app.put("/api/admin/settings",auth,asyncHandler(async(req,res)=>{
 }));
 
 app.get("/api/store/products",asyncHandler(async(req,res)=>{
-  const [rows]=await db.query("SELECT * FROM products WHERE status IS NULL OR status=1 OR status='active' ORDER BY id DESC");
+  const [rows]=await db.query("SELECT p.*, c.name AS category_name, s.name AS subcategory_name FROM products p LEFT JOIN categories c ON c.id=p.category_id LEFT JOIN subcategories s ON s.id=p.subcategory_id WHERE p.status IS NULL OR p.status=1 OR p.status=\'active\' ORDER BY p.id DESC");
   res.json({products:rows});
 }));
 app.get("/api/store/categories",asyncHandler(async(req,res)=>{
