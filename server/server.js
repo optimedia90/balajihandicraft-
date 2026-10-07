@@ -188,7 +188,21 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
       const data={}; for(const key of productCols) if(Object.prototype.hasOwnProperty.call(payload,key))data[key]=payload[key];
       let existingId=null;
       if(sku){const [found]=await connection.query("SELECT id FROM products WHERE sku=? LIMIT 1",[sku]);existingId=found[0]?.id||null}
-      if(!existingId&&payload.slug){const [found]=await connection.query("SELECT id FROM products WHERE slug=? LIMIT 1",[payload.slug]);existingId=found[0]?.id||null}
+      if(payload.slug){
+        const [slugRows]=await connection.query("SELECT id,sku FROM products WHERE slug=? LIMIT 1",[payload.slug]);
+        if(slugRows[0] && !existingId){
+          const suffix=sku?String(sku).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40):"product";
+          let candidate=payload.slug+"-"+(suffix||"product");
+          let n=2;
+          while(true){
+            const [collision]=await connection.query("SELECT id FROM products WHERE slug=? LIMIT 1",[candidate]);
+            if(!collision[0])break;
+            candidate=payload.slug+"-"+(suffix||"product")+"-"+n++;
+          }
+          payload.slug=candidate;
+          data.slug=candidate;
+        }
+      }
       const keys=Object.keys(data);
       if(existingId){
         await connection.query("UPDATE products SET "+keys.map(k=>"`"+k+"`=?").join(",")+" WHERE id=?",[...keys.map(k=>data[k]),existingId]);
