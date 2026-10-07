@@ -81,3 +81,65 @@
  .adminTop h1{font-size:40px}
  .adminPanel{padding:15px}
 }
+
+/* Product editor */
+.productEditor{border:1px solid var(--line);background:#fffdf9;box-shadow:0 18px 50px #1715110b}
+.peHead{padding:24px 26px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start}
+.peHead h3{font:600 27px "Playfair Display";margin:6px 0}
+.peHead p{font-size:11px;color:var(--muted);margin:0}
+.peClose{border:0;background:var(--cream);width:34px;height:34px;font-size:22px;cursor:pointer}
+.peTabs{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--line);padding:0 14px}
+.peTabs button{border:0;background:transparent;padding:14px 13px;font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent}
+.peTabs button.active{color:var(--ink);border-bottom-color:var(--ink)}
+.peBody{padding:24px 26px;min-height:330px}
+.peGrid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.peField{display:grid;gap:7px;font-size:10px;font-weight:700}
+.peField>span{letter-spacing:.2px}
+.peField input,.peField select,.peField textarea,.specRow input{border:1px solid var(--line);padding:12px;background:#fff;outline:0;font-size:11px;width:100%}
+.peField textarea{resize:vertical;line-height:1.6}
+.peWide{grid-column:span 2}
+.peFooter{border-top:1px solid var(--line);padding:15px 26px;display:flex;justify-content:space-between;gap:10px;background:var(--cream)}
+.peFooter>div{display:flex;gap:8px}
+.peMedia{display:grid;gap:18px}
+.mediaMain{display:grid;gap:7px}
+.uploadBtn{width:max-content;border:1px solid var(--line);background:white;padding:9px 13px;font-size:10px;font-weight:700;cursor:pointer}
+.uploadBtn:hover{background:var(--cream)}
+.videoUpload{margin-top:-5px}
+.mediaPreview{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:5px}
+.mediaPreview div{background:#f1eee8;border:1px solid var(--line);padding:6px}
+.mediaPreview img{display:block;width:100%;height:100px;object-fit:cover}
+.mediaPreview small{display:block;font-size:8px;color:var(--muted);padding:5px 2px}
+.peSpecs{display:grid;gap:10px}
+.specTitle{display:flex;justify-content:space-between;align-items:end;margin-bottom:5px}
+.specTitle b{font:600 18px "Playfair Display"}
+.specTitle span{font-size:9px;color:var(--muted)}
+.specRow{display:grid;grid-template-columns:120px 1fr 1fr;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:10px 0}
+.specRow b{font-size:10px}
+.specRow span{font-size:10px;color:var(--muted)}
+.specRow .single{grid-column:2}
+.priceNote{padding:14px;background:#f0ece5;border-left:3px solid var(--accent);font-size:10px;color:var(--muted)}
+.peSettings{display:grid;gap:12px;max-width:700px}
+.peSettings label{display:grid;grid-template-columns:20px 1fr;column-gap:10px;align-items:center;border:1px solid var(--line);padding:16px;background:white;cursor:pointer}
+.peSettings input{grid-row:span 2;width:16px;height:16px}
+.peSettings span{font-size:11px;font-weight:700}
+.peSettings small{grid-column:2;color:var(--muted);font-size:9px;margin-top:4px}
+@media(max-width:900px){
+ .peGrid{grid-template-columns:1fr}
+ .peWide{grid-column:auto}
+ .mediaPreview{grid-template-columns:repeat(3,1fr)}
+ .peBody{padding:18px}
+ .peHead{padding:20px 18px}
+ .peFooter{padding:13px 18px}
+ .specTitle{display:block}
+ .specTitle span{display:block;margin-top:5px}
+ .specRow{grid-template-columns:80px 1fr 1fr}
+}
+@media(max-width:600px){
+ .peTabs button{padding:12px 9px;font-size:9px}
+ .mediaPreview{grid-template-columns:repeat(2,1fr)}
+ .specRow{grid-template-columns:1fr 1fr}
+ .specRow b{grid-column:span 2}
+ .specRow .single{grid-column:1}
+ .peFooter{display:block}
+ .peFooter>div{margin-top:10px;justify-content:flex-end}
+}
