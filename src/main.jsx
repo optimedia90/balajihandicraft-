@@ -19,6 +19,7 @@ const demoProducts=[
 {id:12,name:"Boucle Round Coffee Table",category:"Tables",sub:"Coffee Tables",price:199,old:249,rating:4.6,img:"https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=900"}
  ];
 let products=[...demoProducts];
+let liveCategoryMenus=[];
 const normalizeProduct=(p)=>({id:Number(p.id),name:p.name||p.title||"Furniture Product",category:p.category_name||p.category||"Furniture",sub:p.subcategory_name||p.sub||"",price:Number(p.price||0),old:Number(p.old_price||p.old||p.price||0),rating:Number(p.rating||4.8),img:p.image||p.img||"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900",tag:p.featured?"Featured":""});
 const cats=[["All Furniture",""],["Beds","Beds"],["Sofas","Sofas"],["Dining","Dining"],["Chairs","Chairs"],["Tables","Tables"],["Storage","Storage"]];
 const categoryMenus=[
@@ -36,24 +37,31 @@ function App(){
  const [wish,setWish]=useState(()=>JSON.parse(localStorage.getItem("bh_wish")||"[]"));
  const [currency,setCurrency]=useState(()=>localStorage.getItem("bh_currency")||"USD");
  const [,setStoreVersion]=useState(0);
+ const [storeSettings,setStoreSettings]=useState(null);
  activeCurrency=currency;
  useEffect(()=>localStorage.setItem("bh_currency",currency),[currency]);
  useEffect(()=>localStorage.setItem("bh_cart",JSON.stringify(cart)),[cart]);
  useEffect(()=>localStorage.setItem("bh_wish",JSON.stringify(wish)),[wish]);
  useEffect(()=>{
-   fetch("/api/store/products").then(r=>r.ok?r.json():Promise.reject()).then(data=>{
-     if(Array.isArray(data.products)&&data.products.length){products=data.products.map(normalizeProduct);setStoreVersion(v=>v+1);}
+   Promise.all([fetch("/api/store/products"),fetch("/api/store/categories"),fetch("/api/store/settings")]).then(async([p,c,s])=>[await p.json(),await c.json(),await s.json()]).then(([p,c,s])=>{
+     if(Array.isArray(p.products)&&p.products.length)products=p.products.map(normalizeProduct);
+     if(Array.isArray(c.categories)){
+       const subs=Array.isArray(c.subcategories)?c.subcategories:[];
+       liveCategoryMenus=c.categories.map(cat=>({name:cat.name,slug:cat.slug||cat.name,subs:subs.filter(x=>Number(x.category_id)===Number(cat.id)).map(x=>x.name)}));
+     }
+     if(s&&s.settings)setStoreSettings(s.settings);
+     setStoreVersion(v=>v+1);
    }).catch(()=>{});
  },[]);
  const add=(p)=>setCart(c=>{const x=c.find(i=>i.id===p.id);return x?c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...c,{...p,qty:1}]});
  const toggleWish=(p)=>setWish(w=>w.some(x=>x.id===p.id)?w.filter(x=>x.id!==p.id):[...w,p]);
- return <><Header cart={cart.length} wish={wish.length} currency={currency} setCurrency={setCurrency}/><main><RoutesView cart={cart} setCart={setCart} wish={wish} toggleWish={toggleWish} add={add}/></main><Footer/></>
+ return <><Header cart={cart.length} wish={wish.length} currency={currency} setCurrency={setCurrency} settings={storeSettings}/><main><RoutesView cart={cart} setCart={setCart} wish={wish} toggleWish={toggleWish} add={add}/></main><Footer/></>
 }
-function Header({cart,wish,currency,setCurrency}){
+function Header({cart,wish,currency,setCurrency,settings}){
  const [open,setOpen]=useState(false);const [search,setSearch]=useState(false);
- return <header className="header"><div className="topbar">Free shipping on orders over {fmt(500)} <span>•</span> Handcrafted furniture, made to last</div>
+ return <header className="header"><div className="topbar">{settings?.announcement||("Free shipping on orders over "+fmt(500))} <span>•</span> Handcrafted furniture, made to last</div>
  <div className="navwrap"><Link to="/" className="logo"><span className="logoMark">BH</span><span><b>BALAJI</b><small>HANDICRAFT</small></span></Link>
- <nav className={open?"mobile open":"mobile"}><Link to="/shop" onClick={()=>setOpen(false)}>All Furniture</Link>{categoryMenus.map(cat=><div className="navMenu" key={cat.name}><Link className="navMenuTitle" to={"/shop?cat="+cat.slug} onClick={()=>setOpen(false)}>{cat.name}<ChevronDown/></Link><div className="dropdownMenu">{cat.subs.map(sub=><Link key={sub} to={"/shop?cat="+cat.slug+"&sub="+encodeURIComponent(sub)} onClick={()=>setOpen(false)}>{sub}</Link>)}</div></div>)}</nav>
+ <nav className={open?"mobile open":"mobile"}><Link to="/shop" onClick={()=>setOpen(false)}>All Furniture</Link>{(liveCategoryMenus.length?liveCategoryMenus:categoryMenus).map(cat=><div className="navMenu" key={cat.name}><Link className="navMenuTitle" to={"/shop?cat="+cat.slug} onClick={()=>setOpen(false)}>{cat.name}<ChevronDown/></Link><div className="dropdownMenu">{cat.subs.map(sub=><Link key={sub} to={"/shop?cat="+cat.slug+"&sub="+encodeURIComponent(sub)} onClick={()=>setOpen(false)}>{sub}</Link>)}</div></div>)}</nav>
  <div className="navicons"><div className="currencySwitcher"><span>{currency==="USD"?"🇺🇸":"🇮🇳"}</span><select aria-label="Currency" value={currency} onChange={e=>setCurrency(e.target.value)}><option value="USD">USD ($)</option><option value="INR">INR (₹)</option></select></div><button onClick={()=>setSearch(!search)}><Search/></button><Link to="/wishlist" className="countIcon"><Heart/><i>{wish}</i></Link><Link to="/account"><User/></Link><Link to="/cart" className="countIcon"><ShoppingBag/><i>{cart}</i></Link><button className="hamb" onClick={()=>setOpen(!open)}>{open?<X/>:<Menu/>}</button></div></div>
  {search&&<div className="searchbar"><Search/><input autoFocus placeholder="Search beds, sofas, dining tables..." onKeyDown={e=>{if(e.key==="Enter")location.href="/shop?q="+encodeURIComponent(e.currentTarget.value)}}/></div>}
  </header>
