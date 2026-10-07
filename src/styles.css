@@ -38,3 +38,46 @@
 .authMessage{font-size:10px;padding:10px;background:var(--cream);color:var(--ink);line-height:1.5}
 .authTextBtn{border:0;background:none;text-decoration:underline;margin-top:18px;font-size:10px;cursor:pointer}
 @media(max-width:600px){.authName{grid-template-columns:1fr}.authCard{padding:28px!important}}
+
+
+/* Advanced admin panel */
+.admin{max-width:1380px}
+.adminTopActions{display:flex;gap:10px}
+.adminNotice{margin:0 0 20px;padding:12px 15px;background:#f0ece5;border-left:3px solid var(--accent);font-size:11px}
+.adminMuted{font-size:11px;color:var(--muted);margin:5px 0}
+.adminStats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 25px}
+.adminStats>div{background:var(--cream);padding:20px;border:1px solid var(--line)}
+.adminStats span,.adminStats small{display:block;font-size:10px;color:var(--muted)}
+.adminStats b{display:block;font:600 28px "Playfair Display";margin:8px 0}
+.adminQuick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:25px}
+.adminQuick button{border:1px solid var(--line);background:white;padding:15px;text-align:left;font-size:11px;font-weight:700;cursor:pointer}
+.adminQuick button:hover{border-color:var(--accent);transform:translateY(-1px)}
+.adminForm{background:var(--cream);border:1px solid var(--line);padding:22px;margin-bottom:20px}
+.adminForm h3{font:600 24px "Playfair Display";margin:0 0 18px}
+.adminFormGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.adminFormGrid input,.adminFormGrid textarea,.adminFormGrid select{border:1px solid var(--line);padding:13px;background:white;outline:0;font-size:11px}
+.adminFormGrid textarea{min-height:100px;resize:vertical}
+.wideField{grid-column:span 2}
+.formActions{display:flex;justify-content:flex-end;gap:10px;margin-top:15px}
+.adminRow{grid-template-columns:55px 1fr 100px 90px 55px 35px!important}
+.adminRow button{border:1px solid var(--line);background:white;padding:7px;cursor:pointer;font-size:9px}
+.adminRow button:hover{background:var(--cream)}
+.emptyAdmin{padding:50px;text-align:center;color:var(--muted);border:1px dashed var(--line)}
+.settingsBox{max-width:700px}
+.settingsBox label{margin-bottom:4px}
+.settingsBox input,.settingsBox select{width:100%}
+@media(max-width:900px){
+ .adminTopActions{margin-top:15px}
+ .adminStats{grid-template-columns:1fr 1fr}
+ .adminQuick{grid-template-columns:1fr 1fr}
+ .adminFormGrid{grid-template-columns:1fr}
+ .wideField{grid-column:auto}
+ .adminRow{grid-template-columns:45px 1fr 75px!important}
+ .adminRow .stock,.adminRow button:nth-last-child(2){display:none}
+}
+@media(max-width:600px){
+ .adminStats{grid-template-columns:1fr 1fr}
+ .adminQuick{grid-template-columns:1fr}
+ .adminTop h1{font-size:40px}
+ .adminPanel{padding:15px}
+}
