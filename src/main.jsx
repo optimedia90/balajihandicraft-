@@ -87,17 +87,38 @@ function Blog(){return <div className="container page"><span className="eyebrow"
 function AdminLogin(){
  const [form,setForm]=useState({email:"",password:""});
  const [error,setError]=useState("");
+ const [loading,setLoading]=useState(false);
  const navigate=useNavigate();
+
  const submit=async e=>{
-   e.preventDefault();setError("");
+   if(e)e.preventDefault();
+   if(loading)return;
+   setError("");
+   const email=form.email.trim().toLowerCase();
+   const password=form.password;
+   if(!email||!password){setError("Please enter admin email and password.");return;}
+   setLoading(true);
    try{
-     const res=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(form)});
-     const data=await res.json();
-     if(!res.ok) throw new Error(data.message||"Invalid admin credentials");
-     localStorage.setItem("bh_admin_token",data.token);navigate("/admin");
-   }catch(err){setError(err.message||"Unable to sign in");}
+     const res=await fetch(new URL("/api/admin/login",window.location.origin),{
+       method:"POST",
+       headers:{"Content-Type":"application/json","Accept":"application/json"},
+       body:JSON.stringify({email,password})
+     });
+     const text=await res.text();
+     let data={};
+     try{data=text?JSON.parse(text):{};}catch{data={message:text||"Server returned an invalid response"};}
+     if(!res.ok)throw new Error(data.message||"Invalid admin email or password");
+     if(!data.token)throw new Error("Login succeeded but no admin token was returned.");
+     localStorage.setItem("bh_admin_token",data.token);
+     navigate("/admin",{replace:true});
+   }catch(err){
+     setError(err.message||"Unable to sign in. Please try again.");
+   }finally{
+     setLoading(false);
+   }
  };
- return <div className="container page adminAuth"><span className="eyebrow">STORE CONTROL</span><h1>Admin Login</h1><div className="accountCard authCard"><ShieldCheck/><h2>Balaji Handicraft Admin</h2><p>Authorized staff only. Sign in to manage the store.</p><form onSubmit={submit}><input type="email" placeholder="Admin email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} required/><input type="password" placeholder="Password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} required/>{error&&<div className="authMessage">{error}</div>}<button className="btn dark full" type="submit">Sign in to Admin</button></form><Link className="authBottom" to="/">← Back to store</Link></div></div>
+
+ return <div className="container page adminAuth"><span className="eyebrow">STORE CONTROL</span><h1>Admin Login</h1><div className="accountCard authCard"><ShieldCheck/><h2>Balaji Handicraft Admin</h2><p>Authorized staff only. Sign in to manage the store.</p><form onSubmit={submit} noValidate><input type="email" placeholder="Admin email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} autoComplete="username" required/><input type="password" placeholder="Password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} autoComplete="current-password" required/>{error&&<div className="authMessage">{error}</div>}<button className="btn dark full" type="submit" disabled={loading}>{loading?"Signing in…":"Sign in to Admin"}</button></form><Link className="authBottom" to="/">← Back to store</Link></div></div>
 }
 function Admin(){
  const [tab,setTab]=useState("products");
