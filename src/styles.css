@@ -15,3 +15,9 @@
  .dropdownMenu a{padding:7px 4px!important;font-size:10px!important}
  .mobile.open{max-height:calc(100vh - 112px);overflow:auto}
 }
+
+/* Currency switcher */
+.currencySwitcher{height:34px;display:flex;align-items:center;gap:4px;border:1px solid var(--line);background:#fff;padding:0 7px;border-radius:3px}
+.currencySwitcher span{font-size:14px;line-height:1}
+.currencySwitcher select{border:0!important;padding:0 12px 0 0!important;background:transparent!important;font-size:10px;font-weight:700;color:var(--ink);outline:0;cursor:pointer}
+@media(max-width:900px){.currencySwitcher{height:32px}.currencySwitcher select{font-size:9px;max-width:82px}.navicons{gap:3px}}
