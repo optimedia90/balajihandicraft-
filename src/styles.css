@@ -295,3 +295,18 @@
 @media(max-width:600px){.adminMain{padding:16px 10px 40px}.adminHeader{gap:8px}.adminSearch{width:100%}.adminHeaderRight{display:none}.dashboardStats{grid-template-columns:1fr 1fr}.dashboardQuick{grid-template-columns:1fr}.adminPageTitle{display:block}.adminPageTitle .btn{margin-top:12px}.peHead h3{font-size:28px}.peHeadActions{display:grid;grid-template-columns:1fr 1fr}.peTabs{border-radius:4px}.peTabs button{padding:11px 12px}.peCard{padding:12px}.peBasicGrid{grid-template-columns:1fr}.peWide{grid-column:auto}.uploadGrid{grid-template-columns:repeat(2,1fr)}.specInputs{grid-template-columns:1fr 1fr}.priceGrid{grid-template-columns:1fr}.simpleRow{grid-template-columns:1fr auto}.simpleRow span{display:none}}
 
 .headerPopoverWrap{position:relative}.headerIconBtn{position:relative;display:grid;place-items:center}.headerPopover{position:absolute;right:0;top:calc(100% + 10px);z-index:1000;width:290px;background:#fff;border:1px solid #e6e0d8;border-radius:12px;box-shadow:0 18px 50px rgba(0,0,0,.14);overflow:hidden;color:#222}.popoverTitle{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid #eee}.popoverTitle button{border:0;background:transparent;font-size:20px;cursor:pointer}.notificationItem{width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:12px 15px;border:0;border-bottom:1px solid #f0ece7;background:#fff;text-align:left;cursor:pointer}.notificationItem:hover,.userPopover button:hover{background:#f7f4ef}.notificationItem span{font-size:11px;color:#777}.popoverEmpty{padding:18px;color:#777;font-size:12px}.userPopover{width:210px;padding:6px}.userPopover button{width:100%;display:flex;align-items:center;gap:9px;border:0;background:#fff;padding:10px 12px;border-radius:7px;text-align:left;cursor:pointer;font-size:12px}.userPopover button svg{width:15px;height:15px}.userPopover .danger{color:#b42318}.adminDark .headerPopover{filter:invert(.88) hue-rotate(180deg)}
+
+/* Mobile storefront polish */
+@media(max-width:600px){
+ .topbar{height:34px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:9px 12px;font-size:9px}
+ .navwrap{height:65px;padding:0 15px;gap:8px;min-width:0}
+ .logo{flex:1;min-width:0;gap:8px}.logoMark{width:34px;height:34px;flex:none}.logo b{font-size:12px;letter-spacing:2px}.logo small{font-size:7px;letter-spacing:2.5px}
+ .navicons{gap:1px;flex:none}.navicons button,.navicons a{width:34px;height:34px}.navicons svg{width:18px;height:18px}
+ .currencySwitcher{height:34px;max-width:94px;min-width:78px;padding:0 3px!important;gap:2px!important}.currencySwitcher select{max-width:66px;font-size:9px!important;padding:0!important}
+ .navicons>a[href="/cart"]{display:none}.hamb{display:grid!important}
+ .mobile.open{top:99px;left:0;right:0;padding:20px 22px;max-height:calc(100vh - 99px);overflow:auto}
+ .hero{grid-template-columns:1fr;padding:43px 23px 35px;gap:18px;min-height:0}
+ .heroText{max-width:none}.hero h1{font-size:52px;line-height:.91;letter-spacing:-2.8px;margin:16px 0 22px}.hero p{font-size:15px;line-height:1.75}.actions{gap:16px;margin-top:27px;flex-wrap:wrap}.actions .btn{padding:14px 18px}
+ .heroVisual{min-height:365px;margin:5px -4px 0}.heroVisual:before{width:350px;height:350px}.heroCard{width:88%;padding:9px;transform:rotate(2deg)}.heroCard img{height:285px}.heroCard div{padding:13px}.heroCard b{font-size:14px}.heroCard span{font-size:10px}.floatBadge{right:1%;bottom:48px;width:94px;height:94px;font-size:21px}.floatBadge small{font-size:8px;margin-top:-28px}
+ .trust{padding:27px 22px;gap:18px 12px}.trust div{grid-template-columns:26px 1fr}.trust b{font-size:11px}.trust span{font-size:9px}
+}
