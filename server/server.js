@@ -133,12 +133,32 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
   const rows=parseCSV(csv);
   if(!rows.length)return res.status(400).json({message:"CSV contains no product rows"});
   const groups=new Map();
+  let currentGroup=null;
   for(const row of rows){
-    const handle=String(row.Handle||row["Variant SKU"]||row.Title||"").trim();
-    if(!handle)continue;
-    if(!groups.has(handle))groups.set(handle,{first:row,images:[]});
-    const g=groups.get(handle);
-    if(row["Image Src"]&&String(row["Image Src"]).trim()&&!g.images.includes(String(row["Image Src"]).trim()))g.images.push(String(row["Image Src"]).trim());
+    const title=String(row.Title||"").trim();
+    const rawHandle=String(row.Handle||"").trim();
+    const sku=String(row["Variant SKU"]||row.SKU||"").trim();
+    // Shopify exports put gallery rows below the first product row with blank
+    // title/SKU values. Attach those rows to the preceding product so every
+    // product keeps its own image set instead of creating image-only groups.
+    if(title){
+      const handle=rawHandle||sku||title;
+      if(!groups.has(handle))groups.set(handle,{first:row,images:[]});
+      currentGroup=groups.get(handle);
+    }else if(currentGroup){
+      if(sku||rawHandle) {
+        // Keep explicit variant rows with the active product when the title is blank.
+      }
+    }else{
+      const handle=rawHandle||sku;
+      if(!handle)continue;
+      if(!groups.has(handle))groups.set(handle,{first:row,images:[]});
+      currentGroup=groups.get(handle);
+    }
+    const g=currentGroup;
+    if(g && row["Image Src"]&&String(row["Image Src"]).trim()&&!g.images.includes(String(row["Image Src"]).trim())){
+      g.images.push(String(row["Image Src"]).trim());
+    }
   }
   const productCols=await columns("products");
   const categoryCols=await columns("categories");
