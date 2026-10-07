@@ -165,7 +165,7 @@ function ProductEditor({editing,setEditing,categories,subcategories,onSave,onCan
     {tab==="basic"&&<div className="peGrid">
       {field("Product name *","name","e.g. Solid Sheesham Wood 3 Door Cabinet")}
       {field("SKU","sku","e.g. BH-CAB-001")}
-      <label className="peField"><span>Category</span><select value={editing.category_id||""} onChange={e=>set({...editing,category_id:e.target.value,subcategory_id:""})}><option value="">Select category</option>{categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
+      <label className="peField"><span>Category</span><select value={editing.category_id||""} onChange={e=>setEditing({...editing,category_id:e.target.value,subcategory_id:""})}><option value="">Select category</option>{categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
       <label className="peField"><span>Subcategory</span><select value={editing.subcategory_id||""} onChange={e=>set("subcategory_id",e.target.value)}><option value="">Select subcategory</option>{subs.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label>
       {field("Brand","brand","Balaji Handicraft")}
       {field("Material","material","Solid Sheesham Wood")}
