@@ -162,12 +162,23 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
           : "SELECT id FROM subcategories WHERE category_id=? AND (LOWER(name)=LOWER(?) OR LOWER(slug)=LOWER(?)) LIMIT 1",
           parentId===null?[name,slug]:[parentId,name,slug]);
         if(found[0])return found[0].id;
-        if(table==="categories"){
-          const [r]=await connection.query("INSERT INTO categories (name,slug) VALUES (?,?)",[name,slug]);
+        try{
+          if(table==="categories"){
+            const [r]=await connection.query("INSERT INTO categories (name,slug) VALUES (?,?)",[name,slug]);
+            return r.insertId;
+          }
+          const [r]=await connection.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[parentId,name,slug]);
           return r.insertId;
+        }catch(err){
+          if(err.code==="ER_DUP_ENTRY"){
+            const [retry]=await connection.query(parentId===null
+              ? "SELECT id FROM categories WHERE LOWER(slug)=LOWER(?) LIMIT 1"
+              : "SELECT id FROM subcategories WHERE category_id=? AND LOWER(slug)=LOWER(?) LIMIT 1",
+              parentId===null?[slug]:[parentId,slug]);
+            if(retry[0])return retry[0].id;
+          }
+          throw err;
         }
-        const [r]=await connection.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[parentId,name,slug]);
-        return r.insertId;
       };
       const categoryId=await findOrCreate("categories",categoryName);
       const subcategoryId=subcategoryName?await findOrCreate("subcategories",subcategoryName,categoryId):null;
@@ -211,8 +222,19 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
         await connection.query("UPDATE products SET "+keys.map(k=>"`"+k+"`=?").join(",")+" WHERE id=?",[...keys.map(k=>data[k]),existingId]);
         updated++;
       }else{
-        await connection.query("INSERT INTO products ("+keys.map(k=>"`"+k+"`").join(",")+") VALUES ("+keys.map(()=>"?").join(",")+")",keys.map(k=>data[k]));
-        created++;
+        try{
+          await connection.query("INSERT INTO products ("+keys.map(k=>"`"+k+"`").join(",")+") VALUES ("+keys.map(()=>"?").join(",")+")",keys.map(k=>data[k]));
+          created++;
+        }catch(err){
+          if(err.code==="ER_DUP_ENTRY" && String(err.message||"").includes("slug")){
+            const base=payload.slug||"product";
+            let n=2,candidate=base+"-"+n;
+            while(reservedSlugs.has(candidate) || (await connection.query("SELECT id FROM products WHERE slug=? LIMIT 1",[candidate]))[0][0]) candidate=base+"-"+(++n);
+            data.slug=candidate; payload.slug=candidate; reservedSlugs.add(candidate);
+            await connection.query("INSERT INTO products ("+keys.map(k=>"`"+k+"`").join(",")+") VALUES ("+keys.map(()=>"?").join(",")+")",keys.map(k=>data[k]));
+            created++;
+          }else throw err;
+        }
       }
     }
     await connection.commit();
