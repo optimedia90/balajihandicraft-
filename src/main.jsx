@@ -82,14 +82,117 @@ function RoutesView(p){
  if(path==="/blog")return <Blog/>; if(path==="/account"||path==="/login")return <AuthPage mode="login"/>; if(path==="/register"||path==="/signup")return <AuthPage mode="register"/>; if(path==="/forgot-password")return <AuthPage mode="forgot"/>; if(path==="/admin")return <Admin/>; return <Home {...p}/>;
 }
 function Home({add,toggleWish,wish,settings}){
- return <><section className="hero"><div className="heroText"><span className="eyebrow">THE ART OF BETTER LIVING</span><h1>{settings?.homepage_hero||"Furniture with character."}</h1><p>{settings?.homepage_subtitle||"Handcrafted solid wood pieces designed to bring warmth, comfort and timeless beauty into your home."}</p><div className="actions"><Link className="btn dark" to="/shop">Shop Furniture <ArrowRight/></Link><Link className="textlink" to="/blog">Our craftsmanship →</Link></div></div><div className="heroVisual"><div className="heroCard"><img src={settings?.homepage_image||settings?.banners?.[0]?.image||products[0].img}/><div><b>Sheesham Collection</b><span>Built for generations</span></div></div><div className="floatBadge">100%<small>Solid Wood</small></div></div></section>
- <section className="trust"><div><Truck/><b>Free Delivery</b><span>On orders over $500</span></div><div><ShieldCheck/><b>Quality Assured</b><span>Crafted & checked by hand</span></div><div><RotateCcw/><b>Easy Returns</b><span>7-day return policy</span></div><div><Check/><b>Secure Payments</b><span>100% protected checkout</span></div></section>
- <SectionTitle kicker="CURATED FOR YOUR HOME" title="Shop by category" link="/shop"/><div className="catGrid">{cats.slice(1).map(([n,c],i)=><Link to={"/shop?cat="+c} className="catTile" key={n}><img src={products[i].img}/><div><b>{n}</b><span>Explore collection <ArrowRight/></span></div></Link>)}</div>
- <section className="editorial"><div><span className="eyebrow">THE SHEESHHAM EDIT</span><h2>Natural wood.<br/><em>Beautifully lived in.</em></h2><p>Every grain tells a story. Our solid wood collection pairs traditional craftsmanship with clean, contemporary silhouettes.</p><Link className="btn light" to="/shop?cat=Storage">Explore the edit <ArrowRight/></Link></div><img src={products[9].img}/></section>
- <SectionTitle kicker="MOST LOVED" title="Bestselling pieces" link="/shop"/><ProductGrid items={products.slice(0,4)} add={add} toggleWish={toggleWish} wish={wish}/>
- <section className="newsletter"><span className="eyebrow">JOIN THE HOME EDIT</span><h2>Beautiful homes start here.</h2><p>Get first access to new collections, private offers and styling inspiration.</p><div><input placeholder="Your email address"/><button>Subscribe <ArrowRight/></button></div></section></>
-}
-function SectionTitle({kicker,title,link}){return <div className="sectionTitle"><div><span>{kicker}</span><h2>{title}</h2></div>{link&&<Link to={link}>View all <ArrowRight/></Link>}</div>}
+ const roomCards=[
+  {name:"Living Room",sub:"Sofas • Coffee Tables • TV Units",img:products[1]?.img},
+  {name:"Bedroom",sub:"Beds • Dressers • Bedside Tables",img:products[0]?.img},
+  {name:"Dining Room",sub:"Dining Sets • Chairs • Sideboards",img:products[2]?.img},
+  {name:"Home Office",sub:"Desks • Office Chairs • Storage",img:products[5]?.img}
+ ];
+ const materials=[
+  {name:"Solid Sheesham",text:"Rich grain, lasting strength",img:products[0]?.img},
+  {name:"Natural Cane",text:"Light, airy and handcrafted",img:products[3]?.img},
+  {name:"Warm Teak",text:"Timeless warmth and character",img:products[6]?.img},
+  {name:"Premium Finishes",text:"Hand-finished for everyday living",img:products[4]?.img}
+ ];
+ const testimonials=[
+  ["“The finish, weight and detailing are genuinely impressive. It feels like furniture made to stay in the family.”","Aarav Mehta","Verified Customer"],
+  ["“Beautiful in person and even better than the photos. The craftsmanship is visible in every little detail.”","Riya Sharma","Verified Customer"],
+  ["“From ordering to delivery, everything felt premium. Our living room finally has the character we wanted.”","Karan Singh","Verified Customer"]
+ ];
+ return <>
+  {/* 01 Hero */}
+  <section className="hero homeReveal">
+   <div className="heroText"><span className="eyebrow">THE ART OF BETTER LIVING</span><h1>{settings?.homepage_hero||"Furniture with character."}</h1><p>{settings?.homepage_subtitle||"Handcrafted solid wood pieces designed to bring warmth, comfort and timeless beauty into your home."}</p><div className="actions"><Link className="btn dark" to="/shop">Shop Furniture <ArrowRight/></Link><Link className="textlink" to="/blog">Our craftsmanship →</Link></div></div>
+   <div className="heroVisual"><div className="heroCard"><img src={settings?.homepage_image||settings?.banners?.[0]?.image||products[0].img}/><div><b>Sheesham Collection</b><span>Built for generations</span></div></div><div className="floatBadge">100%<small>Solid Wood</small></div></div>
+  </section>
+
+  {/* 02 Trust */}
+  <section className="trust homeStagger"><div><Truck/><b>Free Delivery</b><span>On orders over $500</span></div><div><ShieldCheck/><b>Quality Assured</b><span>Crafted & checked by hand</span></div><div><RotateCcw/><b>Easy Returns</b><span>7-day return policy</span></div><div><Check/><b>Secure Payments</b><span>100% protected checkout</span></div></section>
+
+  {/* 03 Categories */}
+  <section className="homeSection categorySection">
+   <SectionTitle kicker="CURATED FOR YOUR HOME" title="Shop by category" link="/shop"/>
+   <div className="catGrid categoryReveal">{cats.slice(1).map(([n,c],i)=><Link to={"/shop?cat="+c} className="catTile" key={n}><img src={products[i]?.img}/><div><b>{n}</b><span>Explore collection <ArrowRight/></span></div></Link>)}</div>
+  </section>
+
+  {/* 04 Featured products */}
+  <section className="homeSection featuredSection">
+   <SectionTitle kicker="CURATED PICKS" title="Pieces worth coming home to." link="/shop"/>
+   <div className="products productLift"><ProductGrid items={products.slice(0,4)} add={add} toggleWish={toggleWish} wish={wish}/></div>
+  </section>
+
+  {/* 05 Room inspiration */}
+  <section className="homeRooms">
+   <div className="homeRoomsHead"><div><span className="eyebrow">DESIGNED AROUND YOU</span><h2>Find your room's<br/><em>signature piece.</em></h2></div><p>Explore furniture collections designed to work together, so every corner of your home feels intentional.</p></div>
+   <div className="roomGrid">{roomCards.map((r,i)=><Link to={"/shop?cat="+["Sofas","Beds","Dining","Tables"][i]} className="roomCard" key={r.name}><img src={r.img}/><div><small>0{i+1}</small><b>{r.name}</b><span>{r.sub}</span></div></Link>)}</div>
+  </section>
+
+  {/* 06 Craftsmanship */}
+  <section className="craftSection">
+   <div className="craftImage"><img src={products[9]?.img}/><span>HANDCRAFTED</span></div>
+   <div className="craftCopy"><span className="eyebrow">MADE BY HAND</span><h2>Good furniture<br/><em>takes its time.</em></h2><p>From carefully selected timber to the final hand-finished surface, each Balaji piece is made with patience, precision and respect for the material.</p><div className="craftStats"><div><b>25+</b><span>Years of craft</span></div><div><b>100%</b><span>Solid wood focus</span></div><div><b>1-by-1</b><span>Quality checked</span></div></div><Link className="btn dark" to="/blog">Discover our craft <ArrowRight/></Link></div>
+  </section>
+
+  {/* 07 Best sellers */}
+  <section className="homeSection bestSection">
+   <SectionTitle kicker="MOST LOVED" title="Bestselling pieces" link="/shop"/>
+   <div className="products productWave"><ProductGrid items={products.slice(4,8)} add={add} toggleWish={toggleWish} wish={wish}/></div>
+  </section>
+
+  {/* 08 Brand statement / marquee */}
+  <section className="statementBand"><div className="statementTrack"><span>CRAFTED FOR LIFE</span><i>✦</i><span>BUILT TO LAST</span><i>✦</i><span>MADE WITH CHARACTER</span><i>✦</i><span>CRAFTED FOR LIFE</span><i>✦</i></div></section>
+
+  {/* 09 Materials */}
+  <section className="homeSection materialSection">
+   <SectionTitle kicker="THE MATERIAL STORY" title="Choose your character." link="/shop"/>
+   <div className="materialGrid">{materials.map((m,i)=><Link to="/shop" className="materialCard" key={m.name}><div className="materialImg"><img src={m.img}/><span>0{i+1}</span></div><div><h3>{m.name}</h3><p>{m.text}</p><ArrowRight/></div></Link>)}</div>
+  </section>
+
+  {/* 10 New arrivals */}
+  <section className="newArrivalSection">
+   <div className="newArrivalVisual"><img src={products[8]?.img}/><div><span>NEW ARRIVAL</span><b>Live Edge<br/>Collection</b></div></div>
+   <div className="newArrivalCopy"><span className="eyebrow">JUST LANDED</span><h2>Fresh forms.<br/><em>Natural edges.</em></h2><p>New silhouettes inspired by organic shapes, expressive grain and modern living.</p><Link className="btn dark" to="/shop">Shop new arrivals <ArrowRight/></Link></div>
+   <div className="newArrivalMini">{products.slice(8,12).map(p=><Link to={"/product?id="+p.id} key={p.id}><img src={p.img}/><span>{p.name}</span><b>{fmt(p.price)}</b></Link>)}</div>
+  </section>
+
+  {/* 11 Social proof */}
+  <section className="homeSection reviewSection">
+   <SectionTitle kicker="REAL HOMES. REAL STORIES." title="Loved by people who love home."/>
+   <div className="reviewGrid">{testimonials.map((t,i)=><article className="reviewCard" key={t[1]}><div className="reviewStars">★★★★★</div><p>{t[0]}</p><b>{t[1]}</b><span>{t[2]}</span></article>)}</div>
+  </section>
+
+  {/* 12 Process */}
+  <section className="processSection">
+   <div className="processIntro"><span className="eyebrow">FROM WOOD TO HOME</span><h2>Made in four<br/><em>thoughtful steps.</em></h2></div>
+   <div className="processSteps">{[["01","Select","We choose timber for grain, strength and character."],["02","Shape","Skilled hands turn raw material into balanced forms."],["03","Finish","Each surface is sanded and finished for a rich touch."],["04","Deliver","Your finished piece is carefully prepared for its new home."]].map(s=><div className="processStep" key={s[0]}><span>{s[0]}</span><i></i><h3>{s[1]}</h3><p>{s[2]}</p></div>)}</div>
+  </section>
+
+  {/* 13 Collection showcase */}
+  <section className="showcaseSection">
+   <div className="showcaseCopy"><span className="eyebrow">THE SHEESHHAM EDIT</span><h2>Natural wood.<br/><em>Beautifully lived in.</em></h2><p>Every grain tells a story. Our solid wood collection pairs traditional craftsmanship with clean, contemporary silhouettes.</p><Link className="btn light" to="/shop?cat=Storage">Explore the edit <ArrowRight/></Link></div>
+   <div className="showcaseImage"><img src={products[10]?.img}/><span>01 / 04</span></div>
+  </section>
+
+  {/* 14 More to explore */}
+  <section className="homeSection exploreSection">
+   <SectionTitle kicker="MORE TO EXPLORE" title="Complete the room." link="/shop"/>
+   <div className="exploreGrid">{products.slice(8,12).map((p,i)=><Link to={"/product?id="+p.id} className="exploreCard" key={p.id}><img src={p.img}/><div><span>0{i+1}</span><h3>{p.name}</h3><b>View piece <ArrowRight/></b></div></Link>)}</div>
+  </section>
+
+  {/* 15 Journal */}
+  <section className="homeSection journalSection">
+   <SectionTitle kicker="FROM THE JOURNAL" title="Ideas for better living." link="/blog"/>
+   <div className="journalGrid">{[
+    ["How to choose the right wood for your home",products[0]?.img,"MATERIAL GUIDE"],
+    ["5 ways to make a living room feel warmer",products[1]?.img,"HOME EDIT"],
+    ["The details that make handcrafted furniture special",products[9]?.img,"CRAFT"]
+   ].map(x=><Link to="/blog" className="journalCard" key={x[0]}><img src={x[1]}/><span>{x[2]}</span><h3>{x[0]}</h3><b>Read story <ArrowRight/></b></Link>)}</div>
+  </section>
+
+  {/* 16 Newsletter */}
+  <section className="newsletter newsletterReveal"><span className="eyebrow">JOIN THE HOME EDIT</span><h2>Beautiful homes start here.</h2><p>Get first access to new collections, private offers and styling inspiration.</p><div><input placeholder="Your email address"/><button>Subscribe <ArrowRight/></button></div></section>
+ </>
+}function SectionTitle({kicker,title,link}){return <div className="sectionTitle"><div><span>{kicker}</span><h2>{title}</h2></div>{link&&<Link to={link}>View all <ArrowRight/></Link>}</div>}
 function ProductGrid({items,add,toggleWish,wish}){return <div className="products">{items.map(p=><ProductCard key={p.id} p={p} add={add} toggleWish={toggleWish} wished={wish.some(x=>x.id===p.id)}/>)}</div>}
 function ProductCard({p,add,toggleWish,wished}){return <article className="product"><Link to={"/product?id="+p.id} className="productImg">{p.tag&&<b className="tag">{p.tag}</b>}<img src={p.img}/><button className={wished?"wish active":"wish"} onClick={e=>{e.preventDefault();toggleWish(p)}}><Heart fill={wished?"currentColor":"none"}/></button><button className="quick" onClick={e=>{e.preventDefault();add(p)}}>Add to cart</button></Link><div className="productInfo"><div className="stars"><Star fill="currentColor"/> {p.rating}</div><Link to={"/product?id="+p.id}><h3>{p.name}</h3></Link><span className="sub">{p.sub}</span><div className="price"><b>{fmt(p.price)}</b><del>{fmt(p.old)}</del></div></div></article>}
 function Shop({add,toggleWish,wish}){
