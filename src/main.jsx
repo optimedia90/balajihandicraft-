@@ -1,7 +1,7 @@
 import React,{useEffect,useMemo,useState} from "react";
 import {createRoot} from "react-dom/client";
 import {HashRouter,useLocation,useNavigate,useParams,Link} from "react-router-dom";
-import {Search,ShoppingBag,Heart,User,Menu,X,ChevronDown,ArrowRight,Star,SlidersHorizontal,Trash2,Minus,Plus,Check,Truck,ShieldCheck,RotateCcw,Instagram,Facebook,Youtube,Home as HomeIcon,LayoutDashboard,Package,ShoppingCart,Users,Image as ImageIcon,FileText,Tag,MessageSquare,Settings,BarChart3,LogOut,Sun,Moon,Bell,ExternalLink,Save,Video,FileImage,Boxes,Ticket,StarHalf,PanelLeftClose,PanelLeftOpen,CalendarDays,Info,Upload} from "lucide-react";
+import {Search,ShoppingBag,Heart,User,Menu,X,ChevronDown,ArrowRight,Star,SlidersHorizontal,Trash2,Minus,Plus,Check,Truck,ShieldCheck,RotateCcw,Instagram,Facebook,Youtube,Home as HomeIcon,LayoutDashboard,Package,ShoppingCart,Users,Image as ImageIcon,FileText,Tag,MessageSquare,Settings,BarChart3,LogOut,Sun,Moon,Bell,ExternalLink,Save,Video,FileImage,Boxes,Ticket,StarHalf,PanelLeftClose,PanelLeftOpen,CalendarDays,Info} from "lucide-react";
 import "./styles.css";
 
 const demoProducts=[
@@ -211,7 +211,7 @@ function AdminReports({api,setNotice}){
 
 function BulkProductUpload({api,setNotice,onDone}){
  const [file,setFile]=useState(null),[preview,setPreview]=useState([]),[busy,setBusy]=useState(false),[result,setResult]=useState(null);
- const readPreview=f=>{setFile(f);setResult(null);const reader=new FileReader();reader.onload=()=>{const text=String(reader.result||"");const lines=text.split(/\r?\n/).filter(Boolean);setPreview(lines.slice(0,4).map(x=>x.slice(0,180)))};reader.readAsText(f)};
+ const readPreview=f=>{setFile(f);setResult(null);const reader=new FileReader();reader.onload=()=>{const text=String(reader.result||"");const lines=text.split("\n").filter(Boolean);setPreview(lines.slice(0,4).map(x=>x.slice(0,180)))};reader.readAsText(f)};
  const upload=async()=>{if(!file)return setNotice("Please select a CSV file first.");setBusy(true);try{const form=new FormData();form.append("file",file);const data=await api("/api/admin/products/bulk-csv",{method:"POST",body:form});setResult(data);setNotice("Bulk product import completed.");if(onDone)onDone()}catch(e){setNotice(e.message||"Bulk import failed")}finally{setBusy(false)}};
  return <div className="bulkUploadPage">
   <div className="adminPageTitle"><div><div className="pageCrumb">Products <ChevronDown/> Bulk Upload</div><h1>Bulk Product Upload</h1><p>Import furniture products directly from your CSV file.</p></div><button className="btn light" onClick={()=>onDone&&onDone()}>← Back to Products</button></div>
@@ -220,7 +220,7 @@ function BulkProductUpload({api,setNotice,onDone}){
    <label className="bulkDrop"><input type="file" accept=".csv,text/csv" onChange={e=>e.target.files?.[0]&&readPreview(e.target.files[0])}/><FileText/><b>{file?file.name:"Choose CSV file"}</b><span>{file?"Ready to import":"CSV files only • Maximum 50MB"}</span></label>
    {preview.length>0&&<div className="bulkPreview"><h3>CSV Preview</h3>{preview.map((x,i)=><div key={i}><small>Row {i+1}</small><span>{x}</span></div>)}</div>}
    <div className="bulkRules"><b>Import mapping</b><span>Title → Product Name</span><span>Variant SKU → SKU</span><span>Variant Price → Sale Price</span><span>Variant Compare At Price → Regular Price</span><span>Image Src → Product Images</span><span>SEO Title / SEO Description → SEO</span><span>Product Category → Category & Subcategory</span></div>
-   <button className="btn dark bulkImportBtn" disabled={!file||busy} onClick={upload}>{busy?"Importing products…":<><Upload/> Import Products</>}</button>
+   <button className="btn dark bulkImportBtn" disabled={!file||busy} onClick={upload}>{busy?"Importing products…":<><FileImage/> Import Products</>}</button>
   </section>
   {result&&<section className="bulkResult"><h3>Import Complete</h3><div><b>{result.products}</b><span>Products detected</span></div><div><b>{result.created}</b><span>Created</span></div><div><b>{result.updated}</b><span>Updated</span></div><div><b>{result.skipped}</b><span>Skipped</span></div></section>}
  </div>
