@@ -164,15 +164,11 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
         if(found[0])return found[0].id;
         let candidateSlug=slug;
         if(table==="subcategories" && parentId!==null){
-          const [globalSlug]=await connection.query("SELECT id,category_id FROM subcategories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[slug]);
-          if(globalSlug[0] && Number(globalSlug[0].category_id)!==Number(parentId)){
-            const [cat]=await connection.query("SELECT slug FROM categories WHERE id=? LIMIT 1",[parentId]);
-            const catSlug=cat[0]?.slug||"category";
-            candidateSlug=slug+"-"+catSlug;
-            let n=2;
-            while((await connection.query("SELECT id FROM subcategories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[candidateSlug]))[0][0]){
-              candidateSlug=slug+"-"+catSlug+"-"+n++;
-            }
+          const parentSuffix=String(parentId);
+          candidateSlug=slug+"-"+parentSuffix;
+          let n=2;
+          while((await connection.query("SELECT id FROM subcategories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[candidateSlug]))[0][0]){
+            candidateSlug=slug+"-"+parentSuffix+"-"+n++;
           }
         }
         try{
@@ -209,7 +205,7 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
         price,old_price:oldPrice,qty,status:String(first.Status||"active").trim()||"active",
         category_id:categoryId,subcategory_id:subcategoryId,weight_kg:weightKg,
         seo_title:String(first["SEO Title"]||name).trim(),meta_description:String(first["SEO Description"]||bodyText).trim().slice(0,500),
-        slug:String(first.Handle||name).trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")
+        slug:(String(first.Handle||name).trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+"-"+(sku?String(sku).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""):"product")).slice(0,250)
       };
       const data={}; for(const key of productCols) if(Object.prototype.hasOwnProperty.call(payload,key))data[key]=payload[key];
       let existingId=null;
