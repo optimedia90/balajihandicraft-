@@ -162,19 +162,32 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
           : "SELECT id FROM subcategories WHERE category_id=? AND (LOWER(name)=LOWER(?) OR LOWER(slug)=LOWER(?)) LIMIT 1",
           parentId===null?[name,slug]:[parentId,name,slug]);
         if(found[0])return found[0].id;
+        let candidateSlug=slug;
+        if(table==="subcategories" && parentId!==null){
+          const [globalSlug]=await connection.query("SELECT id,category_id FROM subcategories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[slug]);
+          if(globalSlug[0] && Number(globalSlug[0].category_id)!==Number(parentId)){
+            const [cat]=await connection.query("SELECT slug FROM categories WHERE id=? LIMIT 1",[parentId]);
+            const catSlug=cat[0]?.slug||"category";
+            candidateSlug=slug+"-"+catSlug;
+            let n=2;
+            while((await connection.query("SELECT id FROM subcategories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[candidateSlug]))[0][0]){
+              candidateSlug=slug+"-"+catSlug+"-"+n++;
+            }
+          }
+        }
         try{
           if(table==="categories"){
-            const [r]=await connection.query("INSERT INTO categories (name,slug) VALUES (?,?)",[name,slug]);
+            const [r]=await connection.query("INSERT INTO categories (name,slug) VALUES (?,?)",[name,candidateSlug]);
             return r.insertId;
           }
-          const [r]=await connection.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[parentId,name,slug]);
+          const [r]=await connection.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[parentId,name,candidateSlug]);
           return r.insertId;
         }catch(err){
           if(err.code==="ER_DUP_ENTRY"){
             const [retry]=await connection.query(parentId===null
               ? "SELECT id FROM categories WHERE LOWER(slug)=LOWER(?) LIMIT 1"
               : "SELECT id FROM subcategories WHERE category_id=? AND LOWER(slug)=LOWER(?) LIMIT 1",
-              parentId===null?[slug]:[parentId,slug]);
+              parentId===null?[candidateSlug]:[parentId,candidateSlug]);
             if(retry[0])return retry[0].id;
           }
           throw err;
