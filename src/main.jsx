@@ -40,6 +40,7 @@ function App(){
  const [,setStoreVersion]=useState(0);
  const [storeSettings,setStoreSettings]=useState(null);
  activeCurrency=currency;
+ useEffect(()=>{if(storeSettings?.seo_title)document.title=storeSettings.seo_title; if(storeSettings?.meta_description){let m=document.querySelector('meta[name="description"]');if(!m){m=document.createElement("meta");m.name="description";document.head.appendChild(m)}m.content=storeSettings.meta_description}},[storeSettings?.seo_title,storeSettings?.meta_description]);
  useEffect(()=>localStorage.setItem("bh_currency",currency),[currency]);
  useEffect(()=>localStorage.setItem("bh_cart",JSON.stringify(cart)),[cart]);
  useEffect(()=>localStorage.setItem("bh_wish",JSON.stringify(wish)),[wish]);
