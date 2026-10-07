@@ -183,7 +183,9 @@ function AdminModule({module,api,setNotice}){
   blog:{title:"Blog",endpoint:"blog_posts",fields:[["title","Title"],["slug","Slug"],["excerpt","Excerpt"],["content","Content"],["image","Image URL"],["status","Status"],["seo_title","SEO Title"],["meta_description","Meta Description"]]},
   coupons:{title:"Coupons",endpoint:"coupons",fields:[["code","Coupon Code"],["discount_type","Discount Type"],["discount_value","Discount Value"],["min_order","Minimum Order"],["expires_at","Expiry Date"],["status","Status"]]},
   reviews:{title:"Reviews",endpoint:"reviews",fields:[["product_id","Product ID"],["customer_name","Customer Name"],["rating","Rating"],["comment","Review"],["status","Status"]]},
-  messages:{title:"Messages",endpoint:"contact_messages",fields:[]}
+  messages:{title:"Messages",endpoint:"contact_messages",fields:[]},
+  customers:{title:"Customers",endpoint:"customers",fields:[]},
+  users:{title:"Users",endpoint:"users",fields:[]}
  };
  const cfg=configs[module]; const [items,setItems]=useState([]); const [editing,setEditing]=useState(null); const [loading,setLoading]=useState(true);
  const load=async()=>{setLoading(true);try{const d=await api("/api/admin/"+cfg.endpoint);setItems(d.items||[])}catch(e){setNotice(e.message)}finally{setLoading(false)}};
