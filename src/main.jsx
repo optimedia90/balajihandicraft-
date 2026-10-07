@@ -211,8 +211,7 @@ function AdminReports({api,setNotice}){
 
 function BulkProductUpload({api,setNotice,onDone}){
  const [file,setFile]=useState(null),[preview,setPreview]=useState([]),[busy,setBusy]=useState(false),[result,setResult]=useState(null);
- const readPreview=f=>{setFile(f);setResult(null);const reader=new FileReader();reader.onload=()=>{const text=String(reader.result||"");const lines=text.split(/\r?
-/).filter(Boolean);setPreview(lines.slice(0,4).map(x=>x.slice(0,180)))};reader.readAsText(f)};
+ const readPreview=f=>{setFile(f);setResult(null);const reader=new FileReader();reader.onload=()=>{const text=String(reader.result||"");const lines=text.split(/\r?\n/).filter(Boolean);setPreview(lines.slice(0,4).map(x=>x.slice(0,180)))};reader.readAsText(f)};
  const upload=async()=>{if(!file)return setNotice("Please select a CSV file first.");setBusy(true);try{const form=new FormData();form.append("file",file);const data=await api("/api/admin/products/bulk-csv",{method:"POST",body:form});setResult(data);setNotice("Bulk product import completed.");if(onDone)onDone()}catch(e){setNotice(e.message||"Bulk import failed")}finally{setBusy(false)}};
  return <div className="bulkUploadPage">
   <div className="adminPageTitle"><div><div className="pageCrumb">Products <ChevronDown/> Bulk Upload</div><h1>Bulk Product Upload</h1><p>Import furniture products directly from your CSV file.</p></div><button className="btn light" onClick={()=>onDone&&onDone()}>← Back to Products</button></div>
