@@ -20,6 +20,7 @@ const demoProducts=[
  ];
 let products=[...demoProducts];
 let liveCategoryMenus=[];
+let liveCats=[];
 const normalizeProduct=(p)=>({id:Number(p.id),name:p.name||p.title||"Furniture Product",category:p.category_name||p.category||"Furniture",sub:p.subcategory_name||p.sub||"",price:Number(p.price||0),old:Number(p.old_price||p.old||p.price||0),rating:Number(p.rating||4.8),img:p.image||p.img||"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900",tag:p.featured?"Featured":""});
 const cats=[["All Furniture",""],["Beds","Beds"],["Sofas","Sofas"],["Dining","Dining"],["Chairs","Chairs"],["Tables","Tables"],["Storage","Storage"]];
 const categoryMenus=[
@@ -48,6 +49,7 @@ function App(){
      if(Array.isArray(c.categories)){
        const subs=Array.isArray(c.subcategories)?c.subcategories:[];
        liveCategoryMenus=c.categories.map(cat=>({name:cat.name,slug:cat.slug||cat.name,subs:subs.filter(x=>Number(x.category_id)===Number(cat.id)).map(x=>x.name)}));
+       liveCats=[["All Furniture",""],...c.categories.map(cat=>[cat.name,cat.slug||cat.name])];
      }
      if(s&&s.settings)setStoreSettings(s.settings);
      setStoreVersion(v=>v+1);
@@ -88,9 +90,10 @@ function SectionTitle({kicker,title,link}){return <div className="sectionTitle">
 function ProductGrid({items,add,toggleWish,wish}){return <div className="products">{items.map(p=><ProductCard key={p.id} p={p} add={add} toggleWish={toggleWish} wished={wish.some(x=>x.id===p.id)}/>)}</div>}
 function ProductCard({p,add,toggleWish,wished}){return <article className="product"><Link to={"/product?id="+p.id} className="productImg">{p.tag&&<b className="tag">{p.tag}</b>}<img src={p.img}/><button className={wished?"wish active":"wish"} onClick={e=>{e.preventDefault();toggleWish(p)}}><Heart fill={wished?"currentColor":"none"}/></button><button className="quick" onClick={e=>{e.preventDefault();add(p)}}>Add to cart</button></Link><div className="productInfo"><div className="stars"><Star fill="currentColor"/> {p.rating}</div><Link to={"/product?id="+p.id}><h3>{p.name}</h3></Link><span className="sub">{p.sub}</span><div className="price"><b>{fmt(p.price)}</b><del>{fmt(p.old)}</del></div></div></article>}
 function Shop({add,toggleWish,wish}){
- const qs=new URLSearchParams(useLocation().search),cat=qs.get("cat")||"",q=(qs.get("q")||"").toLowerCase();const [sort,setSort]=useState("featured");
+ const qs=new URLSearchParams(useLocation().search),cat=qs.get("cat")||"",q=(qs.get("q")||"").toLowerCase();
+ const categoryList=liveCats.length?liveCats:cats;const [sort,setSort]=useState("featured");
  const list=useMemo(()=>{let x=products.filter(p=>(!cat||p.category===cat)&&(!q||p.name.toLowerCase().includes(q)));if(sort==="low")x.sort((a,b)=>a.price-b.price);if(sort==="high")x.sort((a,b)=>b.price-a.price);return x},[cat,q,sort]);
- return <div className="container shop"><div className="crumb">Home / Shop</div><div className="shopHead"><div><span className="eyebrow">THE COLLECTION</span><h1>{cat||"All Furniture"}</h1><p>Thoughtfully designed furniture for every room.</p></div><select value={sort} onChange={e=>setSort(e.target.value)}><option value="featured">Sort: Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select></div><div className="shopBody"><aside><b>Categories</b>{cats.map(([n,c])=><Link className={cat===c?"sel":""} to={"/shop"+(c?"?cat="+c:"")} key={n}>{n}</Link>)}<div className="filterNote"><SlidersHorizontal/><b>Made to last</b><span>Solid wood • Handcrafted • Premium finishes</span></div></aside><section><div className="resultbar">{list.length} products <span>Showing the latest collection</span></div><ProductGrid items={list} add={add} toggleWish={toggleWish} wish={wish}/></section></div></div>
+ return <div className="container shop"><div className="crumb">Home / Shop</div><div className="shopHead"><div><span className="eyebrow">THE COLLECTION</span><h1>{cat||"All Furniture"}</h1><p>Thoughtfully designed furniture for every room.</p></div><select value={sort} onChange={e=>setSort(e.target.value)}><option value="featured">Sort: Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select></div><div className="shopBody"><aside><b>Categories</b>{categoryList.map(([n,c])=><Link className={cat===c?"sel":""} to={"/shop"+(c?"?cat="+c:"")} key={n}>{n}</Link>)}<div className="filterNote"><SlidersHorizontal/><b>Made to last</b><span>Solid wood • Handcrafted • Premium finishes</span></div></aside><section><div className="resultbar">{list.length} products <span>Showing the latest collection</span></div><ProductGrid items={list} add={add} toggleWish={toggleWish} wish={wish}/></section></div></div>
 }
 function Product({add,toggleWish,wish}){
  const id=Number(new URLSearchParams(useLocation().search).get("id")||1),p=products.find(x=>x.id===id)||products[0],[qty,setQty]=useState(1),[tab,setTab]=useState("description");
