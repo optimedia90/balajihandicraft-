@@ -55,8 +55,10 @@ function App(){
      setStoreVersion(v=>v+1);
    }).catch(()=>{});
  },[]);
- const add=(p)=>setCart(c=>{const x=c.find(i=>i.id===p.id);return x?c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...c,{...p,qty:1}]});
- const toggleWish=(p)=>setWish(w=>w.some(x=>x.id===p.id)?w.filter(x=>x.id!==p.id):[...w,p]);
+ const add=p=>setCart(c=>{const x=c.find(i=>i.id===p.id);return x?c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...c,{...p,qty:1}]});
+ const toggleWish=p=>setWish(w=>w.some(x=>x.id===p.id)?w.filter(x=>x.id!==p.id):[...w,p]);
+ const isAdmin=useLocation().pathname==="/admin";
+ if(isAdmin)return <Admin/>;
  return <><Header cart={cart.length} wish={wish.length} currency={currency} setCurrency={setCurrency} settings={storeSettings}/><main><RoutesView cart={cart} setCart={setCart} wish={wish} toggleWish={toggleWish} add={add}/></main><Footer/></>
 }
 function Header({cart,wish,currency,setCurrency,settings}){
