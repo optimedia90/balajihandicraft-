@@ -139,12 +139,89 @@ function AdminLogin(){
 
  return <div className="container page adminAuth"><span className="eyebrow">STORE CONTROL</span><h1>Admin Login</h1><div className="accountCard authCard"><ShieldCheck/><h2>Balaji Handicraft Admin</h2><p>Authorized staff only. Sign in to manage the store.</p><form onSubmit={submit} noValidate><input type="email" placeholder="Admin email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} autoComplete="username" required/><input type="password" placeholder="Password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} autoComplete="current-password" required/>{error&&<div className="authMessage">{error}</div>}<button className="btn dark full" type="submit" disabled={loading}>{loading?"Signing in…":"Sign in to Admin"}</button></form><Link className="authBottom" to="/">← Back to store</Link></div></div>
 }
+function ProductEditor({editing,setEditing,categories,subcategories,onSave,onCancel,onUpload}){
+ const [tab,setTab]=useState("basic");
+ const set=(key,value)=>setEditing({...editing,[key]:value});
+ const inchToCm=v=>v===""||v==null?"":(Number(v)*2.54).toFixed(2);
+ const cmToIn=v=>v===""||v==null?"":(Number(v)/2.54).toFixed(2);
+ const setIn=(key,value,cmKey)=>{
+   const next={...editing,[key]:value};
+   if(value!==""&&Number.isFinite(Number(value)))next[cmKey]=inchToCm(value);
+   setEditing(next);
+ };
+ const setCm=(key,value,inKey)=>{
+   const next={...editing,[key]:value};
+   if(value!==""&&Number.isFinite(Number(value)))next[inKey]=cmToIn(value);
+   setEditing(next);
+ };
+ const catId=editing.category_id||"";
+ const subs=subcategories.filter(s=>String(s.category_id)===String(catId));
+ const field=(label,key,placeholder,type="text")=><label className="peField"><span>{label}</span><input type={type} placeholder={placeholder||label} value={editing[key]??""} onChange={e=>set(key,e.target.value)}/></label>;
+ const tabs=[["basic","Basic information"],["media","Images & video"],["details","Product details"],["specs","Specifications"],["pricing","Pricing & stock"],["seo","SEO & meta"],["settings","Settings"]];
+ return <div className="productEditor">
+   <div className="peHead"><div><span className="eyebrow">PRODUCT MANAGEMENT</span><h3>{editing.id?"Edit product":"Add product"}</h3><p>Complete furniture product information in one place.</p></div><button className="peClose" onClick={onCancel}>×</button></div>
+   <div className="peTabs">{tabs.map(([id,label])=><button key={id} className={tab===id?"active":""} onClick={()=>setTab(id)}>{label}</button>)}</div>
+   <div className="peBody">
+    {tab==="basic"&&<div className="peGrid">
+      {field("Product name *","name","e.g. Solid Sheesham Wood 3 Door Cabinet")}
+      {field("SKU","sku","e.g. BH-CAB-001")}
+      <label className="peField"><span>Category</span><select value={editing.category_id||""} onChange={e=>set({...editing,category_id:e.target.value,subcategory_id:""})}><option value="">Select category</option>{categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
+      <label className="peField"><span>Subcategory</span><select value={editing.subcategory_id||""} onChange={e=>set("subcategory_id",e.target.value)}><option value="">Select subcategory</option>{subs.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label>
+      {field("Brand","brand","Balaji Handicraft")}
+      {field("Material","material","Solid Sheesham Wood")}
+      {field("Short description","short_description","One-line product summary")}
+      <label className="peField peWide"><span>Description</span><textarea rows="7" placeholder="Detailed product description" value={editing.description||""} onChange={e=>set("description",e.target.value)}/></label>
+      {field("Tags","tags","sheesham, wooden cabinet, storage")}
+    </div>}
+    {tab==="media"&&<div className="peMedia">
+      <div className="mediaMain">{field("Main product image","image","https://.../product-main.jpg")}{onUpload&&<button type="button" className="uploadBtn" onClick={()=>onUpload("image")}>Upload main image</button>}</div>
+      <div className="peGrid">{["image_2","image_3","image_4","image_5"].map((key,i)=><div className="mediaMain" key={key}>{field("Gallery image "+(i+2),key,"https://.../product-"+(i+2)+".jpg")}{onUpload&&<button type="button" className="uploadBtn" onClick={()=>onUpload(key)}>Upload image</button>}</div>)}</div>
+      {field("Product video URL","video","https://.../product-video.mp4")}
+      {onUpload&&<button type="button" className="uploadBtn videoUpload" onClick={()=>onUpload("video")}>Upload product video</button>}
+      <div className="mediaPreview">{[editing.image,editing.image_2,editing.image_3,editing.image_4,editing.image_5].filter(Boolean).map((u,i)=><div key={i}><img src={u} onError={e=>e.currentTarget.style.display="none"}/><small>Image {i+1}</small></div>)}</div>
+    </div>}
+    {tab==="details"&&<div className="peGrid">
+      {field("Color","color","Natural Brown")}
+      {field("Finish","finish","Natural / Matte")}
+      <label className="peField peWide"><span>Care instructions</span><textarea rows="5" value={editing.care_instructions||""} onChange={e=>set("care_instructions",e.target.value)} placeholder="Wipe with a soft dry cloth..."/></label>
+      <label className="peField peWide"><span>Assembly information</span><textarea rows="5" value={editing.assembly_info||""} onChange={e=>set("assembly_info",e.target.value)} placeholder="Assembly required / Ready to use"/></label>
+    </div>}
+    {tab==="specs"&&<div className="peSpecs">
+      <div className="specTitle"><b>Dimensions</b><span>Enter inches or centimetres; the other unit updates automatically.</span></div>
+      <div className="specRow"><b>Length</b><input type="number" step="0.01" value={editing.length_in??""} onChange={e=>setIn("length_in",e.target.value,"length_cm")} placeholder="Inches"/><input type="number" step="0.01" value={editing.length_cm??""} onChange={e=>setCm("length_cm",e.target.value,"length_in")} placeholder="Centimetres"/></div>
+      <div className="specRow"><b>Width</b><input type="number" step="0.01" value={editing.width_in??""} onChange={e=>setIn("width_in",e.target.value,"width_cm")} placeholder="Inches"/><input type="number" step="0.01" value={editing.width_cm??""} onChange={e=>setCm("width_cm",e.target.value,"width_in")} placeholder="Centimetres"/></div>
+      <div className="specRow"><b>Height</b><input type="number" step="0.01" value={editing.height_in??""} onChange={e=>setIn("height_in",e.target.value,"height_cm")} placeholder="Inches"/><input type="number" step="0.01" value={editing.height_cm??""} onChange={e=>setCm("height_cm",e.target.value,"height_in")} placeholder="Centimetres"/></div>
+      <div className="specRow"><b>Weight</b><input className="single" type="number" step="0.01" value={editing.weight_kg??""} onChange={e=>set("weight_kg",e.target.value)} placeholder="Weight in kg"/><span>kg</span></div>
+    </div>}
+    {tab==="pricing"&&<div className="peGrid">
+      {field("Sale price","price","0","number")}
+      {field("Regular / old price","old_price","0","number")}
+      {field("Stock quantity","qty","0","number")}
+      <label className="peField"><span>Status</span><select value={editing.status??"active"} onChange={e=>set("status",e.target.value)}><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
+      <div className="priceNote peWide"><b>Tip:</b> Keep regular price higher than sale price when showing a discount.</div>
+    </div>}
+    {tab==="seo"&&<div className="peGrid">
+      {field("SEO title","seo_title","Product name | Balaji Handicraft")}
+      {field("URL slug","slug","solid-sheesham-wood-cabinet")}
+      <label className="peField peWide"><span>Meta description</span><textarea rows="5" maxLength="500" value={editing.meta_description||""} onChange={e=>set("meta_description",e.target.value)} placeholder="Short search-engine description for this product"/></label>
+    </div>}
+    {tab==="settings"&&<div className="peSettings">
+      <label><input type="checkbox" checked={Boolean(Number(editing.featured)||editing.featured===true)} onChange={e=>set("featured",e.target.checked?1:0)}/><span>Featured product</span><small>Show in featured collections.</small></label>
+      <label><input type="checkbox" checked={Boolean(Number(editing.best_seller)||editing.best_seller===true)} onChange={e=>set("best_seller",e.target.checked?1:0)}/><span>Best seller</span><small>Mark as a bestselling product.</small></label>
+      <label><input type="checkbox" checked={Boolean(Number(editing.new_arrival)||editing.new_arrival===true)} onChange={e=>set("new_arrival",e.target.checked?1:0)}/><span>New arrival</span><small>Mark as a new collection item.</small></label>
+    </div>}
+   </div>
+   <div className="peFooter"><button className="btn light" onClick={onCancel}>Cancel</button><div><button className="btn light" onClick={()=>setTab(tab==="settings"?"basic":tabs[Math.max(0,tabs.findIndex(x=>x[0]===tab)-1)][0])}>Previous</button><button className="btn dark" onClick={onSave}>{editing.id?"Update product":"Save product"}</button></div></div>
+ </div>
+}
+
 function Admin(){
  const [tab,setTab]=useState("overview");
  const [allowed,setAllowed]=useState(Boolean(localStorage.getItem("bh_admin_token")));
  const [stats,setStats]=useState({products:0,orders:0,customers:0,revenue:0});
  const [rows,setRows]=useState([]);
  const [categories,setCategories]=useState([]);
+ const [subcategories,setSubcategories]=useState([]);
  const [orders,setOrders]=useState([]);
  const [settings,setSettings]=useState({store_name:"Balaji Handicraft",currency:"INR",shipping_threshold:42000,phone:"",email:"",address:"",announcement:""});
  const [editing,setEditing]=useState(null);
@@ -153,7 +230,10 @@ function Admin(){
  const navigate=useNavigate();
  const token=localStorage.getItem("bh_admin_token");
  const api=async(path,options={})=>{
-   const res=await fetch(path,{...options,headers:{"Content-Type":"application/json","Authorization":"Bearer "+token,...(options.headers||{})}});
+   const isForm=options.body instanceof FormData;
+   const headers={"Authorization":"Bearer "+token,...(options.headers||{})};
+   if(!isForm)headers["Content-Type"]="application/json";
+   const res=await fetch(path,{...options,headers});
    const text=await res.text();let data={};try{data=text?JSON.parse(text):{};}catch{data={message:text};}
    if(!res.ok)throw new Error(data.message||"Request failed");
    return data;
@@ -162,45 +242,54 @@ function Admin(){
    setLoading(true);setNotice("");
    try{
      const [s,p,c,o,st]=await Promise.all([api("/api/admin/stats"),api("/api/admin/products"),api("/api/admin/categories"),api("/api/admin/orders"),api("/api/admin/settings")]);
-     setStats(s);setRows(p.products||[]);setCategories(c.categories||[]);setOrders(o.orders||[]);setSettings(st.settings||settings);
+     setStats(s);setRows(p.products||[]);setCategories(c.categories||[]);setSubcategories(c.subcategories||[]);setOrders(o.orders||[]);setSettings(st.settings||settings);
    }catch(e){setNotice(e.message||"Could not load admin data");}
    finally{setLoading(false);}
  };
  useEffect(()=>{if(allowed)load();},[allowed]);
  if(!allowed)return <AdminLogin/>;
  const logout=()=>{localStorage.removeItem("bh_admin_token");setAllowed(false);navigate("/admin",{replace:true});};
- const removeProduct=async(id)=>{if(!confirm("Delete this product permanently?"))return;try{await api("/api/admin/products/"+id,{method:"DELETE"});setNotice("Product deleted.");load();}catch(e){setNotice(e.message);}};
- const saveSettings=async()=>{try{await api("/api/admin/settings",{method:"PUT",body:JSON.stringify(settings)});setNotice("Store settings saved. Refresh the storefront to see changes.");}catch(e){setNotice(e.message);}};
+ const blankProduct=()=>({name:"",sku:"",category_id:"",subcategory_id:"",short_description:"",description:"",brand:"Balaji Handicraft",material:"Solid Sheesham Wood",tags:"",image:"",image_2:"",image_3:"",image_4:"",image_5:"",video:"",length_in:"",width_in:"",height_in:"",length_cm:"",width_cm:"",height_cm:"",weight_kg:"",color:"",finish:"",care_instructions:"",assembly_info:"",price:"",old_price:"",qty:"",status:"active",featured:0,best_seller:0,new_arrival:0,seo_title:"",meta_description:"",slug:""});
+ const startAdd=()=>{setEditing(blankProduct());setTab("products");window.scrollTo({top:0,behavior:"smooth"});};
  const saveProduct=async()=>{
-   if(!editing?.name)return setNotice("Product name is required.");
-   const payload={...editing,price:Number(editing.price||0),old_price:Number(editing.old_price||0),qty:Number(editing.qty||0),status:editing.status||"active"};
+   if(!editing?.name?.trim())return setNotice("Product name is required.");
+   const payload={...editing,name:editing.name.trim(),price:Number(editing.price||0),old_price:Number(editing.old_price||0),qty:Number(editing.qty||0),category_id:editing.category_id?Number(editing.category_id):null,subcategory_id:editing.subcategory_id?Number(editing.subcategory_id):null,length_in:editing.length_in===""?null:Number(editing.length_in),width_in:editing.width_in===""?null:Number(editing.width_in),height_in:editing.height_in===""?null:Number(editing.height_in),length_cm:editing.length_cm===""?null:Number(editing.length_cm),width_cm:editing.width_cm===""?null:Number(editing.width_cm),height_cm:editing.height_cm===""?null:Number(editing.height_cm),weight_kg:editing.weight_kg===""?null:Number(editing.weight_kg),featured:editing.featured?1:0,best_seller:editing.best_seller?1:0,new_arrival:editing.new_arrival?1:0};
    try{
      if(editing.id)await api("/api/admin/products/"+editing.id,{method:"PUT",body:JSON.stringify(payload)});
      else await api("/api/admin/products",{method:"POST",body:JSON.stringify(payload)});
      setEditing(null);setNotice("Product saved successfully.");load();
-   }catch(e){setNotice(e.message);}
+   }catch(e){setNotice(e.message||"Could not save product");}
  };
+ const uploadMedia=async(key)=>{
+   const input=document.createElement("input");input.type="file";input.accept=key==="video"?"video/*":"image/*";
+   input.onchange=async()=>{
+     const file=input.files?.[0];if(!file)return;
+     const form=new FormData();form.append("file",file);
+     try{setNotice("Uploading "+file.name+"…");const data=await api("/api/admin/upload",{method:"POST",body:form});setEditing(e=>({...e,[key]:data.url}));setNotice("Upload complete.");}
+     catch(e){setNotice(e.message||"Upload failed");}
+   };
+   input.click();
+ };
+ const removeProduct=async id=>{if(!confirm("Delete this product permanently?"))return;try{await api("/api/admin/products/"+id,{method:"DELETE"});setNotice("Product deleted.");load();}catch(e){setNotice(e.message);}};
+ const saveSettings=async()=>{try{await api("/api/admin/settings",{method:"PUT",body:JSON.stringify(settings)});setNotice("Store settings saved. Refresh the storefront to see changes.");}catch(e){setNotice(e.message);}};
  const saveCategory=async()=>{
    if(!editing?.name)return setNotice("Category name is required.");
-   try{
-     if(editing.id)await api("/api/admin/categories/"+editing.id,{method:"PUT",body:JSON.stringify(editing)});
-     else await api("/api/admin/categories",{method:"POST",body:JSON.stringify(editing)});
-     setEditing(null);setNotice("Category saved successfully.");load();
-   }catch(e){setNotice(e.message);}
+   try{if(editing.id)await api("/api/admin/categories/"+editing.id,{method:"PUT",body:JSON.stringify(editing)});else await api("/api/admin/categories",{method:"POST",body:JSON.stringify(editing)});setEditing(null);setNotice("Category saved successfully.");load();}
+   catch(e){setNotice(e.message);}
  };
  const tabs=[["overview","Dashboard"],["products","Products"],["orders","Orders"],["categories","Categories"],["settings","Store settings"]];
  return <div className="container admin">
    <div className="adminTop"><div><span className="eyebrow">STORE CONTROL</span><h1>Furniture Admin</h1><p>Central control panel for products, orders, categories and website settings.</p></div><div className="adminTopActions"><button className="btn light" onClick={logout}>Sign out</button><Link className="btn dark" to="/">View store <ArrowRight/></Link></div></div>
    {notice&&<div className="adminNotice">{notice}</div>}
    <div className="adminLayout">
-     <aside>{tabs.map(([id,label])=><button key={id} className={tab===id?"on":""} onClick={()=>{setTab(id);setEditing(null)}}>{label}</button>)}</aside>
-     <section className="adminPanel">
-       {tab==="overview"&&<><div className="panelHead"><div><h2>Dashboard</h2><p className="adminMuted">Live data from your MySQL database.</p></div><button className="btn light" onClick={load}>Refresh</button></div><div className="adminStats"><div><span>Products</span><b>{stats.products}</b><small>Live catalog</small></div><div><span>Orders</span><b>{stats.orders}</b><small>Latest orders</small></div><div><span>Revenue</span><b>{fmt(stats.revenue/84)}</b><small>Database total</small></div><div><span>Customers</span><b>{stats.customers}</b><small>Registered users</small></div></div><div className="adminQuick"><button onClick={()=>{setTab("products");setEditing({name:"",sku:"",price:"",old_price:"",qty:"",image:"",description:"",status:"active"})}}>+ Add product</button><button onClick={()=>setTab("orders")}>View orders</button><button onClick={()=>setTab("categories")}>Manage categories</button><button onClick={()=>setTab("settings")}>Edit website settings</button></div></>}
-       {tab==="products"&&<><div className="panelHead"><div><h2>Products</h2><p className="adminMuted">{rows.length} products in database</p></div><button type="button" className="btn dark" onClick={()=>{setTab("products");setEditing({name:"",sku:"",price:"",old_price:"",qty:"",image:"",description:"",status:"active"});window.scrollTo({top:0,behavior:"smooth"})}}>+ Add product</button></div>{editing&&<div className="adminForm"><h3>{editing.id?"Edit product":"Add product"}</h3><div className="adminFormGrid"><input placeholder="Product name *" value={editing.name||""} onChange={e=>setEditing({...editing,name:e.target.value})}/><input placeholder="SKU" value={editing.sku||""} onChange={e=>setEditing({...editing,sku:e.target.value})}/><input placeholder="Price" type="number" value={editing.price||""} onChange={e=>setEditing({...editing,price:e.target.value})}/><input placeholder="Old price" type="number" value={editing.old_price||""} onChange={e=>setEditing({...editing,old_price:e.target.value})}/><input placeholder="Stock quantity" type="number" value={editing.qty||""} onChange={e=>setEditing({...editing,qty:e.target.value})}/><input placeholder="Image URL" value={editing.image||""} onChange={e=>setEditing({...editing,image:e.target.value})}/><textarea className="wideField" placeholder="Description" value={editing.description||""} onChange={e=>setEditing({...editing,description:e.target.value})}/><select value={editing.status||"active"} onChange={e=>setEditing({...editing,status:e.target.value})}><option value="active">Active</option><option value="inactive">Inactive</option></select></div><div className="formActions"><button className="btn light" onClick={()=>setEditing(null)}>Cancel</button><button className="btn dark" onClick={saveProduct}>Save product</button></div></div>}{loading?<p>Loading…</p>:rows.map(x=><div className="adminRow" key={x.id}><img src={x.image||"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300"}/><div><b>{x.name}</b><span>{x.sku||"No SKU"} · Stock {x.qty??"—"}</span></div><strong>{x.price!=null?fmt(Number(x.price)/84):"—"}</strong><span className="stock">{String(x.status||"active")}</span><button className="editProductBtn" onClick={()=>{setEditing({...x});window.scrollTo({top:0,behavior:"smooth"})}}>Edit Product</button><button onClick={()=>removeProduct(x.id)} title="Delete product"><Trash2/></button></div>)}</>}
-       {tab==="orders"&&<><div className="panelHead"><div><h2>Orders</h2><p className="adminMuted">Latest 100 orders from database.</p></div><button className="btn light" onClick={load}>Refresh</button></div>{orders.length?orders.map(o=><div className="orderMock" key={o.id}><b>#{o.order_number||o.id}</b><span>{o.created_at||o.date||"Order"} · {o.status||"Pending"}</span><strong>{o.total!=null?fmt(Number(o.total)/84):"—"}</strong><i>{o.payment_status||o.status||"Pending"}</i></div>):<div className="emptyAdmin">No orders found yet.</div>}</>}
-       {tab==="categories"&&<><div className="panelHead"><div><h2>Categories</h2><p className="adminMuted">Changes here control the catalog structure.</p></div><button className="btn dark" onClick={()=>setEditing({name:"",slug:""})}>+ Add category</button></div>{editing&&<div className="adminForm"><h3>{editing.id?"Edit category":"Add category"}</h3><div className="adminFormGrid"><input placeholder="Category name *" value={editing.name||""} onChange={e=>setEditing({...editing,name:e.target.value})}/><input placeholder="Slug" value={editing.slug||""} onChange={e=>setEditing({...editing,slug:e.target.value})}/></div><div className="formActions"><button className="btn light" onClick={()=>setEditing(null)}>Cancel</button><button className="btn dark" onClick={saveCategory}>Save category</button></div></div>}{categories.map(c=><div className="categoryRow" key={c.id}><b>{c.name}</b><span>{c.slug||""}</span><button onClick={()=>setEditing({...c})}>Edit</button></div>)}</>}
-       {tab==="settings"&&<><div className="panelHead"><div><h2>Website settings</h2><p className="adminMuted">These values are stored in MySQL and exposed to the storefront.</p></div></div><div className="settingsBox"><label>Store name<input value={settings.store_name||""} onChange={e=>setSettings({...settings,store_name:e.target.value})}/></label><label>Currency<select value={settings.currency||"INR"} onChange={e=>setSettings({...settings,currency:e.target.value})}><option value="INR">INR (₹)</option><option value="USD">USD ($)</option></select></label><label>Free shipping threshold<input type="number" value={settings.shipping_threshold||""} onChange={e=>setSettings({...settings,shipping_threshold:e.target.value})}/></label><label>Announcement<input value={settings.announcement||""} onChange={e=>setSettings({...settings,announcement:e.target.value})}/></label><label>Phone<input value={settings.phone||""} onChange={e=>setSettings({...settings,phone:e.target.value})}/></label><label>Email<input value={settings.email||""} onChange={e=>setSettings({...settings,email:e.target.value})}/></label><label>Address<input value={settings.address||""} onChange={e=>setSettings({...settings,address:e.target.value})}/></label><button className="btn dark" onClick={saveSettings}>Save website settings</button></div></>}
-     </section>
+    <aside>{tabs.map(([id,label])=><button key={id} className={tab===id?"on":""} onClick={()=>{setTab(id);if(id!=="products")setEditing(null)}}>{label}</button>)}</aside>
+    <section className="adminPanel">
+     {tab==="overview"&&<><div className="panelHead"><div><h2>Dashboard</h2><p className="adminMuted">Live data from your MySQL database.</p></div><button className="btn light" onClick={load}>Refresh</button></div><div className="adminStats"><div><span>Products</span><b>{stats.products}</b><small>Live catalog</small></div><div><span>Orders</span><b>{stats.orders}</b><small>Latest orders</small></div><div><span>Revenue</span><b>{fmt(stats.revenue/84)}</b><small>Database total</small></div><div><span>Customers</span><b>{stats.customers}</b><small>Registered users</small></div></div><div className="adminQuick"><button onClick={startAdd}>+ Add product</button><button onClick={()=>setTab("orders")}>View orders</button><button onClick={()=>setTab("categories")}>Manage categories</button><button onClick={()=>setTab("settings")}>Edit website settings</button></div></>}
+     {tab==="products"&&<><div className="panelHead"><div><h2>Products</h2><p className="adminMuted">{rows.length} products in database</p></div>{!editing&&<button type="button" className="btn dark" onClick={startAdd}>+ Add product</button>}</div>{editing?<ProductEditor editing={editing} setEditing={setEditing} categories={categories} subcategories={subcategories} onSave={saveProduct} onCancel={()=>setEditing(null)} onUpload={uploadMedia}/>:loading?<p>Loading…</p>:rows.map(x=><div className="adminRow" key={x.id}><img src={x.image||"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300"}/><div><b>{x.name}</b><span>{x.sku||"No SKU"} · Stock {x.qty??"—"}</span></div><strong>{x.price!=null?fmt(Number(x.price)/84):"—"}</strong><span className="stock">{String(x.status||"active")}</span><button className="editProductBtn" onClick={()=>{setEditing({...x});window.scrollTo({top:0,behavior:"smooth"})}}>Edit Product</button><button onClick={()=>removeProduct(x.id)} title="Delete product"><Trash2/></button></div>)}</>}
+     {tab==="orders"&&<><div className="panelHead"><div><h2>Orders</h2><p className="adminMuted">Latest 100 orders from database.</p></div><button className="btn light" onClick={load}>Refresh</button></div>{orders.length?orders.map(o=><div className="orderMock" key={o.id}><b>#{o.order_number||o.id}</b><span>{o.created_at||o.date||"Order"} · {o.status||"Pending"}</span><strong>{o.total!=null?fmt(Number(o.total)/84):"—"}</strong><i>{o.payment_status||o.status||"Pending"}</i></div>):<div className="emptyAdmin">No orders found yet.</div>}</>}
+     {tab==="categories"&&<><div className="panelHead"><div><h2>Categories</h2><p className="adminMuted">Changes here control the catalog structure.</p></div><button className="btn dark" onClick={()=>setEditing({name:"",slug:""})}>+ Add category</button></div>{editing&&<div className="adminForm"><h3>{editing.id?"Edit category":"Add category"}</h3><div className="adminFormGrid"><input placeholder="Category name *" value={editing.name||""} onChange={e=>setEditing({...editing,name:e.target.value})}/><input placeholder="Slug" value={editing.slug||""} onChange={e=>setEditing({...editing,slug:e.target.value})}/></div><div className="formActions"><button className="btn light" onClick={()=>setEditing(null)}>Cancel</button><button className="btn dark" onClick={saveCategory}>Save category</button></div></div>}{categories.map(c=><div className="categoryRow" key={c.id}><b>{c.name}</b><span>{c.slug||""}</span><button onClick={()=>setEditing({...c})}>Edit</button></div>)}</>}
+     {tab==="settings"&&<><div className="panelHead"><div><h2>Website settings</h2><p className="adminMuted">These values are stored in MySQL and exposed to the storefront.</p></div></div><div className="settingsBox"><label>Store name<input value={settings.store_name||""} onChange={e=>setSettings({...settings,store_name:e.target.value})}/></label><label>Currency<select value={settings.currency||"INR"} onChange={e=>setSettings({...settings,currency:e.target.value})}><option value="INR">INR (₹)</option><option value="USD">USD ($)</option></select></label><label>Free shipping threshold<input type="number" value={settings.shipping_threshold||""} onChange={e=>setSettings({...settings,shipping_threshold:e.target.value})}/></label><label>Announcement<input value={settings.announcement||""} onChange={e=>setSettings({...settings,announcement:e.target.value})}/></label><label>Phone<input value={settings.phone||""} onChange={e=>setSettings({...settings,phone:e.target.value})}/></label><label>Email<input value={settings.email||""} onChange={e=>setSettings({...settings,email:e.target.value})}/></label><label>Address<input value={settings.address||""} onChange={e=>setSettings({...settings,address:e.target.value})}/></label><button className="btn dark" onClick={saveSettings}>Save website settings</button></div></>}
+    </section>
    </div>
  </div>
 }
