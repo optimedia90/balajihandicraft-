@@ -32,7 +32,7 @@ const categoryMenus=[
  {name:"Storage",slug:"Storage",subs:["Wardrobes","Dressers","TV Units","Bookshelves","Cabinets","Sideboards","Chest of Drawers"]}
 ];
 let activeCurrency=localStorage.getItem("bh_currency")||"USD";
-const fmt=n=>{const value=activeCurrency==="INR"?Number(n)*84:Number(n);return activeCurrency==="INR"?"₹"+Math.round(value).toLocaleString("en-IN"):"$"+value.toLocaleString("en-US",{maximumFractionDigits:0});};
+const fmt=n=>{const value=Number(n)||0;return activeCurrency==="INR"?"₹"+Math.round(value).toLocaleString("en-IN"):"$"+(value/84).toLocaleString("en-US",{maximumFractionDigits:0});};
 function App(){
  const [cart,setCart]=useState(()=>JSON.parse(localStorage.getItem("bh_cart")||"[]"));
  const [wish,setWish]=useState(()=>JSON.parse(localStorage.getItem("bh_wish")||"[]"));
