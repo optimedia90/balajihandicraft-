@@ -29,7 +29,7 @@ const resolveImage=(src)=>{
  if(/^https?:\/\//i.test(v)){
   try{
    const u=new URL(v);
-   if(u.protocol==="https:"&&u.hostname==="cdn.shopify.com")return window.location.origin+"/api/image-proxy?url="+encodeURIComponent(u.href);
+   if(u.protocol==="https:"&&u.hostname==="cdn.shopify.com")return u.href;
    return u.href;
   }catch{return v;}
  }
