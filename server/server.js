@@ -509,7 +509,7 @@ app.get("/api/store/blog",asyncHandler(async(req,res)=>{ const [items]=await db.
 app.get("/api/store/banners",asyncHandler(async(req,res)=>{ const [items]=await db.query("SELECT * FROM banners ORDER BY id DESC"); res.json({items}); }));
 app.get("/api/store/products",asyncHandler(async(req,res)=>{
   await ensureProductFields();
-  const [rows]=await db.query("SELECT p.*, c.name AS category_name, s.name AS subcategory_name FROM products p LEFT JOIN categories c ON c.id=p.category_id LEFT JOIN subcategories s ON s.id=p.subcategory_id WHERE p.status IS NULL OR p.status=1 OR p.status=\\'active\\' ORDER BY p.id DESC");
+  const [rows]=await db.query("SELECT p.*, c.name AS category_name, s.name AS subcategory_name FROM products p LEFT JOIN categories c ON c.id=p.category_id LEFT JOIN subcategories s ON s.id=p.subcategory_id WHERE p.status IS NULL OR p.status=1 OR p.status=? ORDER BY p.id DESC",["active"]);
   await repairProductImages(rows);
   res.json({products:rows});
 }));
