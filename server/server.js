@@ -12,11 +12,15 @@ dotenv.config();
 const app=express();
 const __filename=fileURLToPath(import.meta.url);
 const __dirname=path.dirname(__filename);
-const uploadDir=path.join(__dirname,"uploads");
+// Keep new uploads outside the deployed source tree when possible.
+const legacyUploadDir=path.join(__dirname,"uploads");
+const uploadDir=process.env.UPLOAD_DIR||path.join(process.env.HOME||__dirname,".balaji-handicraft-uploads");
 fs.mkdirSync(uploadDir,{recursive:true});
+fs.mkdirSync(legacyUploadDir,{recursive:true});
 const upload=multer({dest:uploadDir,limits:{fileSize:50*1024*1024}});
 app.use(express.json({limit:"20mb"}));
 app.use("/uploads",express.static(uploadDir));
+app.use("/uploads",express.static(legacyUploadDir));
 
 // Proxy Shopify CDN product images through the storefront origin.
 app.get("/api/image-proxy",async(req,res)=>{
@@ -82,6 +86,43 @@ async function ensureProductFields(){
   for(const [name,type] of Object.entries(defs)) if(!existing.has(name)) await db.query("ALTER TABLE products ADD COLUMN "+name+" "+type);
 }
 
+const imageRepairMapPath=path.join(__dirname,"product-image-repair.json");
+let imageRepairMap=null;
+function getImageRepairMap(){
+  if(imageRepairMap)return imageRepairMap;
+  try{imageRepairMap=JSON.parse(fs.readFileSync(imageRepairMapPath,"utf8"));}catch{imageRepairMap={};}
+  return imageRepairMap;
+}
+function missingLocalUpload(value){
+  if(!value)return true;
+  let pathname="";
+  try{pathname=new URL(String(value),"http://local.invalid").pathname;}catch{return false;}
+  const at=pathname.indexOf("/uploads/");
+  if(at<0)return false;
+  let filename="";
+  try{filename=path.basename(decodeURIComponent(pathname.slice(at+9)));}catch{return true;}
+  if(!filename)return true;
+  return !fs.existsSync(path.join(uploadDir,filename))&&!fs.existsSync(path.join(legacyUploadDir,filename));
+}
+async function repairProductImages(rows){
+  const map=getImageRepairMap();
+  for(const product of rows){
+    const backup=map[String(product.sku||"").trim()];
+    if(!backup)continue;
+    let changed=false;
+    if(missingLocalUpload(product.image)){product.image=backup;changed=true;}
+    for(const key of ["image_2","image_3","image_4","image_5"]){
+      if(product[key]&&missingLocalUpload(product[key])){product[key]="";changed=true;}
+    }
+    if(changed){
+      await db.query("UPDATE products SET image=?, image_2=?, image_3=?, image_4=?, image_5=? WHERE id=?",
+        [product.image||backup,product.image_2||"",product.image_3||"",product.image_4||"",product.image_5||"",product.id]);
+      if(!product.image)product.image=backup;
+    }
+  }
+  return rows;
+}
+
 async function ensureSettings(){
   await db.query("CREATE TABLE IF NOT EXISTS store_settings (id INT PRIMARY KEY DEFAULT 1, store_name VARCHAR(255) NOT NULL DEFAULT 'Balaji Handicraft', currency VARCHAR(10) NOT NULL DEFAULT 'INR', shipping_threshold DECIMAL(12,2) NOT NULL DEFAULT 42000, phone VARCHAR(100) DEFAULT '', email VARCHAR(255) DEFAULT '', address VARCHAR(500) DEFAULT '', announcement VARCHAR(500) DEFAULT 'Free shipping on orders over ₹42,000') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
   await db.query("INSERT IGNORE INTO store_settings (id) VALUES (1)");
@@ -125,7 +166,9 @@ app.get("/api/admin/stats",auth,asyncHandler(async(req,res)=>{
 }));
 
 app.get("/api/admin/products",auth,asyncHandler(async(req,res)=>{
+  await ensureProductFields();
   const [rows]=await db.query("SELECT * FROM products ORDER BY id DESC");
+  await repairProductImages(rows);
   res.json({products:rows});
 }));
 app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(async(req,res)=>{
@@ -465,7 +508,9 @@ app.put("/api/admin/seo",auth,asyncHandler(async(req,res)=>{ await ensureAdminCo
 app.get("/api/store/blog",asyncHandler(async(req,res)=>{ const [items]=await db.query("SELECT * FROM blog_posts WHERE status IS NULL OR status='published' OR status='active' ORDER BY id DESC"); res.json({items}); }));
 app.get("/api/store/banners",asyncHandler(async(req,res)=>{ const [items]=await db.query("SELECT * FROM banners ORDER BY id DESC"); res.json({items}); }));
 app.get("/api/store/products",asyncHandler(async(req,res)=>{
-  const [rows]=await db.query("SELECT p.*, c.name AS category_name, s.name AS subcategory_name FROM products p LEFT JOIN categories c ON c.id=p.category_id LEFT JOIN subcategories s ON s.id=p.subcategory_id WHERE p.status IS NULL OR p.status=1 OR p.status=\'active\' ORDER BY p.id DESC");
+  await ensureProductFields();
+  const [rows]=await db.query("SELECT p.*, c.name AS category_name, s.name AS subcategory_name FROM products p LEFT JOIN categories c ON c.id=p.category_id LEFT JOIN subcategories s ON s.id=p.subcategory_id WHERE p.status IS NULL OR p.status=1 OR p.status=\\'active\\' ORDER BY p.id DESC");
+  await repairProductImages(rows);
   res.json({products:rows});
 }));
 app.get("/api/store/categories",asyncHandler(async(req,res)=>{
