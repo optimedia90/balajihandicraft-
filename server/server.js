@@ -154,6 +154,31 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
   };
   const rows=parseCSV(csv);
   if(!rows.length)return res.status(400).json({message:"CSV contains no product rows"});
+  // Image-only repair imports update only the five image columns and never overwrite product details.
+  if(rows.some(r=>String(r["Image Repair"]||"").trim().toUpperCase()==="YES")){
+    const imageGroups=new Map();
+    for(const row of rows){
+      const sku=String(row["Variant SKU"]||row.SKU||"").trim();
+      const image=String(row["Image Src"]||"").trim();
+      if(!sku||!image)continue;
+      if(!imageGroups.has(sku))imageGroups.set(sku,[]);
+      imageGroups.get(sku).push({image,position:Number(row["Image Position"]||0)});
+    }
+    const connection=await db.getConnection();
+    let updated=0,notFound=0;
+    try{
+      await connection.beginTransaction();
+      for(const [sku,entries] of imageGroups){
+        const images=[...new Map(entries.sort((a,b)=>(a.position||9999)-(b.position||9999)).map(x=>[x.image,x.image])).values()].slice(0,5);
+        while(images.length<5)images.push("");
+        const [result]=await connection.query("UPDATE products SET image=?, image_2=?, image_3=?, image_4=?, image_5=? WHERE sku=?",[...images,sku]);
+        if(result.affectedRows)updated++;else notFound++;
+      }
+      await connection.commit();
+    }catch(err){await connection.rollback();throw err}
+    finally{connection.release()}
+    return res.json({message:"Image-only repair finished. Other product fields were not changed.",updated,notFound,processed:imageGroups.size});
+  }
   const groups=new Map();
   // Group Shopify rows by SKU first. Every image row can contain a Title,
   // so grouping by "Title present/blank" is unreliable. SKU is the stable
