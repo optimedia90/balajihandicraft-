@@ -24,22 +24,26 @@ let liveCats=[];
 const originalImageUrl=(src)=>{try{const u=new URL(String(src||""),window.location.origin);if(u.pathname==="/api/image-proxy")return u.searchParams.get("url")||src;return src}catch{return src}};
 const imageErrorFallback=(e)=>{
  const img=e.currentTarget;
- let u;try{u=new URL(img.src)}catch{u=null}
- if(u&&u.hostname==="cdn.shopify.com"&&img.dataset.proxyTried!=="1"){
+ const src=img.dataset.originalSrc||img.src;
+ let u;try{u=new URL(src,window.location.origin)}catch{u=null}
+ if(u&&u.hostname==="cdn.shopify.com"&&img.dataset.weservTried!=="1"){
+  img.dataset.originalSrc=u.href;
+  img.dataset.weservTried="1";
+  img.src="https://images.weserv.nl/?url="+encodeURIComponent(u.href);
+  return;
+ }
+ if(u&&u.hostname==="images.weserv.nl"&&img.dataset.proxyTried!=="1"){
   img.dataset.proxyTried="1";
-  img.src=window.location.origin+"/api/image-proxy?url="+encodeURIComponent(u.href);
+  img.src=window.location.origin+"/api/image-proxy?url="+encodeURIComponent(img.dataset.originalSrc||"");
   return;
  }
  if(u&&u.pathname==="/api/image-proxy"&&img.dataset.originalTried!=="1"){
   img.dataset.originalTried="1";
-  img.src=u.searchParams.get("url")||img.src;
+  img.src=img.dataset.originalSrc||u.searchParams.get("url")||img.src;
   return;
  }
- if(img.dataset.fallbackTried==="1"){img.style.visibility="hidden";return;}
- img.dataset.fallbackTried="1";
- const label=String(img.alt||"").toLowerCase();
- const fallback=label.includes("sofa")?"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900":label.includes("chair")?"https://images.unsplash.com/photo-1592078615290-033ee584e267?w=900":label.includes("table")||label.includes("dining")?"https://images.unsplash.com/photo-1617806118233-18e1de247200?w=900":"https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=900";
- img.src=fallback;
+ // Never substitute an unrelated stock photo for a real product image.
+ img.style.visibility="hidden";
 };
 const resolveImage=(src)=>{
  const v=String(src||"").trim().replace(/^["']|["']$/g,"");
