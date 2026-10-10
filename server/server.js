@@ -18,6 +18,28 @@ const upload=multer({dest:uploadDir,limits:{fileSize:50*1024*1024}});
 app.use(express.json({limit:"20mb"}));
 app.use("/uploads",express.static(uploadDir));
 
+// Proxy Shopify CDN product images through the storefront origin.
+app.get("/api/image-proxy",async(req,res)=>{
+  try{
+    const target=new URL(String(req.query.url||""));
+    if(target.protocol!=="https:"||target.hostname!=="cdn.shopify.com")return res.status(400).end("Unsupported image host");
+    const upstream=await fetch(target.href,{headers:{"User-Agent":"BalajiHandicraftImageProxy/1.0"},signal:AbortSignal.timeout(12000)});
+    if(!upstream.ok)return res.status(upstream.status).end("Image unavailable");
+    if(new URL(upstream.url).hostname!=="cdn.shopify.com")return res.status(502).end("Unexpected image host");
+    const type=upstream.headers.get("content-type")||"";
+    if(!type.startsWith("image/"))return res.status(415).end("Not an image");
+    res.setHeader("Content-Type",type);
+    res.setHeader("Cache-Control","public, max-age=86400, stale-while-revalidate=604800");
+    res.setHeader("X-Content-Type-Options","nosniff");
+    res.status(200);
+    const bytes=Buffer.from(await upstream.arrayBuffer());
+    res.end(bytes);
+  }catch(err){
+    if(!res.headersSent)res.status(502);
+    res.end("Could not load product image");
+  }
+});
+
 const PORT=process.env.PORT||3000;
 const JWT_SECRET=process.env.JWT_SECRET||"change-this-jwt-secret";
 const ADMIN_EMAIL=process.env.ADMIN_EMAIL||"admin@balajihandicraft.com";
