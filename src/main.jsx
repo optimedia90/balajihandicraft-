@@ -22,7 +22,25 @@ let products=[...demoProducts];
 let liveCategoryMenus=[];
 let liveCats=[];
 const originalImageUrl=(src)=>{try{const u=new URL(String(src||""),window.location.origin);if(u.pathname==="/api/image-proxy")return u.searchParams.get("url")||src;return src}catch{return src}};
-const imageErrorFallback=(e)=>{const img=e.currentTarget;if(img.dataset.fallbackTried==="1"){img.style.visibility="hidden";return;}const original=originalImageUrl(img.src);if(original&&original!==img.src&&!img.dataset.originalTried){img.dataset.originalTried="1";img.src=original;return;}img.dataset.fallbackTried="1";const label=String(img.alt||"").toLowerCase();const choices=label.includes("sofa")?["https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900","https://images.unsplash.com/photo-1550254478-152c0b6b9b5e?w=900"]:label.includes("bed")||label.includes("bedroom")?["https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=900","https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=900"]:label.includes("chair")?["https://images.unsplash.com/photo-1592078615290-033ee584e267?w=900","https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900"]:label.includes("dining")||label.includes("table")?["https://images.unsplash.com/photo-1617806118233-18e1de247200?w=900","https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=900"]:["https://images.unsplash.com/photo-1558997519-83ea9252edf8?w=900","https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900"];const fallback=choices.find(url=>!String(img.src).includes(url.split("?")[0]))||"https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=900";img.src=fallback;};
+const imageErrorFallback=(e)=>{
+ const img=e.currentTarget;
+ let u;try{u=new URL(img.src)}catch{u=null}
+ if(u&&u.hostname==="cdn.shopify.com"&&img.dataset.proxyTried!=="1"){
+  img.dataset.proxyTried="1";
+  img.src=window.location.origin+"/api/image-proxy?url="+encodeURIComponent(u.href);
+  return;
+ }
+ if(u&&u.pathname==="/api/image-proxy"&&img.dataset.originalTried!=="1"){
+  img.dataset.originalTried="1";
+  img.src=u.searchParams.get("url")||img.src;
+  return;
+ }
+ if(img.dataset.fallbackTried==="1"){img.style.visibility="hidden";return;}
+ img.dataset.fallbackTried="1";
+ const label=String(img.alt||"").toLowerCase();
+ const fallback=label.includes("sofa")?"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900":label.includes("chair")?"https://images.unsplash.com/photo-1592078615290-033ee584e267?w=900":label.includes("table")||label.includes("dining")?"https://images.unsplash.com/photo-1617806118233-18e1de247200?w=900":"https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=900";
+ img.src=fallback;
+};
 const resolveImage=(src)=>{
  const v=String(src||"").trim().replace(/^["']|["']$/g,"");
  if(!v)return "";
