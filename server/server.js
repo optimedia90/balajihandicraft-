@@ -306,7 +306,7 @@ app.put("/api/admin/products/:id",auth,asyncHandler(async(req,res)=>{
   try{await db.query("UPDATE products SET "+quoted+" WHERE id=?",[...keys.map(k=>body[k]),req.params.id]);res.json({ok:true})}
   catch(err){console.error("Update product failed:",err);res.status(400).json({message:"Could not update product: "+(err.sqlMessage||err.message||"Database error")})}
 }));
-app.delete("/api/admin/products/:id",auth,asyncHandler(async(req,res)=>{
+app.delete("/api/admin/products/bulk",auth,asyncHandler(async(req,res)=>{\n  const raw=Array.isArray(req.body?.ids)?req.body.ids:[];\n  const ids=[...new Set(raw.map(Number).filter(id=>Number.isInteger(id)&&id>0))];\n  if(!ids.length)return res.status(400).json({message:"Select at least one valid product."});\n  const [result]=await db.query("DELETE FROM products WHERE id IN ("+ids.map(()=>"?").join(",")+")",ids);\n  res.json({ok:true,deleted:result.affectedRows||0});\n}));\napp.delete("/api/admin/products/:id",auth,asyncHandler(async(req,res)=>{
   await db.query("DELETE FROM products WHERE id=?",[req.params.id]);
   res.json({ok:true});
 }));
