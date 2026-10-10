@@ -24,8 +24,7 @@ let liveCats=[];
 const originalImageUrl=(src)=>{try{const u=new URL(String(src||""),window.location.origin);if(u.pathname==="/api/image-proxy")return u.searchParams.get("url")||src;return src}catch{return src}};
 const imageErrorFallback=(e)=>{
  const img=e.currentTarget;
- const src=img.dataset.originalSrc||img.src;
- let u;try{u=new URL(src,window.location.origin)}catch{u=null}
+ let u;try{u=new URL(img.src,window.location.origin)}catch{u=null}
  if(u&&u.hostname==="cdn.shopify.com"&&img.dataset.weservTried!=="1"){
   img.dataset.originalSrc=u.href;
   img.dataset.weservTried="1";
