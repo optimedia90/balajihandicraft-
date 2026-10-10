@@ -265,24 +265,46 @@ app.post("/api/admin/products/bulk-csv",auth,upload.single("file"),asyncHandler(
   finally{connection.release()}
 }));
 
+async function uniqueProductSlug(name,sku,requestedSlug,excludeId=null){
+  const clean=v=>String(v||"").toLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  const base=clean(requestedSlug)||[clean(name),clean(sku)].filter(Boolean).join("-");
+  let candidate=(base||"furniture-product").slice(0,240),n=2;
+  while(true){
+    const params=[candidate];
+    let sql="SELECT id FROM products WHERE slug=? ";
+    if(excludeId){sql+="AND id<>? ";params.push(excludeId)}
+    sql+="LIMIT 1";
+    const [rows]=await db.query(sql,params);
+    if(!rows.length)return candidate;
+    const suffix="-"+n++;
+    candidate=(base||"furniture-product").slice(0,250-suffix.length)+suffix;
+  }
+}
 app.post("/api/admin/products",auth,asyncHandler(async(req,res)=>{
+  await ensureProductFields();
   const cols=await columns("products");
-  const body=pick(req.body||{},cols.filter(c=>c!=="id"&&c!=="created_at"&&c!=="updated_at"));
-  if(!body.name)return res.status(400).json({message:"Product name is required"});
+  const body=pick(req.body||{},cols.filter(c=>!["id","created_at","updated_at"].includes(c)));
+  if(!String(body.name||"").trim())return res.status(400).json({message:"Product name is required"});
+  body.name=String(body.name).trim();
+  if(cols.includes("slug"))body.slug=await uniqueProductSlug(body.name,body.sku,body.slug);
   const keys=Object.keys(body);
-  const quoted=keys.map(k=>"\`"+k+"\`").join(",");
+  if(!keys.length)return res.status(400).json({message:"No product fields were supplied"});
+  const quoted=keys.map(k=>String.fromCharCode(96)+k+String.fromCharCode(96)).join(",");
   const sql="INSERT INTO products ("+quoted+") VALUES ("+keys.map(()=>"?").join(",")+")";
-  const [result]=await db.query(sql,keys.map(k=>body[k]));
-  res.status(201).json({id:result.insertId});
+  try{const [result]=await db.query(sql,keys.map(k=>body[k]));res.status(201).json({id:result.insertId})}
+  catch(err){console.error("Create product failed:",err);res.status(400).json({message:"Could not save product: "+(err.sqlMessage||err.message||"Database error")})}
 }));
 app.put("/api/admin/products/:id",auth,asyncHandler(async(req,res)=>{
+  await ensureProductFields();
   const cols=await columns("products");
-  const body=pick(req.body||{},cols.filter(c=>c!=="id"&&c!=="created_at"&&c!=="updated_at"));
+  const body=pick(req.body||{},cols.filter(c=>!["id","created_at","updated_at"].includes(c)));
+  if(body.name)body.name=String(body.name).trim();
+  if(cols.includes("slug")&&body.name)body.slug=await uniqueProductSlug(body.name,body.sku,body.slug,req.params.id);
   const keys=Object.keys(body);
   if(!keys.length)return res.status(400).json({message:"No changes supplied"});
-  const sql="UPDATE products SET "+keys.map(k=>"\`"+k+"\`=?").join(",")+" WHERE id=?";
-  await db.query(sql,[...keys.map(k=>body[k]),req.params.id]);
-  res.json({ok:true});
+  const quoted=keys.map(k=>String.fromCharCode(96)+k+String.fromCharCode(96)+"=?").join(",");
+  try{await db.query("UPDATE products SET "+quoted+" WHERE id=?",[...keys.map(k=>body[k]),req.params.id]);res.json({ok:true})}
+  catch(err){console.error("Update product failed:",err);res.status(400).json({message:"Could not update product: "+(err.sqlMessage||err.message||"Database error")})}
 }));
 app.delete("/api/admin/products/:id",auth,asyncHandler(async(req,res)=>{
   await db.query("DELETE FROM products WHERE id=?",[req.params.id]);
