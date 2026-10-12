@@ -158,7 +158,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 04 Featured products */}
   <section className="homeSection featuredSection">
    <SectionTitle kicker="CURATED PICKS" title="Pieces worth coming home to." link="/shop"/>
-   <div className="products productLift"><ProductGrid items={products.slice(0,4)} add={add} toggleWish={toggleWish} wish={wish}/></div>
+   <div className="productLift"><ProductGrid items={products.slice(0,4)} add={add} toggleWish={toggleWish} wish={wish}/></div>
   </section>
 
   {/* 05 Room inspiration */}
@@ -176,7 +176,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 07 Best sellers */}
   <section className="homeSection bestSection">
    <SectionTitle kicker="MOST LOVED" title="Bestselling pieces" link="/shop"/>
-   <div className="products productWave"><ProductGrid items={products.slice(4,8)} add={add} toggleWish={toggleWish} wish={wish}/></div>
+   <div className="productWave"><ProductGrid items={products.slice(4,8)} add={add} toggleWish={toggleWish} wish={wish}/></div>
   </section>
 
   {/* 08 Brand statement / marquee */}
