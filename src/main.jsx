@@ -219,7 +219,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 14 More to explore */}
   <section className="homeSection exploreSection">
    <SectionTitle kicker="MORE TO EXPLORE" title="Complete the room." link="/shop"/>
-   <div className="exploreGrid">{products.slice(8,12).map((p,i)=><Link to={"/product?id="+p.id} className="exploreCard" key={p.id}><img onError={imageErrorFallback} src={p.img}/><div><span>0{i+1}</span><h3>{p.name}</h3><b>View piece <ArrowRight/></b></div></Link>)}</div>
+   <div className="exploreGrid">{products.slice(0,4).map((p,i)=><Link to={"/product?id="+p.id} className="exploreCard" key={p.id}><img onError={imageErrorFallback} src={p.img||demoProducts[i]?.img||demoProducts[0]?.img} alt={p.name}/><div><span>0{i+1}</span><h3>{p.name}</h3><b>View piece <ArrowRight/></b></div></Link>)}</div>
   </section>
 
   {/* 15 Journal */}
