@@ -168,9 +168,8 @@ function Home({add,toggleWish,wish,settings}){
   </section>
 
   {/* 06 Craftsmanship */}
-  <section className="craftSection">
-   <div className="craftImage"><img onError={imageErrorFallback} src={products[9]?.img}/><span>HANDCRAFTED</span></div>
-   <div className="craftCopy"><span className="eyebrow">MADE BY HAND</span><h2>Good furniture<br/><em>takes its time.</em></h2><p>From carefully selected timber to the final hand-finished surface, each Balaji piece is made with patience, precision and respect for the material.</p><div className="craftStats"><div><b>25+</b><span>Years of craft</span></div><div><b>100%</b><span>Solid wood focus</span></div><div><b>1-by-1</b><span>Quality checked</span></div></div><Link className="btn dark" to="/blog">Discover our craft <ArrowRight/></Link></div>
+  <section className="craftSection craftPosterSection">
+   <img className="craftPosterImage" src="/craft-poster.webp" alt="Balaji Handicraft solid wood furniture and craftsmanship" />
   </section>
 
   {/* 07 Best sellers */}
