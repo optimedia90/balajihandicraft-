@@ -193,7 +193,7 @@ function Home({add,toggleWish,wish,settings}){
 
   {/* 10 New arrivals */}
   <section className="newArrivalSection">
-   <div className="newArrivalVisual"><img onError={imageErrorFallback} src={products[8]?.img}/><div><span>NEW ARRIVAL</span><b>Live Edge<br/>Collection</b></div></div>
+   <div className="newArrivalVisual"><img src="/craft-poster.webp" alt="Balaji Handicraft solid wood furniture poster" onError={(e)=>{e.currentTarget.onerror=null;e.currentTarget.src=products[8]?.img||products[0]?.img||"";}}/><div><span>NEW ARRIVAL</span><b>Live Edge<br/>Collection</b></div></div>
    <div className="newArrivalCopy"><span className="eyebrow">JUST LANDED</span><h2>Fresh forms.<br/><em>Natural edges.</em></h2><p>New silhouettes inspired by organic shapes, expressive grain and modern living.</p><Link className="btn dark" to="/shop">Shop new arrivals <ArrowRight/></Link></div>
    <div className="newArrivalMini">{products.slice(8,12).map(p=><Link to={"/product?id="+p.id} key={p.id}><img onError={imageErrorFallback} src={p.img}/><span>{p.name}</span><b>{fmt(p.price)}</b></Link>)}</div>
   </section>
