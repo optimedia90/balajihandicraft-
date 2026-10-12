@@ -213,7 +213,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 13 Collection showcase */}
   <section className="showcaseSection">
    <div className="showcaseCopy"><span className="eyebrow">THE SHEESHHAM EDIT</span><h2>Natural wood.<br/><em>Beautifully lived in.</em></h2><p>Every grain tells a story. Our solid wood collection pairs traditional craftsmanship with clean, contemporary silhouettes.</p><Link className="btn light" to="/shop?cat=Storage">Explore the edit <ArrowRight/></Link></div>
-   <div className="showcaseImage"><img onError={imageErrorFallback} src={products[10]?.img}/><span>01 / 04</span></div>
+   <div className="showcaseImage"><img src="/craft-poster.webp" alt="Solid wood furniture craftsmanship poster" onError={(e)=>{e.currentTarget.onerror=null;e.currentTarget.src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1400&q=85";}}/><span>01 / 04</span></div>
   </section>
 
   {/* 14 More to explore */}
