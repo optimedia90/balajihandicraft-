@@ -228,7 +228,7 @@ function Home({add,toggleWish,wish,settings}){
    <div className="journalGrid">{[
     ["How to choose the right wood for your home",products[0]?.img,"MATERIAL GUIDE"],
     ["5 ways to make a living room feel warmer",products[1]?.img,"HOME EDIT"],
-    ["The details that make handcrafted furniture special",products[9]?.img,"CRAFT"]
+    ["The details that make handcrafted furniture special",products[0]?.img,"CRAFT"]
    ].map(x=><Link to="/blog" className="journalCard" key={x[0]}><img onError={imageErrorFallback} src={x[1]}/><span>{x[2]}</span><h3>{x[0]}</h3><b>Read story <ArrowRight/></b></Link>)}</div>
   </section>
 
