@@ -542,3 +542,11 @@
 .megaGroup>a:hover{color:#c43a32}
 @media(min-width:901px) and (max-width:1250px){.navwrap{gap:12px}.logo{flex-basis:150px;min-width:150px}.navwrap nav{gap:clamp(8px,1.2vw,15px)}.navMenuTitle{font-size:12px;gap:4px}.navicons{gap:1px}.navicons button,.navicons a{width:30px}}
 @media(max-width:900px){.navMenu{position:relative}.navMenuTitle{padding:12px 0}.dropdownMenu.megaMenu{position:static;display:none;box-shadow:none;border-top:0;padding:12px 16px;min-height:0;grid-template-columns:1fr;gap:20px;visibility:visible;opacity:1;pointer-events:auto;transform:none}.navMenu:hover .dropdownMenu.megaMenu{display:grid}.navMenu:focus-within .dropdownMenu.megaMenu{display:grid}}
+
+
+/* Sticky footer layout: keep the footer at the bottom on short pages without covering content. */
+html,body,#root{min-height:100%;width:100%}
+body{min-height:100vh}
+#root{min-height:100vh;display:flex;flex-direction:column}
+#root>main{flex:1 0 auto;width:100%}
+#root>footer{flex-shrink:0;margin-top:auto}
