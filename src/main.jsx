@@ -63,6 +63,22 @@ const normalizeProduct=(p)=>{
  return {id:Number(p.id),name:p.name||p.title||"Furniture Product",category:p.category_name||p.category||"Furniture",sub:p.subcategory_name||p.sub||"",price:Number(p.price||0),old:Number(p.old_price||p.old||p.price||0),rating:Number(p.rating||4.8),img:imgs[0]||p.img||"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900",gallery:imgs,description:p.description||p.short_description||"",short_description:p.short_description||"",brand:p.brand||"",material:p.material||"",color:p.color||"",finish:p.finish||"",care_instructions:p.care_instructions||"",assembly_info:p.assembly_info||"",length_in:p.length_in,width_in:p.width_in,height_in:p.height_in,length_cm:p.length_cm,width_cm:p.width_cm,height_cm:p.height_cm,weight_kg:p.weight_kg,tag:p.featured?"Featured":""};
 };
 const cats=[["All Furniture",""],["Beds","Beds"],["Sofas","Sofas"],["Dining","Dining"],["Chairs","Chairs"],["Tables","Tables"],["Storage","Storage"]];
+const categoryCardProduct=(category)=>{
+ const rows=products.filter(p=>p&&p.img);
+ const norm=v=>String(v||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+ const categoryAliases={
+  Beds:["bed","beds","bedroom"],
+  Sofas:["sofa","sofas","couch","sectional"],
+  Dining:["dining","diningtable","diningset"],
+  Chairs:["chair","chairs","armchair","stool"],
+  Tables:["table","tables","coffee table","console table","side table","study table"],
+  Storage:["storage","cabinet","wardrobe","dresser","sideboard","tv unit","bookshelf","trunk"]
+ };
+ const keys=categoryAliases[category]||[category.toLowerCase()];
+ const categoryMatch=rows.find(p=>keys.some(k=>norm(p.category)===norm(k)||norm(p.category).includes(norm(k))));
+ if(categoryMatch)return categoryMatch;
+ return rows.find(p=>keys.some(k=>norm(p.name).includes(norm(k))))||null;
+};
 const categoryMenus=[
  {name:"Living Room",slug:"Living Room",groups:[
   {title:"Seating",subs:["Sofa Sets","Armchairs","Rocking Chairs","Folding Chairs","Stools & Ottomans"]},
@@ -170,7 +186,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 03 Categories */}
   <section className="homeSection categorySection">
    <SectionTitle kicker="CURATED FOR YOUR HOME" title="Shop by category" link="/shop"/>
-   <div className="catGrid categoryReveal">{cats.slice(1).map(([n,c],i)=><Link to={"/shop?cat="+c} className="catTile" key={n}><img onError={imageErrorFallback} src={products[i]?.img}/><div><b>{n}</b><span>Explore collection <ArrowRight/></span></div></Link>)}</div>
+   <div className="catGrid categoryReveal">{cats.slice(1).map(([n,c])=>{const product=categoryCardProduct(c);return <Link to={"/shop?cat="+c} className="catTile" key={n}>{product?.img?<img onError={imageErrorFallback} src={product.img} alt={product.name}/>:<div className="catTileNoImage" aria-label={"No "+n+" product image available"}/>}<div><b>{n}</b><span>Explore collection <ArrowRight/></span></div></Link>})}</div>
   </section>
 
   {/* 04 Featured products */}
