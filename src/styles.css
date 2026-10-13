@@ -528,3 +528,17 @@
 /* Keep the desktop navigation balanced when live menu labels vary in length. */
 @media(min-width:901px) and (max-width:1250px){.navwrap{padding:0 2%;gap:10px}.logo{flex-basis:145px}.navwrap nav{gap:10px;font-size:11px}.navicons{gap:2px}.navicons button,.navicons a{width:32px}}
 @media(min-width:901px){.navwrap nav{overflow:visible}.navMenu{flex-shrink:1;min-width:0}.navMenuTitle{font-size:12px}.navMenuTitle svg{flex-shrink:0}}
+
+/* Room-based mega navigation, matched to the supplied reference screenshots */
+.navwrap nav{gap:clamp(12px,2.2vw,32px);overflow:visible}
+.navMenu{position:static}
+.navMenuTitle{display:inline-flex;align-items:center;gap:8px;padding:29px 0;white-space:nowrap;font-size:14px;font-weight:500}
+.navMenuTitle svg{width:15px;height:15px}
+.dropdownMenu.megaMenu{position:absolute;left:0;right:0;top:100%;width:100%;min-height:190px;padding:30px max(5%,calc((100vw - 1280px)/2));background:#fff;box-shadow:0 16px 28px #00000012;border-top:1px solid #eee;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px;visibility:hidden;opacity:0;pointer-events:none;transform:translateY(6px);transition:opacity .18s ease,transform .18s ease;z-index:30}
+.navMenu:hover .dropdownMenu.megaMenu,.navMenu:focus-within .dropdownMenu.megaMenu{visibility:visible;opacity:1;pointer-events:auto;transform:translateY(0)}
+.megaGroup{display:flex;flex-direction:column;align-items:flex-start;gap:13px;min-width:0}
+.megaGroup>b{font-size:15px;font-weight:700;margin-bottom:4px;color:#222}
+.megaGroup>a{font-size:14px;font-weight:400;color:#666;white-space:normal}
+.megaGroup>a:hover{color:#c43a32}
+@media(min-width:901px) and (max-width:1250px){.navwrap{gap:12px}.logo{flex-basis:150px;min-width:150px}.navwrap nav{gap:clamp(8px,1.2vw,15px)}.navMenuTitle{font-size:12px;gap:4px}.navicons{gap:1px}.navicons button,.navicons a{width:30px}}
+@media(max-width:900px){.navMenu{position:relative}.navMenuTitle{padding:12px 0}.dropdownMenu.megaMenu{position:static;display:none;box-shadow:none;border-top:0;padding:12px 16px;min-height:0;grid-template-columns:1fr;gap:20px;visibility:visible;opacity:1;pointer-events:auto;transform:none}.navMenu:hover .dropdownMenu.megaMenu{display:grid}.navMenu:focus-within .dropdownMenu.megaMenu{display:grid}}
