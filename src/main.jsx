@@ -64,12 +64,30 @@ const normalizeProduct=(p)=>{
 };
 const cats=[["All Furniture",""],["Beds","Beds"],["Sofas","Sofas"],["Dining","Dining"],["Chairs","Chairs"],["Tables","Tables"],["Storage","Storage"]];
 const categoryMenus=[
- {name:"Beds",slug:"Beds",subs:["King Beds","Queen Beds","Double Beds","Single Beds","Storage Beds","Canopy Beds","Kids Beds"]},
- {name:"Sofas",slug:"Sofas",subs:["3 Seater Sofas","2 Seater Sofas","Sectional Sofas","Sofa Sets","L Shape Sofas","Recliner Sofas","Loveseats"]},
- {name:"Dining",slug:"Dining",subs:["Dining Tables","Dining Sets","Dining Chairs","Bar Tables","Benches","Sideboards"]},
- {name:"Chairs",slug:"Chairs",subs:["Accent Chairs","Armchairs","Lounge Chairs","Dining Chairs","Office Chairs","Rocking Chairs"]},
- {name:"Tables",slug:"Tables",subs:["Coffee Tables","Console Tables","Side Tables","Bedside Tables","Study Tables","Office Tables"]},
- {name:"Storage",slug:"Storage",subs:["Wardrobes","Dressers","TV Units","Bookshelves","Cabinets","Sideboards","Chest of Drawers"]}
+ {name:"Living Room",slug:"Living Room",groups:[
+  {title:"Seating",subs:["Sofa Sets","Armchairs","Rocking Chairs","Folding Chairs","Stools & Ottomans"]},
+  {title:"Tables",subs:["Coffee Tables","Side & End Tables","Console Tables"]},
+  {title:"TV & Media",subs:["TV Units"]}
+ ]},
+ {name:"Bedroom",slug:"Bedroom",groups:[
+  {title:"Beds",subs:["All Beds","King Size Beds","Queen Size Beds","Single Beds"]},
+  {title:"Bedroom Storage",subs:["Wardrobes","Dressers & Chests of Drawers"]},
+  {title:"Vanity",subs:["Dressing Tables"]}
+ ]},
+ {name:"Dining Room",slug:"Dining Room",groups:[
+  {title:"Dining Sets",subs:["All Dining Sets","4 Seater Dining Sets","6 Seater Dining Sets"]},
+  {title:"Dining Seating",subs:["Dining Chairs","Dining Benches"]},
+  {title:"Bar",subs:["Bar Furniture"]}
+ ]},
+ {name:"Storage & Study",slug:"Storage & Study",groups:[
+  {title:"Storage",subs:["Bookshelves","Sideboards & Crockery Units","Trunks & Storage Chests","Wall Shelves"]},
+  {title:"Seating",subs:["Benches & Settees"]},
+  {title:"Study",subs:["Study Tables"]}
+ ]},
+ {name:"Home Decor",slug:"Home Decor",groups:[
+  {title:"Home Decor",subs:["Wall Art","Mirrors","Lighting","Vases & Planters"]},
+  {title:"Decorative Accessories",subs:["Decorative Objects","Rugs & Throws"]}
+ ]}
 ];
 let activeCurrency=localStorage.getItem("bh_currency")||"USD";
 const fmt=n=>{const value=Number(n)||0;return activeCurrency==="INR"?"₹"+Math.round(value).toLocaleString("en-IN"):"$"+(value/84).toLocaleString("en-US",{maximumFractionDigits:0});};
@@ -106,7 +124,7 @@ function Header({cart,wish,currency,setCurrency,settings,menus=categoryMenus}){
  const [open,setOpen]=useState(false);const [search,setSearch]=useState(false);
  return <header className="header"><div className="topbar">{settings?.announcement||("Free shipping on orders over "+fmt(500))} <span>•</span> Handcrafted furniture, made to last</div>
  <div className="navwrap"><Link to="/" className="logo"><span className="logoMark">BH</span><span><b>BALAJI</b><small>HANDICRAFT</small></span></Link>
- <nav className={open?"mobile open":"mobile"}><Link to="/shop" onClick={()=>setOpen(false)}>All Furniture</Link>{menus.map(cat=><div className="navMenu" key={cat.name}><Link className="navMenuTitle" to={"/shop?cat="+encodeURIComponent(cat.name)} onClick={()=>setOpen(false)}>{cat.name}<ChevronDown/></Link><div className="dropdownMenu">{cat.subs.map(sub=><Link key={sub} to={"/shop?cat="+encodeURIComponent(cat.name)+"&sub="+encodeURIComponent(sub)} onClick={()=>setOpen(false)}>{sub}</Link>)}</div></div>)}</nav>
+ <nav className={open?"mobile open":"mobile"}>{menus.map(cat=><div className="navMenu" key={cat.name}><Link className="navMenuTitle" to={"/shop?cat="+encodeURIComponent(cat.name)} onClick={()=>setOpen(false)}>{cat.name}<ChevronDown/></Link><div className="dropdownMenu megaMenu">{cat.groups.map(group=><div className="megaGroup" key={group.title}><b>{group.title}</b>{group.subs.map(sub=><Link key={sub} to={"/shop?cat="+encodeURIComponent(cat.name)+"&sub="+encodeURIComponent(sub)} onClick={()=>setOpen(false)}>{sub}</Link>)}</div>)}</div></div>)}</nav>
  <div className="navicons"><div className="currencySwitcher"><span>{currency==="USD"?"🇺🇸":"🇮🇳"}</span><select aria-label="Currency" value={currency} onChange={e=>setCurrency(e.target.value)}><option value="USD">USD ($)</option><option value="INR">INR (₹)</option></select></div><button onClick={()=>setSearch(!search)}><Search/></button><Link to="/wishlist" className="countIcon"><Heart/><i>{wish}</i></Link><Link to="/account"><User/></Link><Link to="/cart" className="countIcon"><ShoppingBag/><i>{cart}</i></Link><button className="hamb" onClick={()=>setOpen(!open)}>{open?<X/>:<Menu/>}</button></div></div>
  {search&&<div className="searchbar"><Search/><input autoFocus placeholder="Search beds, sofas, dining tables..." onKeyDown={e=>{if(e.key==="Enter")location.href="/shop?q="+encodeURIComponent(e.currentTarget.value)}}/></div>}
  </header>
