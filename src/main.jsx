@@ -268,9 +268,28 @@ function Home({add,toggleWish,wish,settings}){
   </section>
 
   {/* 16 Newsletter */}
-  <section className="newsletter newsletterReveal"><span className="eyebrow">JOIN THE HOME EDIT</span><h2>Beautiful homes start here.</h2><p>Get first access to new collections, private offers and styling inspiration.</p><div><input placeholder="Your email address"/><button>Subscribe <ArrowRight/></button></div></section>
+  <NewsletterSection/>
  </>
-}function SectionTitle({kicker,title,link}){return <div className="sectionTitle"><div><span>{kicker}</span><h2>{title}</h2></div>{link&&<Link to={link}>View all <ArrowRight/></Link>}</div>}
+}function NewsletterSection(){
+ const [email,setEmail]=useState("");
+ const [status,setStatus]=useState("");
+ const [submitting,setSubmitting]=useState(false);
+ async function subscribe(e){
+  e.preventDefault();
+  const value=email.trim().toLowerCase();
+  if(!value||!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value)){setStatus("Please enter a valid email address.");return;}
+  setSubmitting(true);setStatus("");
+  try{
+   const res=await fetch("/api/store/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:value})});
+   const data=await res.json().catch(()=>({}));
+   if(!res.ok)throw new Error(data.message||"Subscription failed. Please try again.");
+   setStatus(data.message||"Thanks for subscribing! You’re on the list.");setEmail("");
+  }catch(err){setStatus(err.message||"Could not subscribe right now. Please try again.");}
+  finally{setSubmitting(false);}
+ }
+ return <section className="newsletter newsletterReveal"><span className="eyebrow">JOIN THE HOME EDIT</span><h2>Beautiful homes start here.</h2><p>Get first access to new collections, private offers and styling inspiration.</p><form onSubmit={subscribe} noValidate><input type="email" name="email" aria-label="Your email address" placeholder="Your email address" value={email} onChange={e=>{setEmail(e.target.value);if(status)setStatus("");}} autoComplete="email" required/><button type="submit" disabled={submitting}>{submitting?"Please wait…":"Subscribe"} <ArrowRight/></button></form>{status&&<p className="newsletterStatus" role="status" aria-live="polite">{status}</p>}</section>
+}
+function SectionTitle({kicker,title,link}){return <div className="sectionTitle"><div><span>{kicker}</span><h2>{title}</h2></div>{link&&<Link to={link}>View all <ArrowRight/></Link>}</div>}
 function ProductGrid({items,add,toggleWish,wish}){return <div className="products">{items.map(p=><ProductCard key={p.id} p={p} add={add} toggleWish={toggleWish} wished={wish.some(x=>x.id===p.id)}/>)}</div>}
 function ProductCard({p,add,toggleWish,wished}){const navigate=useNavigate();return <article className="product"><div className="productImg"><Link to={"/product?id="+p.id} className="productImageLink">{p.tag&&<b className="tag">{p.tag}</b>}<img onError={imageErrorFallback} src={p.img}/></Link><button type="button" className={wished?"wish active":"wish"} aria-label={wished?"Remove from wishlist":"Add to wishlist"} onClick={e=>{e.preventDefault();e.stopPropagation();toggleWish(p)}}><Heart fill={wished?"currentColor":"none"}/></button><button type="button" className="quick" onClick={e=>{e.preventDefault();e.stopPropagation();add(p);navigate("/cart")}}>Add to cart <ArrowRight size={14}/></button></div><div className="productInfo"><div className="stars"><Star fill="currentColor"/> {p.rating}</div><Link to={"/product?id="+p.id}><h3>{p.name}</h3></Link><span className="sub">{p.sub}</span><div className="price"><b>{fmt(p.price)}</b><del>{fmt(p.old)}</del></div></div></article>}
 function Shop({add,toggleWish,wish}){
