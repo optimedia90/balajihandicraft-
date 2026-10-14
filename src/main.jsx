@@ -274,14 +274,72 @@ function Home({add,toggleWish,wish,settings}){
 function ProductGrid({items,add,toggleWish,wish}){return <div className="products">{items.map(p=><ProductCard key={p.id} p={p} add={add} toggleWish={toggleWish} wished={wish.some(x=>x.id===p.id)}/>)}</div>}
 function ProductCard({p,add,toggleWish,wished}){const navigate=useNavigate();return <article className="product"><div className="productImg"><Link to={"/product?id="+p.id} className="productImageLink">{p.tag&&<b className="tag">{p.tag}</b>}<img onError={imageErrorFallback} src={p.img}/></Link><button type="button" className={wished?"wish active":"wish"} aria-label={wished?"Remove from wishlist":"Add to wishlist"} onClick={e=>{e.preventDefault();e.stopPropagation();toggleWish(p)}}><Heart fill={wished?"currentColor":"none"}/></button><button type="button" className="quick" onClick={e=>{e.preventDefault();e.stopPropagation();add(p);navigate("/cart")}}>Add to cart <ArrowRight size={14}/></button></div><div className="productInfo"><div className="stars"><Star fill="currentColor"/> {p.rating}</div><Link to={"/product?id="+p.id}><h3>{p.name}</h3></Link><span className="sub">{p.sub}</span><div className="price"><b>{fmt(p.price)}</b><del>{fmt(p.old)}</del></div></div></article>}
 function Shop({add,toggleWish,wish}){
- const qs=new URLSearchParams(useLocation().search),cat=qs.get("cat")||"",sub=qs.get("sub")||"",q=(qs.get("q")||"").toLowerCase();
+ const qs=new URLSearchParams(useLocation().search),cat=qs.get("cat")||"",sub=qs.get("sub")||"",q=(qs.get("q")||"").trim();
  const categoryList=liveCats.length?liveCats:cats;const [sort,setSort]=useState("featured");
  const clean=v=>String(v||"").toLowerCase().replace(/[^a-z0-9]/g,"");
- const categoryAliases={"beds":["bed","beds","bedroom"],"bedroom":["bed","beds","bedroom"],"sofas":["sofa","sofas","livingroom"],"livingroom":["sofa","sofas","livingroom"],"dining":["dining","diningroom"],"diningroom":["dining","diningroom"],"chairs":["chair","chairs"],"tables":["table","tables"],"storage":["storage","cabinet","cabinetsstorage","wardrobe"]};
- const matchesCategory=p=>{if(!cat)return true;const wanted=clean(cat),actual=clean(p.category),aliases=categoryAliases[wanted]||[wanted];const subCategory=clean(p.sub),name=clean(p.name);if(wanted==="tables"){return actual.includes("table")||subCategory.includes("table")||name.includes("table");}if(wanted==="dining"||wanted==="diningroom"){return actual.includes("dining")||subCategory.includes("dining")||name.includes("dining");}if(!aliases.includes(actual))return false;if(wanted==="beds"){if(!name.includes("bed"))return false;if(["sofa","wardrobe","bedside","nightstand","dresser","chestofdrawers","cabinet","tvunit","bookshelf"].some(term=>name.includes(term)))return false;}if(wanted==="sofas"){if(!["sofa","sofas","couch","sectional","settee","loveseat","chaise","sofacumbed"].some(term=>name.includes(term)))return false;if(["tvunit","tvconsole","coffeetable","diningtable","sidetable","endtable","consoletable","bedside","wardrobe","cabinet","bookshelf"].some(term=>name.includes(term)))return false;}return true;};
- const matchesSub=p=>{if(!sub)return true;const wanted=clean(sub),actual=clean(p.sub);return actual===wanted||actual.includes(wanted)||wanted.includes(actual)&&actual.length>2;};
- const list=useMemo(()=>{const terms=clean(q).split(/\s+/).filter(Boolean);const sofaSearch=terms.some(term=>["sofa","sofas","couch","couches","sectional","settee","loveseat"].includes(term));let x=products.filter(p=>{const searchable=clean([p.name,p.category,p.sub,p.description,p.short_desc,p.sku,p.tag].filter(Boolean).join(" "));const queryMatches=!terms.length||terms.every(term=>searchable.includes(term));const sofaOnlyMatch=!sofaSearch||["sofa","sofas","couch","couches","sectional","settee","loveseat","chaise"].some(term=>clean([p.name,p.category,p.sub].filter(Boolean).join(" ")).includes(term));return matchesCategory(p)&&matchesSub(p)&&queryMatches&&sofaOnlyMatch});if(sort==="low")x.sort((a,b)=>a.price-b.price);if(sort==="high")x.sort((a,b)=>b.price-a.price);return x},[cat,sub,q,sort,products.length]);
- return <div className="container shop"><div className="crumb">Home / Shop</div><div className="shopHead"><div><span className="eyebrow">THE COLLECTION</span><h1>{sub||cat||"All Furniture"}</h1><p>Thoughtfully designed furniture for every room.</p></div><select value={sort} onChange={e=>setSort(e.target.value)}><option value="featured">Sort: Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select></div><div className="shopBody"><aside><b>Categories</b>{categoryList.map(([n,c])=><Link className={cat===c&&!sub?"sel":""} to={"/shop"+(c?"?cat="+encodeURIComponent(c):"")} key={n}>{n}</Link>)}<div className="filterNote"><SlidersHorizontal/><b>Made to last</b><span>Solid wood • Handcrafted • Premium finishes</span></div></aside><section><div className="resultbar">{list.length} products <span>{sub?"Showing "+sub:"Showing the latest collection"}</span></div><ProductGrid items={list} add={add} toggleWish={toggleWish} wish={wish}/></section></div></div>
+ const textOf=p=>[p.name,p.category,p.sub,p.description,p.short_description,p.short_desc,p.sku,p.tag,p.material,p.color,p.finish].filter(Boolean).join(" ").toLowerCase();
+ const typeGroups=[
+  {id:"sofas",aliases:["sofa","sofas","couch","couches","sectional","sectionals","settee","settees","loveseat","loveseats","chaise","sofacumbed"]},
+  {id:"beds",aliases:["bed","beds","bedframe","bedframes","kingbed","kingbeds","queenbed","queenbeds","singlebed","singlebeds","bunkbed","bunkbeds","platformbed","platformbeds"]},
+  {id:"bedside",aliases:["bedside","nightstand","nightstands","bedsidetable","bedsidetables"]},
+  {id:"diningtables",aliases:["diningtable","diningtables","diningtab le","diningtab les"]},
+  {id:"dining",aliases:["dining","diningroom","diningchair","diningchairs","diningbench","diningbenches","diningset","diningsets","diningtable","diningtables","barfurniture"]},
+  {id:"chairs",aliases:["chair","chairs","armchair","armchairs","accentchair","accentchairs","loungechair","loungechairs","rockingchair","rockingchairs","foldingchair","foldingchairs","officechair","officechairs","stool","stools","ottoman","ottomans"]},
+  {id:"tables",aliases:["table","tables","coffeetable","coffeetables","sidetable","sidetables","endtable","endtables","consoletable","consoletables","stud ytable","studytable","study tables","desk","desks"]},
+  {id:"wardrobes",aliases:["wardrobe","wardrobes","closet","closets","almirah","almirahs"]},
+  {id:"dressers",aliases:["dresser","dressers","chestofdrawers","drawerchest","drawers","vanity","vanities","dressingtable","dressingtables"]},
+  {id:"sideboards",aliases:["sideboard","sideboards","buffet","buffets","crockeryunit","crockeryunits"]},
+  {id:"tvunits",aliases:["tvunit","tvunits","tvconsole","tvconsoles","mediaunit","mediaunits","entertainmentcenter","entertainmentcenters"]},
+  {id:"storage",aliases:["storage","cabinet","cabinets","bookshelf","bookshelves","bookcase","bookcases","trunk","trunks","storagechest","storagechests","shelving","shelves","wall shelf","wallshelf","wallshelves"]},
+  {id:"benches",aliases:["bench","benches","settee","settees"]},
+  {id:"decor",aliases:["decor","wallart","mirror","mirrors","lighting","vase","vases","planter","planters","rug","rugs","throw","throws"]}
+ ];
+ const productText=p=>clean([p.name,p.category,p.sub].filter(Boolean).join(" "));
+ const groupMatches=(p,g)=>g.aliases.some(a=>productText(p).includes(clean(a)));
+ const categoryAliases={
+  "beds":["beds","bed"],"bedroom":["beds","bed","bedside","dressers","wardrobes"],
+  "sofas":["sofas"],"livingroom":["sofas","chairs","tables","tvunits"],
+  "dining":["dining","diningtables","chairs"],"diningroom":["dining","diningtables","chairs"],
+  "chairs":["chairs"],"tables":["tables","diningtables","bedside"],
+  "storage":["storage","wardrobes","dressers","sideboards","tvunits"],
+  "study":["tables","chairs","storage"],"homeoffice":["tables","chairs","storage"],
+  "homedecor":["decor"]
+ };
+ const matchesCategory=p=>{
+  if(!cat)return true;
+  const wanted=clean(cat);
+  const groups=categoryAliases[wanted];
+  if(groups)return typeGroups.filter(g=>groups.includes(g.id)).some(g=>groupMatches(p,g));
+  return clean(p.category)===wanted||clean(p.category).includes(wanted)||clean(p.name).includes(wanted)||clean(p.sub).includes(wanted);
+ };
+ const matchesSub=p=>{
+  if(!sub)return true;
+  const wanted=clean(sub),actual=clean(p.sub),combined=productText(p);
+  if(actual===wanted||actual.includes(wanted)||wanted.includes(actual)&&actual.length>2)return true;
+  const matchingGroup=typeGroups.find(g=>g.aliases.some(a=>clean(a)===wanted));
+  return matchingGroup?groupMatches(p,matchingGroup):combined.includes(wanted);
+ };
+ const queryGroup=query=>{
+  const normalized=clean(query);
+  if(!normalized)return null;
+  const priority=["diningtables","bedside","tvunits","wardrobes","dressers","sideboards","benches","sofas","beds","dining","chairs","tables","storage","decor"];
+  return priority.map(id=>typeGroups.find(g=>g.id===id)).find(g=>g&&g.aliases.some(a=>normalized.includes(clean(a))))||null;
+ };
+ const list=useMemo(()=>{
+  const rawTerms=q.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  const normalizedQuery=clean(q);
+  const intent=queryGroup(q);
+  let x=products.filter(p=>{
+   const searchable=clean(textOf(p));
+   const queryMatches=!rawTerms.length||rawTerms.every(term=>searchable.includes(clean(term)));
+   const intentMatches=!intent||groupMatches(p,intent);
+   return matchesCategory(p)&&matchesSub(p)&&queryMatches&&intentMatches;
+  });
+  if(sort==="low")x.sort((a,b)=>a.price-b.price);
+  if(sort==="high")x.sort((a,b)=>b.price-a.price);
+  return x;
+ },[cat,sub,q,sort,products.length]);
+ return <div className="container shop"><div className="crumb">Home / Shop</div><div className="shopHead"><div><span className="eyebrow">THE COLLECTION</span><h1>{sub||cat||(q?"Search results":"All Furniture")}</h1><p>{q?"Products matching “"+q+"”.":"Thoughtfully designed furniture for every room."}</p></div><select value={sort} onChange={e=>setSort(e.target.value)}><option value="featured">Sort: Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select></div><div className="shopBody"><aside><b>Categories</b>{categoryList.map(([n,c])=><Link className={cat===c&&!sub?"sel":""} to={"/shop"+(c?"?cat="+encodeURIComponent(c):"")} key={n}>{n}</Link>)}<div className="filterNote"><SlidersHorizontal/><b>Made to last</b><span>Solid wood • Handcrafted • Premium finishes</span></div></aside><section><div className="resultbar">{list.length} products <span>{q?"Search: "+q:sub?"Showing "+sub:"Showing the latest collection"}</span></div>{list.length?<ProductGrid items={list} add={add} toggleWish={toggleWish} wish={wish}/>:<div className="emptyState"><h3>No matching products found</h3><p>Try a different product name or browse all furniture.</p><Link className="btn dark" to="/shop">View all furniture <ArrowRight/></Link></div>}</section></div></div>
 }
 function Product({add,toggleWish,wish}){
  const id=Number(new URLSearchParams(useLocation().search).get("id")||1),p=products.find(x=>x.id===id)||products[0],[qty,setQty]=useState(1),[tab,setTab]=useState("description"),[activeImg,setActiveImg]=useState(p.img),[zoom,setZoom]=useState(null);
