@@ -59,7 +59,39 @@ const db=mysql.createPool({
   connectionLimit:10
 });
 
+
 const asyncHandler=fn=>(req,res,next)=>Promise.resolve(fn(req,res,next)).catch(next);
+
+// Customer order confirmation email. Configure SMTP_* variables in Hostinger.
+// Email delivery failures must never undo a successfully saved order.
+function escapeHtml(value){
+ return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+async function sendOrderConfirmation({email,name,orderNumber,total,items,address,city,state,postal}){
+ const {SMTP_HOST,SMTP_PORT,SMTP_SECURE,SMTP_USER,SMTP_PASS,MAIL_FROM,STORE_URL}=process.env;
+ if(!SMTP_HOST||!SMTP_USER||!SMTP_PASS){
+  console.warn("Order confirmation email skipped: SMTP_HOST, SMTP_USER and SMTP_PASS must be configured.");
+  return false;
+ }
+ const nodemailer=(await import("nodemailer")).default;
+ const port=Number(SMTP_PORT||465);
+ const transporter=nodemailer.createTransport({
+  host:SMTP_HOST,port,secure:SMTP_SECURE?SMTP_SECURE==="true":port===465,
+  auth:{user:SMTP_USER,pass:SMTP_PASS}
+ });
+ const money=value=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(Number(value)||0);
+ const rows=items.map(item=>'<tr><td style="padding:12px 8px;border-bottom:1px solid #e8e2d9">'+escapeHtml(item.name)+'</td><td style="padding:12px 8px;text-align:center;border-bottom:1px solid #e8e2d9">'+item.qty+'</td><td style="padding:12px 8px;text-align:right;border-bottom:1px solid #e8e2d9">'+money(item.price*item.qty)+'</td></tr>').join("");
+ const site=String(STORE_URL||"https://ivory-lemur-828776.hostingersite.com").replace(/\/$/,"");
+ const from=MAIL_FROM||SMTP_USER;
+ await transporter.sendMail({
+  from:{name:"Balaji Handicraft",address:from},to:email,
+  subject:"Order confirmed — "+orderNumber+" | Balaji Handicraft",
+  text:"Hi "+name+", thank you for your order "+orderNumber+". We have received your Cash on Delivery order for "+money(total)+". Delivery address: "+[address,city,state,postal].join(", ")+". We will keep you updated. "+site,
+  html:`<!doctype html><html><body style="margin:0;background:#f7f4ef;font-family:Arial,sans-serif;color:#211f1b"><div style="max-width:680px;margin:28px auto;background:#fff;border:1px solid #e8e2d9"><div style="background:#171511;color:#fff;padding:28px 32px"><div style="font-size:12px;letter-spacing:3px">BALAJI HANDICRAFT</div><h1 style="font-family:Georgia,serif;font-weight:normal;margin:22px 0 6px;font-size:30px">Thank you for your order.</h1><p style="margin:0;color:#d6c6ad">Your order has been received successfully.</p></div><div style="padding:28px 32px"><p>Hi <strong>${escapeHtml(name)}</strong>,</p><p>Thank you for choosing Balaji Handicraft. We have received your order and it is currently being processed.</p><div style="background:#f7f4ef;padding:16px;margin:22px 0"><div style="font-size:12px;color:#756b5f">ORDER NUMBER</div><div style="font-size:22px;font-weight:bold;margin-top:5px">${escapeHtml(orderNumber)}</div><div style="margin-top:10px">Payment: Cash on Delivery</div></div><h2 style="font-family:Georgia,serif;font-size:20px">Order summary</h2><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:10px 8px;border-bottom:2px solid #211f1b">Product</th><th style="padding:10px 8px;border-bottom:2px solid #211f1b">Qty</th><th style="text-align:right;padding:10px 8px;border-bottom:2px solid #211f1b">Amount</th></tr></thead><tbody>${rows}</tbody></table><div style="text-align:right;font-size:19px;font-weight:bold;padding:18px 8px">Total: ${money(total)}</div><h2 style="font-family:Georgia,serif;font-size:20px">Delivery address</h2><p style="line-height:1.7">${escapeHtml(name)}<br>${escapeHtml(address)}<br>${escapeHtml(city)}, ${escapeHtml(state)} ${escapeHtml(postal)}<br>${escapeHtml(process.env.CUSTOMER_SUPPORT_EMAIL||"")}</p><p style="line-height:1.6">We’ll send you updates as your order progresses. If you have questions, reply to this email.</p><p style="margin-top:28px"><a href="${escapeHtml(site)}" style="display:inline-block;background:#171511;color:#fff;text-decoration:none;padding:13px 20px">Visit Balaji Handicraft</a></p></div><div style="background:#f7f4ef;padding:18px 32px;color:#756b5f;font-size:12px">Handcrafted furniture made with care · Balaji Handicraft</div></div></body></html>`
+ });
+ return true;
+}
+
 
 async function columns(table){
   const [rows]=await db.query("SHOW COLUMNS FROM \`"+table+"\`");
@@ -550,7 +582,13 @@ app.post("/api/store/orders",asyncHandler(async(req,res)=>{
  const data={order_number:orderNumber,customer_name:name,email,phone,address,city,state,postal_code:postal,items:JSON.stringify(cleanItems),total,payment_method:"Cash on Delivery",status:"pending"};
  const allowed=new Set(await columns("orders")),keys=Object.keys(data).filter(k=>allowed.has(k));
  const [result]=await db.query("INSERT INTO orders ("+keys.map(k=>"`"+k+"`").join(",")+") VALUES ("+keys.map(()=>"?").join(",")+")",keys.map(k=>data[k]));
- res.status(201).json({ok:true,order:{id:result.insertId,order_number:orderNumber,total,status:"pending"}});
+ let emailSent=false;
+ try{
+  emailSent=await sendOrderConfirmation({email,name,orderNumber,total,items:cleanItems,address,city,state,postal});
+ }catch(mailError){
+  console.error("Order saved but customer confirmation email failed:",mailError.message);
+ }
+ res.status(201).json({ok:true,order:{id:result.insertId,order_number:orderNumber,total,status:"pending",emailSent}});
 }));
 app.get("/api/store/settings",asyncHandler(async(req,res)=>{
   await ensureSettings();
