@@ -590,6 +590,34 @@ app.post("/api/store/orders",asyncHandler(async(req,res)=>{
  }
  res.status(201).json({ok:true,order:{id:result.insertId,order_number:orderNumber,total,status:"pending",emailSent}});
 }));
+// Admin-only SMTP diagnostic: never returns credentials.
+app.get("/api/admin/email-status",auth,asyncHandler(async(req,res)=>{
+ const configured={
+  host:Boolean(process.env.SMTP_HOST||"smtp.hostinger.com"),
+  user:Boolean(process.env.SMTP_USER),
+  password:Boolean(process.env.SMTP_PASS),
+  from:Boolean(process.env.MAIL_FROM||process.env.SMTP_USER)
+ };
+ if(!configured.user||!configured.password){
+  return res.status(200).json({configured:false,verified:false,missing:["SMTP_USER","SMTP_PASS"].filter(k=>!process.env[k]),message:"Add the SMTP mailbox username and password in Hostinger environment variables, then restart/redeploy the app."});
+ }
+ try{
+  const nodemailer=(await import("nodemailer")).default;
+  const port=Number(process.env.SMTP_PORT||465);
+  const transporter=nodemailer.createTransport({
+   host:process.env.SMTP_HOST||"smtp.hostinger.com",
+   port,
+   secure:process.env.SMTP_SECURE?process.env.SMTP_SECURE==="true":port===465,
+   auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS},
+   connectionTimeout:10000,greetingTimeout:10000,socketTimeout:15000
+  });
+  await transporter.verify();
+  return res.json({configured:true,verified:true,message:"SMTP connection verified. New orders can send confirmation emails."});
+ }catch(error){
+  console.error("SMTP diagnostic failed:",error.message);
+  return res.status(200).json({configured:true,verified:false,message:"SMTP connection failed. Check Hostinger mailbox credentials, SMTP host/port, and mailbox status."});
+ }
+}));
 app.get("/api/store/settings",asyncHandler(async(req,res)=>{
   await ensureSettings();
   const [rows]=await db.query("SELECT * FROM store_settings WHERE id=1 LIMIT 1");
