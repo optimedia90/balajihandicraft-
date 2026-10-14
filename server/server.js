@@ -519,6 +519,30 @@ app.get("/api/store/categories",asyncHandler(async(req,res)=>{
   try{[subcategories]=await db.query("SELECT * FROM subcategories ORDER BY id ASC");}catch{}
   res.json({categories,subcategories});
 }));
+async function ensureOrders(){
+ await db.query("CREATE TABLE IF NOT EXISTS orders (id INT AUTO_INCREMENT PRIMARY KEY, order_number VARCHAR(40) NULL, customer_name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, phone VARCHAR(100) NOT NULL, address VARCHAR(500) NOT NULL, city VARCHAR(150) NOT NULL, state VARCHAR(150) NOT NULL, postal_code VARCHAR(20) NOT NULL, items LONGTEXT NOT NULL, total DECIMAL(12,2) NOT NULL DEFAULT 0, payment_method VARCHAR(50) NOT NULL DEFAULT 'Cash on Delivery', status VARCHAR(40) NOT NULL DEFAULT 'pending', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+ const defs={order_number:"VARCHAR(40) NULL",customer_name:"VARCHAR(255) NOT NULL DEFAULT ''",email:"VARCHAR(255) NOT NULL DEFAULT ''",phone:"VARCHAR(100) NOT NULL DEFAULT ''",address:"VARCHAR(500) NOT NULL DEFAULT ''",city:"VARCHAR(150) NOT NULL DEFAULT ''",state:"VARCHAR(150) NOT NULL DEFAULT ''",postal_code:"VARCHAR(20) NOT NULL DEFAULT ''",items:"LONGTEXT NULL",payment_method:"VARCHAR(50) NOT NULL DEFAULT 'Cash on Delivery'",status:"VARCHAR(40) NOT NULL DEFAULT 'pending'"};
+ const existing=new Set(await columns("orders"));
+ for(const [name,type] of Object.entries(defs))if(!existing.has(name))await db.query("ALTER TABLE orders ADD COLUMN `"+name+"` "+type);
+}
+app.post("/api/store/orders",asyncHandler(async(req,res)=>{
+ const body=req.body||{},customer=body.customer||{},shipping=body.shipping||{},items=Array.isArray(body.items)?body.items:[];
+ const name=String(customer.name||"").trim(),email=String(customer.email||"").trim(),phone=String(customer.phone||"").trim();
+ const address=String(shipping.address||"").trim(),city=String(shipping.city||"").trim(),state=String(shipping.state||"").trim(),postal=String(shipping.postal_code||"").trim();
+ if(!name||!email||!phone||!address||!city||!state||!postal)return res.status(400).json({message:"Please complete all contact and delivery details."});
+ if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))return res.status(400).json({message:"Please enter a valid email address."});
+ if(!items.length)return res.status(400).json({message:"Your cart is empty."});
+ const cleanItems=items.map(x=>({id:String(x.id||""),name:String(x.name||"Product").slice(0,255),price:Number(x.price),qty:Math.floor(Number(x.qty)||1)}));
+ if(cleanItems.some(x=>!Number.isFinite(x.price)||x.price<0||x.qty<1||x.qty>99))return res.status(400).json({message:"One or more cart items are invalid. Please review your cart."});
+ const total=cleanItems.reduce((sum,x)=>sum+x.price*x.qty,0);
+ if(!Number.isFinite(total)||total<=0)return res.status(400).json({message:"Order total is invalid."});
+ await ensureOrders();
+ const orderNumber="BH"+Date.now().toString().slice(-10);
+ const data={order_number:orderNumber,customer_name:name,email,phone,address,city,state,postal_code:postal,items:JSON.stringify(cleanItems),total,payment_method:"Cash on Delivery",status:"pending"};
+ const allowed=new Set(await columns("orders")),keys=Object.keys(data).filter(k=>allowed.has(k));
+ const [result]=await db.query("INSERT INTO orders ("+keys.map(k=>"`"+k+"`").join(",")+") VALUES ("+keys.map(()=>"?").join(",")+")",keys.map(k=>data[k]));
+ res.status(201).json({ok:true,order:{id:result.insertId,order_number:orderNumber,total,status:"pending"}});
+}));
 app.get("/api/store/settings",asyncHandler(async(req,res)=>{
   await ensureSettings();
   const [rows]=await db.query("SELECT * FROM store_settings WHERE id=1 LIMIT 1");
@@ -535,6 +559,6 @@ app.use(express.static(dist));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
 app.listen(PORT,async()=>{
-  try{await ensureProductFields();await ensureSettings();console.log("Store settings ready");}catch(e){console.error("Settings table setup failed:",e.message);}
+  try{await ensureProductFields();await ensureSettings();await ensureOrders();console.log("Store settings and orders ready");}catch(e){console.error("Store setup failed:",e.message);}
   console.log("Balaji Handicraft server running on port "+PORT);
 });
