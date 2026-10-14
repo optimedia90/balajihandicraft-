@@ -566,3 +566,77 @@ body{min-height:100vh}
 
 
 .blogTitleLink{color:inherit;text-decoration:none}.blogTitleLink:hover{color:var(--accent)}.blogCard>a{display:block;overflow:hidden}.blogCard>a img{display:block;transition:transform .35s ease}.blogCard>a:hover img{transform:scale(1.025)}.blogReadMore{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--ink);text-decoration:none;margin-top:4px}.blogReadMore svg,.blogStoryEnd svg{width:14px;height:14px}.blogReadMore:hover{color:var(--accent)}.blogStory{max-width:900px!important}.blogBack{display:inline-block;margin-bottom:28px;font-size:12px;color:var(--muted);text-decoration:none}.blogStory h1{max-width:780px;font-size:clamp(36px,5vw,64px);line-height:1.05;margin:18px 0}.blogStoryIntro{max-width:720px;font-size:18px;line-height:1.7;color:var(--muted)}.blogStoryHero{display:block;width:100%;max-height:560px;object-fit:cover;margin:32px 0 42px}.blogStoryBody{max-width:700px;margin:0 auto}.blogStoryBody>p{font-size:16px;line-height:1.95;color:var(--muted);margin:0 0 24px}.blogStoryEnd{border-top:1px solid var(--line);margin-top:42px;padding-top:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:12px}.blogStoryEnd a{display:inline-flex;align-items:center;gap:8px;color:var(--ink);font-weight:700;text-decoration:none}
+
+/* Order management workspace */
+.orderManager .adminPageTitle{align-items:center}
+.orderManager .adminPageTitle .btn{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:11px}
+.orderManager .adminPageTitle .btn svg{width:14px;height:14px}
+.orderStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:18px}
+.orderStats button{background:#fff;border:1px solid #e7e1d7;border-radius:8px;padding:17px 18px;text-align:left;cursor:pointer;transition:border-color .18s,transform .18s}
+.orderStats button:hover{transform:translateY(-1px);border-color:#b18a58}
+.orderStats button.active{border-color:#171511;box-shadow:inset 0 0 0 1px #171511}
+.orderStats span,.orderStats small{display:block;color:#8c867d;font-size:10px}
+.orderStats b{display:block;font:600 27px "Playfair Display";margin:8px 0 4px;color:#171511}
+.orderListCard{overflow:hidden}
+.orderToolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid #eee9e1}
+.orderToolbar h3{font:600 18px "Playfair Display";margin:0 0 4px}
+.orderToolbar p{font-size:10px;color:#8c867d;margin:0}
+.orderSearch{width:min(370px,50%);display:flex;align-items:center;gap:8px;border:1px solid #e4ded4;border-radius:5px;padding:0 11px;background:#fff}
+.orderSearch svg{width:15px;color:#8c867d;flex-shrink:0}
+.orderSearch input{width:100%;border:0;outline:0;padding:11px 0;font-size:11px;background:transparent}
+.orderTableWrap{width:100%;overflow-x:auto}
+.orderTable{width:100%;border-collapse:collapse;white-space:nowrap;font-size:11px}
+.orderTable th{background:#faf9f6;text-align:left;color:#827b72;font-size:9px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;padding:13px 15px;border-bottom:1px solid #eee9e1}
+.orderTable td{padding:15px;border-bottom:1px solid #f0ece6;color:#625d55}
+.orderTable tbody tr{cursor:pointer;transition:background .15s}
+.orderTable tbody tr:hover{background:#fbf9f5}
+.orderTable tbody tr:last-child td{border-bottom:0}
+.orderTable td b,.orderTable td small{display:block}
+.orderTable td b{color:#211f1a;font-weight:700;font-size:11px}
+.orderTable td small{color:#938c82;font-size:9px;margin-top:5px;max-width:190px;overflow:hidden;text-overflow:ellipsis}
+.paymentTag{display:inline-block;border:1px solid #e7e1d7;border-radius:20px;padding:5px 8px;font-size:9px;color:#655e55}
+.orderStatus{display:inline-flex;align-items:center;gap:6px;width:max-content;border-radius:30px;padding:6px 9px;font-size:9px;font-weight:700;background:#f3eee6;color:#8a6b3f}
+.orderStatus i{display:block;width:6px;height:6px;border-radius:50%;background:currentColor}
+.status-pending{background:#fff2d9;color:#9b6a14}.status-confirmed{background:#e9f1ff;color:#315da8}.status-processing{background:#f0e9ff;color:#6f4bb2}.status-shipped{background:#e7f5f2;color:#277c70}.status-delivered{background:#e8f5e8;color:#377b42}.status-cancelled{background:#fcebea;color:#b4453e}
+.orderOpen{display:grid;place-items:center;width:30px;height:30px;border:1px solid #e7e1d7;border-radius:50%;background:#fff;cursor:pointer}
+.orderOpen svg{width:14px;height:14px}
+.orderEmpty{padding:55px 20px;display:flex;align-items:center;flex-direction:column;gap:8px;color:#8c867d;font-size:11px}
+.orderEmpty svg{width:28px;height:28px;color:#b18a58;margin-bottom:4px}
+.orderEmpty b{font:600 18px "Playfair Display";color:#24211c}
+.orderModalBackdrop{position:fixed;inset:0;background:rgba(18,16,13,.52);z-index:1000;display:flex;justify-content:flex-end;backdrop-filter:blur(2px)}
+.orderModal{width:min(850px,100%);height:100%;overflow:auto;background:#faf9f6;box-shadow:-12px 0 40px #0002;animation:orderSlideIn .2s ease-out}
+@keyframes orderSlideIn{from{transform:translateX(24px);opacity:.7}to{transform:translateX(0);opacity:1}}
+.orderModal>header{display:flex;align-items:flex-start;justify-content:space-between;padding:26px 30px 22px;border-bottom:1px solid #e8e2d8;background:#fff}
+.orderModalEyebrow{font-size:9px;letter-spacing:.16em;color:#b18a58;font-weight:800}
+.orderModal header h2{font:600 30px "Playfair Display";margin:5px 0}
+.orderModal header p{font-size:10px;color:#8c867d;margin:0}
+.orderClose{display:grid;place-items:center;width:36px;height:36px;border:1px solid #e7e1d7;border-radius:50%;background:#fff;cursor:pointer}
+.orderClose svg{width:16px}
+.orderModalBody{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(230px,.85fr);gap:14px;padding:20px 24px}
+.orderDetailCard{background:#fff;border:1px solid #e7e1d7;border-radius:7px;padding:17px;margin-bottom:13px;min-width:0}
+.orderDetailCard h3{display:flex;align-items:center;gap:8px;font:600 15px "Playfair Display";margin:0 0 16px}
+.orderDetailCard h3 svg{width:16px;height:16px;color:#b18a58}
+.orderItem{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #f0ece6}
+.orderItemThumb{width:38px;height:42px;display:grid;place-items:center;background:#f5f1ea;color:#b18a58;border-radius:4px;flex-shrink:0}
+.orderItemThumb svg{width:17px}
+.orderItemInfo{flex:1;min-width:0}
+.orderItemInfo b,.orderItemInfo span{display:block;white-space:normal}
+.orderItemInfo b{font-size:10px;line-height:1.5;color:#24211c}
+.orderItemInfo span{font-size:9px;color:#8c867d;margin-top:4px}
+.orderItem>strong{font-size:10px;white-space:nowrap}
+.orderTotal{display:flex;justify-content:space-between;align-items:center;padding-top:16px;font-size:11px}
+.orderTotal b{font-size:15px}
+.orderDetailCard>p{font-size:11px;color:#777067;line-height:1.8;margin:8px 0 0}
+.orderStatusSelect{display:grid;gap:7px;margin-top:18px;font-size:10px;font-weight:700;color:#625d55}
+.orderStatusSelect select{width:100%;border:1px solid #ded7cc;border-radius:4px;padding:11px;background:#fff;font-size:11px;color:#211f1a;outline:0}
+.orderHint{display:block;font-size:9px;line-height:1.6;color:#928a80;margin-top:9px}
+.orderContactLine{display:flex;align-items:flex-start;gap:10px;margin-top:14px}
+.orderContactLine>svg{width:14px;height:14px;color:#b18a58;flex-shrink:0;margin-top:2px}
+.orderContactLine small,.orderContactLine b{display:block;overflow-wrap:anywhere}
+.orderContactLine small{font-size:9px;color:#8c867d;margin-bottom:4px}
+.orderContactLine b{font-size:10px;color:#26231f;font-weight:600}
+.orderModal>footer{position:sticky;bottom:0;display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:14px 24px;background:#fff;border-top:1px solid #e8e2d8}
+.orderModal>footer .btn{padding:10px 15px;font-size:10px}
+.orderSaving{font-size:10px;color:#8c867d;margin-right:auto}
+@media(max-width:900px){.orderStats{grid-template-columns:repeat(2,minmax(0,1fr))}.orderModalBody{grid-template-columns:1fr}.orderModal{width:min(620px,100%)}}
+@media(max-width:600px){.orderManager .adminPageTitle{align-items:flex-start;gap:12px;flex-direction:column}.orderStats{gap:8px}.orderStats button{padding:13px}.orderToolbar{align-items:stretch;flex-direction:column}.orderSearch{width:100%;box-sizing:border-box}.orderModal>header{padding:20px}.orderModalBody{padding:14px}.orderModal>footer{padding:12px 14px}}
