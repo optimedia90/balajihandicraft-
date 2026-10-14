@@ -467,6 +467,15 @@ app.get("/api/admin/orders",auth,asyncHandler(async(req,res)=>{
   const [rows]=await db.query("SELECT * FROM orders ORDER BY id DESC LIMIT 100");
   res.json({orders:rows});
 }));
+app.put("/api/admin/orders/:id",auth,asyncHandler(async(req,res)=>{
+  const allowedStatuses=new Set(["pending","confirmed","processing","shipped","delivered","cancelled"]);
+  const status=String(req.body?.status||"").trim().toLowerCase();
+  if(!allowedStatuses.has(status))return res.status(400).json({message:"Invalid order status."});
+  const [result]=await db.query("UPDATE orders SET status=? WHERE id=?",[status,req.params.id]);
+  if(!result.affectedRows)return res.status(404).json({message:"Order not found."});
+  const [rows]=await db.query("SELECT * FROM orders WHERE id=? LIMIT 1",[req.params.id]);
+  res.json({ok:true,order:rows[0]});
+}));
 
 app.get("/api/admin/settings",auth,asyncHandler(async(req,res)=>{
   await ensureSettings();
