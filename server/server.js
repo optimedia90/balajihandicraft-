@@ -530,7 +530,7 @@ app.post("/api/store/orders",asyncHandler(async(req,res)=>{
  const name=String(customer.name||"").trim(),email=String(customer.email||"").trim(),phone=String(customer.phone||"").trim();
  const address=String(shipping.address||"").trim(),city=String(shipping.city||"").trim(),state=String(shipping.state||"").trim(),postal=String(shipping.postal_code||"").trim();
  if(!name||!email||!phone||!address||!city||!state||!postal)return res.status(400).json({message:"Please complete all contact and delivery details."});
- if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))return res.status(400).json({message:"Please enter a valid email address."});
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return res.status(400).json({message:"Please enter a valid email address."});
  if(!items.length)return res.status(400).json({message:"Your cart is empty."});
  const cleanItems=items.map(x=>({id:String(x.id||""),name:String(x.name||"Product").slice(0,255),price:Number(x.price),qty:Math.floor(Number(x.qty)||1)}));
  if(cleanItems.some(x=>!Number.isFinite(x.price)||x.price<0||x.qty<1||x.qty>99))return res.status(400).json({message:"One or more cart items are invalid. Please review your cart."});
