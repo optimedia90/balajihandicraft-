@@ -279,10 +279,11 @@ async function ensureFurnitureTaxonomy(){
     if(/study|book|shelf|storage|cabinet|sideboard|chest|bench|settee/.test(n))return "Storage & Study";
     return legacyFallback[String(legacyName||"").toLowerCase()]||"Living Room";
   };
+  const knownLegacyNames=new Set(["chairs","seating","tables","tv & media","beds","bedroom storage","vanity","dining sets","dining seating","bar","storage","cabinets & storage","shelving","benches","office seating","workspaces","office storage","outdoor furniture","furniture sets","foot stool","foot stools","study","desks","workspace tables","coffee tables","side tables","side & end tables","console tables"]);
   const [legacyCategories]=await db.query("SELECT id,name FROM categories ORDER BY id ASC");
   for(const legacy of legacyCategories){
     const legacyName=String(legacy.name||"");
-    if(canonicalNames.some(name=>name.toLowerCase()===legacyName.toLowerCase()))continue;
+    if(canonicalNames.some(name=>name.toLowerCase()===legacyName.toLowerCase())||!knownLegacyNames.has(legacyName.toLowerCase()))continue;
     const [legacySubs]=await db.query("SELECT id,name FROM subcategories WHERE category_id=? ORDER BY id ASC",[legacy.id]);
     for(const sub of legacySubs){
       const targetName=destinationForSub(sub.name,legacyName);
