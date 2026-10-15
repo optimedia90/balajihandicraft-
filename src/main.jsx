@@ -158,7 +158,7 @@ function App(){
        const familyRules=[
          {main:"Living Room",aliases:{"chairs":"Seating","seating":"Seating","sofas":"Sofas","tables":"Tables","tv & media":"TV & Media"}},
          {main:"Bedroom",aliases:{"beds":"Beds","bedroom storage":"Bedroom Storage","vanity":"Vanity"}},
-         {main:"Dining Room",aliases:{"dining sets":"Dining Sets","dining seating":"Dining Seating","bar":"Bar","bar furniture":"Bar"}},
+         {main:"Dining Room",aliases:{"dining sets":"Dining Sets","dining seating":"Dining Seating","bar":"Bar Furniture","bar furniture":"Bar Furniture"}},
          {main:"Storage",aliases:{"benches":"Seating","shelving":"Storage","cabinets & storage":"Storage","furniture sets":"Storage","study":"Study","study tables":"Study"}},
          {main:"Office Furniture",aliases:{"office seating":"Office Seating","workspaces":"Workspaces","office storage":"Office Storage","desks":"Workspaces","workspace tables":"Workspaces"}}
        ];
@@ -206,6 +206,19 @@ function App(){
            {title:"TV & Media",subs:tv},
            {title:"Seating",subs:seating}
          ];
+       }
+       // Show Bar Furniture as a single Dining dropdown group and avoid a legacy duplicate "Bar" group.
+       const diningMenuForBar=liveCategoryMenus.find(menu=>["dining room","dining"].includes(String(menu.name).toLowerCase()));
+       if(diningMenuForBar){
+         const barGroup=diningMenuForBar.groups.find(group=>group.title==="Bar Furniture");
+         const legacyBar=diningMenuForBar.groups.find(group=>group.title==="Bar");
+         if(barGroup&&legacyBar){
+           const known=new Set(barGroup.subs.map(sub=>typeof sub==="string"?sub:sub.name));
+           barGroup.subs.push(...legacyBar.subs.filter(sub=>!known.has(typeof sub==="string"?sub:sub.name)));
+           diningMenuForBar.groups=diningMenuForBar.groups.filter(group=>group.title!=="Bar");
+         }else if(legacyBar){
+           legacyBar.title="Bar Furniture";
+         }
        }
        // Keep Dining Sets grouped with the three requested links in the storefront mega-menu.
        const diningMenu=liveCategoryMenus.find(menu=>["dining room","dining"].includes(String(menu.name).toLowerCase()));
