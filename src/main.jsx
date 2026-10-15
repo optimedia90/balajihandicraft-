@@ -99,9 +99,8 @@ const categoryMenus=[
   {title:"Bar",subs:["Bar Furniture"]}
  ]},
  {name:"Storage & Study",slug:"Storage & Study",groups:[
-  {title:"Storage",subs:["Bookshelves","Sideboards & Crockery Units","Trunks & Storage Chests","Wall Shelves"]},
-  {title:"Seating",subs:["Benches & Settees"]},
-  {title:"Study",subs:["Study Tables"]}
+  {title:"Storage",subs:["Cabinets","Chest of Drawers","Kitchen Cabinets","Sideboards","Crockery Unit","Bookshelves","Wall Shelves","Trunks & Storage Chests"]},
+  {title:"Study",subs:["Study Tables","Corner Table","Folding Table"]}
  ]},
  {name:"Office Furniture",slug:"Office Furniture",groups:[
   {title:"Office Seating",subs:["Office Chairs","Office Stools"]},
@@ -251,6 +250,33 @@ function App(){
            {title:"Beds",subs:["All Beds","King Size Beds","Queen Size Beds","Single Beds"].map(name=>findBedroomSub(name,"Beds"))},
            {title:"Bedroom Storage",subs:["Wardrobes","Chests of Drawers","Bedside Tables","Console Tables","Trunks"].map(name=>findBedroomSub(name,"Bedroom Storage"))},
            {title:"Vanity",subs:[findBedroomSub("Dressing","Vanity")]}
+         ];
+       }
+       // Keep Storage & Study menu aligned with the approved database taxonomy.
+       const storageStudyMenu=liveCategoryMenus.find(menu=>["storage & study","storage"].includes(String(menu.name).toLowerCase()));
+       if(storageStudyMenu){
+         const allStorageSubs=liveCategoryMenus.flatMap(menu=>(menu.groups||[]).flatMap(group=>group.subs||[])).map(sub=>typeof sub==="string"?{name:sub}:sub);
+         const findStorageSub=(names,displayName)=>{
+           const wanted=names.map(name=>name.toLowerCase());
+           const found=allStorageSubs.find(sub=>wanted.includes(String(sub.name||"").trim().toLowerCase()));
+           return {name:displayName,categoryName:storageStudyMenu.name,routeSubName:found?.name||displayName};
+         };
+         storageStudyMenu.groups=[
+           {title:"Storage",subs:[
+             findStorageSub(["Cabinets"],"Cabinets"),
+             findStorageSub(["Chest of Drawers","Chests of Drawers"],"Chest of Drawers"),
+             findStorageSub(["Kitchen Cabinets"],"Kitchen Cabinets"),
+             findStorageSub(["Sideboards"],"Sideboards"),
+             findStorageSub(["Crockery Unit","Sideboards & Crockery Units","Crockery Units"],"Crockery Unit"),
+             findStorageSub(["Bookshelves"],"Bookshelves"),
+             findStorageSub(["Wall Shelves"],"Wall Shelves"),
+             findStorageSub(["Trunks & Storage Chests"],"Trunks & Storage Chests")
+           ]},
+           {title:"Study",subs:[
+             findStorageSub(["Study Tables"],"Study Tables"),
+             findStorageSub(["Corner Table","Corner Tables"],"Corner Table"),
+             findStorageSub(["Folding Table","Folding Tables"],"Folding Table")
+           ]}
          ];
        }
        liveCats=[["All Furniture",""],...liveCategoryRecords.map(cat=>[cat.name,cat.name])];
