@@ -253,6 +253,56 @@ async function ensureFurnitureTaxonomy(){
       }
     }
   }
+
+  // Fold old top-level menu headings into the six canonical admin categories.
+  // Product records are retained and their category/subcategory IDs are remapped.
+  const canonicalNames=["Living Room","Sofas","Bedroom","Dining Room","Storage & Study","Office Furniture"];
+  const canonicalIds={};
+  for(const name of canonicalNames){
+    const [rows]=await db.query("SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1",[name]);
+    if(rows[0])canonicalIds[name]=Number(rows[0].id);
+  }
+  const legacyFallback={
+    "chairs":"Living Room","seating":"Living Room","tables":"Living Room","tv & media":"Living Room",
+    "beds":"Bedroom","bedroom storage":"Bedroom","vanity":"Bedroom",
+    "dining sets":"Dining Room","dining seating":"Dining Room","bar":"Dining Room",
+    "storage":"Storage & Study","cabinets & storage":"Storage & Study","shelving":"Storage & Study","benches":"Storage & Study",
+    "office seating":"Office Furniture","workspaces":"Office Furniture","office storage":"Office Furniture",
+    "outdoor furniture":"Living Room","furniture sets":"Living Room"
+  };
+  const destinationForSub=(subName,legacyName)=>{
+    const n=String(subName||"").toLowerCase();
+    if(/sofa|couch|sectional/.test(n))return "Sofas";
+    if(/dining|bar furniture/.test(n))return "Dining Room";
+    if(/bed|wardrobe|trunk|dresser|vanity|dressing/.test(n))return "Bedroom";
+    if(/office|desk|workspace|filing/.test(n))return "Office Furniture";
+    if(/study|book|shelf|storage|cabinet|sideboard|chest|bench|settee/.test(n))return "Storage & Study";
+    return legacyFallback[String(legacyName||"").toLowerCase()]||"Living Room";
+  };
+  const [legacyCategories]=await db.query("SELECT id,name FROM categories ORDER BY id ASC");
+  for(const legacy of legacyCategories){
+    const legacyName=String(legacy.name||"");
+    if(canonicalNames.some(name=>name.toLowerCase()===legacyName.toLowerCase()))continue;
+    const [legacySubs]=await db.query("SELECT id,name FROM subcategories WHERE category_id=? ORDER BY id ASC",[legacy.id]);
+    for(const sub of legacySubs){
+      const targetName=destinationForSub(sub.name,legacyName);
+      const targetCategoryId=canonicalIds[targetName]||canonicalIds["Living Room"];
+      if(!targetCategoryId)continue;
+      const [dupes]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(name)=LOWER(?) LIMIT 1",[targetCategoryId,sub.name]);
+      const targetSubId=dupes[0]?.id;
+      if(targetSubId){
+        await db.query("UPDATE products SET category_id=?,subcategory_id=? WHERE subcategory_id=?",[targetCategoryId,targetSubId,sub.id]);
+        await db.query("DELETE FROM subcategories WHERE id=?",[sub.id]);
+      }else{
+        await db.query("UPDATE subcategories SET category_id=? WHERE id=?",[targetCategoryId,sub.id]);
+        await db.query("UPDATE products SET category_id=? WHERE subcategory_id=?",[targetCategoryId,sub.id]);
+      }
+    }
+    const defaultTarget=legacyFallback[legacyName.toLowerCase()]||destinationForSub(legacyName,legacyName);
+    const targetId=canonicalIds[defaultTarget]||canonicalIds["Living Room"];
+    if(targetId)await db.query("UPDATE products SET category_id=?,subcategory_id=NULL WHERE category_id=? AND (subcategory_id IS NULL OR subcategory_id NOT IN (SELECT id FROM subcategories))",[targetId,legacy.id]);
+    await db.query("DELETE FROM categories WHERE id=?",[legacy.id]);
+  }
 }
 
 app.get("/api/health",(req,res)=>res.json({ok:true,service:"balaji-handicraft-api"}));
