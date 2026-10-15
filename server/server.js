@@ -205,7 +205,7 @@ async function ensureFurnitureTaxonomy(){
       const [existing]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(name)=LOWER(?) LIMIT 1",[categoryId,subName]);
       if(existing[0])continue;
       let slug=slugify(subName),n=2;
-      while((await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(slug)=LOWER(?) LIMIT 1",[categoryId,slug]))[0][0])slug=slugify(subName)+"-"+n++;
+      while((await db.query("SELECT id FROM subcategories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[slug]))[0][0])slug=slugify(subName)+"-"+n++;
       await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[categoryId,subName,slug]);
     }
   }
@@ -221,7 +221,8 @@ async function ensureFurnitureTaxonomy(){
       const [targetRows]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(name)=LOWER(?) LIMIT 1",[sofaId,subName]);
       let targetId=targetRows[0]?.id;
       if(!targetId){
-        const slug=slugify(subName);
+        let slug=slugify(subName),n=2;
+        while((await db.query("SELECT id FROM subcategories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[slug]))[0][0])slug=slugify(subName)+"-"+n++;
         const [created]=await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[sofaId,subName,slug]);
         targetId=created.insertId;
       }
@@ -369,7 +370,7 @@ async function ensureDiningSetsMenuTaxonomy(){
     }
     if(!targetId){
       let slug=slugify(name),n=2;
-      while((await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(slug)=LOWER(?) LIMIT 1",[diningId,slug]))[0][0])slug=slugify(name)+"-"+n++;
+      while((await db.query("SELECT id FROM subcategories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[slug]))[0][0])slug=slugify(name)+"-"+n++;
       const [created]=await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[diningId,name,slug]);
       targetId=Number(created.insertId);
     }
@@ -412,7 +413,7 @@ async function ensureDiningBarFurnitureTaxonomy(){
     }
     if(!targetId){
       let slug=slugify(name),n=2;
-      while((await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(slug)=LOWER(?) LIMIT 1",[categoryId,slug]))[0][0])slug=slugify(name)+"-"+n++;
+      while((await db.query("SELECT id FROM subcategories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[slug]))[0][0])slug=slugify(name)+"-"+n++;
       const [created]=await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[categoryId,name,slug]);
       targetId=Number(created.insertId);
     }
@@ -472,7 +473,7 @@ async function ensureBedroomMenuTaxonomy(){
     }
     if(!targetId){
       let slug=slugify(name),n=2;
-      while((await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(slug)=LOWER(?) LIMIT 1",[targetCategoryId,slug]))[0][0])slug=slugify(name)+"-"+n++;
+      while((await db.query("SELECT id FROM subcategories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[slug]))[0][0])slug=slugify(name)+"-"+n++;
       const [created]=await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[targetCategoryId,name,slug]);
       targetId=Number(created.insertId);
     }
