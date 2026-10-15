@@ -435,7 +435,7 @@ async function ensureDiningBarFurnitureTaxonomy(){
 
 async function ensureStorageStudyMenuTaxonomy(){
   await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-  const migrationName="align_storage_study_menu_taxonomy_v2";
+  const migrationName="align_storage_study_menu_taxonomy_v3";
   const [done]=await db.query("SELECT name FROM app_migrations WHERE name=?",[migrationName]);
   if(done.length)return;
 
@@ -482,6 +482,12 @@ async function ensureStorageStudyMenuTaxonomy(){
   await ensureSubcategory("Crockery Unit",["Sideboards & Crockery Units","Crockery Units"]);
   await ensureSubcategory("Corner Table",["Corner Tables"]);
   await ensureSubcategory("Folding Table",["Folding Tables"]);
+  // Restore the Storage & Study "More" group links from the previous menu.
+  await ensureSubcategory("Bookcases & Standing Shelves",["Bookcase & Standing Shelves"]);
+  await ensureSubcategory("Wall Shelves & Ledges",["Wall Shelf & Ledges"]);
+  await ensureSubcategory("Magazine Racks",["Magazine Rack"]);
+  await ensureSubcategory("Bookshelves",["Book Shelf"]);
+  await ensureSubcategory("Wall Shelves",["Wall Shelf"]);
 
   const removeNames=["Storage Chests","Wine & Liquor Cabinets","China Cabinets & Hutches","Storage & Entryway Benches","Benches & Settees"];
   for(const name of removeNames){
