@@ -433,6 +433,67 @@ async function ensureDiningBarFurnitureTaxonomy(){
   await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",[migrationName]);
 }
 
+async function ensureStorageStudyMenuTaxonomy(){
+  await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+  const migrationName="align_storage_study_menu_taxonomy_v1";
+  const [done]=await db.query("SELECT name FROM app_migrations WHERE name=?",[migrationName]);
+  if(done.length)return;
+
+  const slugify=value=>String(value||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  const [categoryRows]=await db.query("SELECT id FROM categories WHERE LOWER(TRIM(name)) IN (?,?) ORDER BY CASE WHEN LOWER(TRIM(name))=? THEN 0 ELSE 1 END LIMIT 1",["Storage & Study","Storage","Storage & Study"]);
+  let storageId=Number(categoryRows[0]?.id||0);
+  if(!storageId){
+    let slug="storage-study",n=2;
+    while((await db.query("SELECT id FROM categories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[slug]))[0][0])slug="storage-study-"+n++;
+    const [created]=await db.query("INSERT INTO categories (name,slug) VALUES (?,?)",["Storage & Study",slug]);
+    storageId=Number(created.insertId);
+  }
+
+  const uniqueSubSlug=async(name,excludeId=0)=>{
+    const base=slugify(name);let candidate=base,n=2;
+    while((await db.query("SELECT id FROM subcategories WHERE LOWER(slug)=LOWER(?) AND id<>? LIMIT 1",[candidate,excludeId]))[0][0])candidate=base+"-"+n++;
+    return candidate;
+  };
+  const ensureSubcategory=async(name,aliases=[])=>{
+    const candidates=[name,...aliases];
+    const placeholders=candidates.map(()=>"?").join(",");
+    const [rows]=await db.query(
+      "SELECT id,category_id,name FROM subcategories WHERE LOWER(TRIM(name)) IN ("+placeholders+") ORDER BY CASE WHEN LOWER(TRIM(name))=LOWER(?) THEN 0 ELSE 1 END, CASE WHEN category_id=? THEN 0 ELSE 1 END, id",
+      [...candidates,name,storageId]
+    );
+    let target=rows.find(row=>Number(row.category_id)===storageId&&String(row.name).trim().toLowerCase()===name.toLowerCase())||rows[0];
+    let targetId=Number(target?.id||0);
+    if(targetId){
+      const slug=await uniqueSubSlug(name,targetId);
+      await db.query("UPDATE subcategories SET category_id=?,name=?,slug=? WHERE id=?",[storageId,name,slug,targetId]);
+    }else{
+      const slug=await uniqueSubSlug(name);
+      const [created]=await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[storageId,name,slug]);
+      targetId=Number(created.insertId);
+    }
+    for(const row of rows){
+      if(Number(row.id)===targetId)continue;
+      await db.query("UPDATE products SET category_id=?,subcategory_id=? WHERE subcategory_id=?",[storageId,targetId,row.id]);
+      await db.query("DELETE FROM subcategories WHERE id=?",[row.id]);
+    }
+    await db.query("UPDATE products SET category_id=? WHERE subcategory_id=?",[storageId,targetId]);
+  };
+
+  await ensureSubcategory("Crockery Unit",["Sideboards & Crockery Units","Crockery Units"]);
+  await ensureSubcategory("Corner Table",["Corner Tables"]);
+  await ensureSubcategory("Folding Table",["Folding Tables"]);
+
+  const removeNames=["Storage Chests","Wine & Liquor Cabinets","China Cabinets & Hutches","Storage & Entryway Benches","Benches & Settees","Vanities"];
+  for(const name of removeNames){
+    const [rows]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(TRIM(name))=LOWER(?)",[storageId,name]);
+    for(const row of rows){
+      await db.query("UPDATE products SET category_id=?,subcategory_id=NULL WHERE subcategory_id=?",[storageId,row.id]);
+      await db.query("DELETE FROM subcategories WHERE id=?",[row.id]);
+    }
+  }
+  await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",[migrationName]);
+}
+
 async function ensureBedroomMenuTaxonomy(){
   await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
   const migrationName="align_bedroom_menu_taxonomy_v1";
@@ -1057,6 +1118,6 @@ app.use(express.static(dist));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
 app.listen(PORT,async()=>{
-  try{await ensureProductFields();await ensureSettings();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();await ensureBedroomMenuTaxonomy();await ensureDiningSetsMenuTaxonomy();await ensureDiningBarFurnitureTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
+  try{await ensureProductFields();await ensureSettings();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();await ensureBedroomMenuTaxonomy();await ensureDiningSetsMenuTaxonomy();await ensureDiningBarFurnitureTaxonomy();await ensureStorageStudyMenuTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
   console.log("Balaji Handicraft server running on port "+PORT);
 });
