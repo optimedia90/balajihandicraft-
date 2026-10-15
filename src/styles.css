@@ -651,3 +651,30 @@ body{min-height:100vh}
 .moreMegaMenu .moreCategoryTitle:hover{background:transparent!important;color:var(--accent)!important}
 @media(min-width:901px) and (max-width:1250px){.navwrap{gap:10px}.navwrap nav{gap:8px}.navwrap nav .navMenuTitle{font-size:10px}.navwrap .logo{flex-basis:145px;min-width:145px}}
 @media(max-width:900px){.navwrap nav .navMenuTitle{font-size:14px}.moreMegaMenu{max-height:55vh;grid-template-columns:1fr!important}.moreMenu .dropdownMenu.megaMenu{display:grid!important}}
+
+
+/* Compact, anchored More mega-menu: keep the store page visible and avoid a full-screen panel. */
+@media(min-width:901px){
+ .navwrap nav .navMenu.moreMenu{position:relative;flex:0 0 auto;}
+ .navwrap nav .navMenu.moreMenu>.dropdownMenu.moreMegaMenu{
+  position:absolute;top:calc(100% - 1px);left:auto;right:-12px;width:min(920px,calc(100vw - 32px));min-width:0;max-width:calc(100vw - 32px);
+  max-height:min(62vh,520px);min-height:0;overflow-y:auto;overflow-x:hidden;
+  padding:24px 28px;background:#fffdf9;border:1px solid var(--line);border-top:1px solid #eee;
+  box-shadow:0 18px 45px #1715111c;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  align-content:start;align-items:start;column-gap:24px;row-gap:26px;
+  transform:translateY(6px);visibility:hidden;opacity:0;pointer-events:none;
+ }
+ .navwrap nav .navMenu.moreMenu:hover>.dropdownMenu.moreMegaMenu,
+ .navwrap nav .navMenu.moreMenu:focus-within>.dropdownMenu.moreMegaMenu{
+  transform:translateY(0);visibility:visible;opacity:1;pointer-events:auto;
+ }
+ .moreMegaMenu .megaGroup{gap:9px;}
+ .moreMegaMenu .megaGroup>a:not(.moreCategoryTitle){font-size:12px!important;line-height:1.45;white-space:normal!important;padding:0!important;}
+}
+@media(min-width:901px) and (max-width:1100px){
+ .navwrap nav .navMenu.moreMenu>.dropdownMenu.moreMegaMenu{width:min(760px,calc(100vw - 24px));grid-template-columns:repeat(3,minmax(0,1fr))!important;padding:20px;column-gap:18px;}
+}
+@media(max-width:900px){
+ .navwrap nav .navMenu.moreMenu{position:relative;}
+ .navwrap nav .navMenu.moreMenu>.dropdownMenu.moreMegaMenu{width:100%;max-width:100%;max-height:45vh;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;padding:14px;grid-template-columns:1fr!important;}
+}
