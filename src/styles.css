@@ -685,3 +685,14 @@ body{min-height:100vh}
 .adminBrandImage{width:34px;height:34px;object-fit:cover;border-radius:50%;flex:0 0 34px;display:block}
 .adminBrand small{font-size:5.5px;letter-spacing:.35px;white-space:nowrap}
 @media(max-width:600px){.brandLogoImage{width:34px;height:34px;flex-basis:34px}.logo small{font-size:5px;letter-spacing:.35px}.logo{gap:7px}}
+
+/* Homepage quick collections strip — circular image links */
+.quickCollectionSection{width:100%;background:#fff;padding:24px 2.2% 27px;border-bottom:1px solid #f0ece6}
+.quickCollectionRail{max-width:1380px;margin:0 auto;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));align-items:start;gap:12px}
+.quickCollectionItem{min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;color:var(--ink)}
+.quickCollectionImage{width:clamp(82px,9.4vw,132px);height:clamp(82px,9.4vw,132px);border-radius:50%;background:#f5f2ed;display:grid;place-items:center;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease}
+.quickCollectionImage img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;transition:transform .35s ease}
+.quickCollectionItem:hover .quickCollectionImage{transform:translateY(-3px);box-shadow:0 8px 22px #17151112}
+.quickCollectionItem:hover .quickCollectionImage img{transform:scale(1.07)}
+.quickCollectionLabel{font-size:clamp(10px,.95vw,13px);line-height:1.25;font-weight:500;white-space:nowrap}
+@media(max-width:760px){.quickCollectionSection{padding:17px 0 20px}.quickCollectionRail{display:flex;gap:18px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:0 16px 4px}.quickCollectionItem{flex:0 0 84px;scroll-snap-align:start;gap:8px}.quickCollectionImage{width:78px;height:78px}.quickCollectionLabel{font-size:11px;white-space:normal}.quickCollectionRail::-webkit-scrollbar{display:none}.quickCollectionRail{scrollbar-width:none}}
