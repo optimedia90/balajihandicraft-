@@ -324,6 +324,82 @@ async function ensureFurnitureTaxonomy(){
   }
 }
 
+async function ensureBedroomMenuTaxonomy(){
+  await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+  const migrationName="align_bedroom_menu_taxonomy_v1";
+  const [done]=await db.query("SELECT name FROM app_migrations WHERE name=?",[migrationName]);
+  if(done.length)return;
+
+  const slugify=value=>String(value||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  const getOrCreateCategory=async name=>{
+    const [rows]=await db.query("SELECT id FROM categories WHERE LOWER(TRIM(name))=LOWER(?) LIMIT 1",[name]);
+    if(rows[0])return Number(rows[0].id);
+    let slug=slugify(name),n=2;
+    while((await db.query("SELECT id FROM categories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[slug]))[0][0])slug=slugify(name)+"-"+n++;
+    const [created]=await db.query("INSERT INTO categories (name,slug) VALUES (?,?)",[name,slug]);
+    return Number(created.insertId);
+  };
+  const [bedroomRows]=await db.query("SELECT id FROM categories WHERE LOWER(TRIM(name))=LOWER(?) LIMIT 1",["Bedroom"]);
+  const bedroomId=Number(bedroomRows[0]?.id||0);
+  const bedsId=await getOrCreateCategory("Beds");
+  const storageId=await getOrCreateCategory("Bedroom Storage");
+  const vanityId=await getOrCreateCategory("Vanity");
+
+  const migrateSubcategory=async({targetCategoryId,name,aliases=[]})=>{
+    const [targetRows]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(TRIM(name))=LOWER(?) LIMIT 1",[targetCategoryId,name]);
+    let targetId=Number(targetRows[0]?.id||0);
+    const searchNames=[name,...aliases];
+    const params=[...searchNames.map(()=>"?")];
+    const sourceCategoryIds=[bedroomId,targetCategoryId].filter(Boolean);
+    const sourcePlaceholders=sourceCategoryIds.map(()=>"?").join(",");
+    const [sources]=await db.query(
+      "SELECT id,category_id,name FROM subcategories WHERE LOWER(TRIM(name)) IN ("+params.join(",")+") AND category_id IN ("+sourcePlaceholders+") ORDER BY id ASC",
+      [...searchNames,...sourceCategoryIds]
+    );
+    if(!targetId&&sources.length){
+      const source=sources.shift();
+      await db.query("UPDATE subcategories SET category_id=?,name=?,slug=? WHERE id=?",[targetCategoryId,name,slugify(name),source.id]);
+      await db.query("UPDATE products SET category_id=? WHERE subcategory_id=?",[targetCategoryId,source.id]);
+      targetId=Number(source.id);
+    }
+    if(!targetId){
+      let slug=slugify(name),n=2;
+      while((await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(slug)=LOWER(?) LIMIT 1",[targetCategoryId,slug]))[0][0])slug=slugify(name)+"-"+n++;
+      const [created]=await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[targetCategoryId,name,slug]);
+      targetId=Number(created.insertId);
+    }
+    for(const source of sources){
+      if(Number(source.id)===targetId)continue;
+      await db.query("UPDATE products SET category_id=?,subcategory_id=? WHERE subcategory_id=?",[targetCategoryId,targetId,source.id]);
+      await db.query("DELETE FROM subcategories WHERE id=?",[source.id]);
+    }
+    return targetId;
+  };
+
+  for(const name of ["All Beds","King Size Beds","Queen Size Beds","Single Beds"]){
+    await migrateSubcategory({targetCategoryId:bedsId,name});
+  }
+  await migrateSubcategory({targetCategoryId:storageId,name:"Wardrobes"});
+  await migrateSubcategory({targetCategoryId:storageId,name:"Chests of Drawers",aliases:["Dressers","Dresser","Dressers & Chests of Drawers"]});
+  await migrateSubcategory({targetCategoryId:storageId,name:"Bedside Tables",aliases:["Bedside Table","Nightstands","Nightstand"]});
+  await migrateSubcategory({targetCategoryId:storageId,name:"Console Tables"});
+  await migrateSubcategory({targetCategoryId:storageId,name:"Trunks",aliases:["Trunk"]});
+  await migrateSubcategory({targetCategoryId:vanityId,name:"Dressing",aliases:["Dressing Tables","Dressing Table"]});
+
+  // Remove outdated Bedroom-only labels after their products have been remapped.
+  if(bedroomId){
+    const oldNames=["All Beds","King Size Beds","Queen Size Beds","Single Beds","Wardrobes","Dressers","Dresser","Dressers & Chests of Drawers","Bedside Table","Bedside Tables","Nightstands","Nightstand","Console Tables","Trunks","Trunk","Dressing Tables","Dressing Table"];
+    for(const oldName of oldNames){
+      const [rows]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(TRIM(name))=LOWER(?)",[bedroomId,oldName]);
+      for(const row of rows){
+        await db.query("UPDATE products SET category_id=?,subcategory_id=NULL WHERE subcategory_id=?",[bedroomId,row.id]);
+        await db.query("DELETE FROM subcategories WHERE id=?",[row.id]);
+      }
+    }
+  }
+  await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",[migrationName]);
+}
+
 async function ensureMegaMenuCleanup(){
   await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
   const [done]=await db.query("SELECT name FROM app_migrations WHERE name=?",["clean_furniture_mega_menu_v1"]);
@@ -872,6 +948,6 @@ app.use(express.static(dist));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
 app.listen(PORT,async()=>{
-  try{await ensureProductFields();await ensureSettings();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
+  try{await ensureProductFields();await ensureSettings();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();await ensureBedroomMenuTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
   console.log("Balaji Handicraft server running on port "+PORT);
 });
