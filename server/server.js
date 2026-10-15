@@ -268,7 +268,7 @@ async function ensureFurnitureTaxonomy(){
     "dining sets":"Dining Room","dining seating":"Dining Room","bar":"Dining Room",
     "storage":"Storage & Study","cabinets & storage":"Storage & Study","shelving":"Storage & Study","benches":"Storage & Study",
     "office seating":"Office Furniture","workspaces":"Office Furniture","office storage":"Office Furniture",
-    "outdoor furniture":"Living Room","furniture sets":"Living Room"
+    "outdoor furniture":"Living Room","furniture sets":"Living Room","sofa sets":"Sofas"
   };
   const destinationForSub=(subName,legacyName)=>{
     const n=String(subName||"").toLowerCase();
@@ -279,7 +279,7 @@ async function ensureFurnitureTaxonomy(){
     if(/study|book|shelf|storage|cabinet|sideboard|chest|bench|settee/.test(n))return "Storage & Study";
     return legacyFallback[String(legacyName||"").toLowerCase()]||"Living Room";
   };
-  const knownLegacyNames=new Set(["chairs","seating","tables","tv & media","beds","bedroom storage","vanity","dining sets","dining seating","bar","storage","cabinets & storage","shelving","benches","office seating","workspaces","office storage","outdoor furniture","furniture sets","foot stool","foot stools","study","desks","workspace tables","coffee tables","side tables","side & end tables","console tables"]);
+  const knownLegacyNames=new Set(["chairs","seating","tables","tv & media","beds","bedroom storage","vanity","dining sets","dining seating","bar","storage","cabinets & storage","shelving","benches","office seating","workspaces","office storage","outdoor furniture","furniture sets","sofa sets","foot stool","foot stools","study","desks","workspace tables","coffee tables","side tables","side & end tables","console tables"]);
   const [legacyCategories]=await db.query("SELECT id,name FROM categories ORDER BY id ASC");
   for(const legacy of legacyCategories){
     const legacyName=String(legacy.name||"");
