@@ -385,6 +385,53 @@ async function ensureDiningSetsMenuTaxonomy(){
   await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",[migrationName]);
 }
 
+async function ensureDiningBarFurnitureTaxonomy(){
+  await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+  const migrationName="add_dining_benches_and_bar_furniture_v1";
+  const [done]=await db.query("SELECT name FROM app_migrations WHERE name=?",[migrationName]);
+  if(done.length)return;
+  const slugify=value=>String(value||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  const ensureCategory=async(name)=>{
+    const [found]=await db.query("SELECT id FROM categories WHERE LOWER(TRIM(name))=LOWER(?) ORDER BY id LIMIT 1",[name]);
+    if(found[0])return Number(found[0].id);
+    let slug=slugify(name),n=2;
+    while((await db.query("SELECT id FROM categories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[slug]))[0][0])slug=slugify(name)+"-"+n++;
+    const [created]=await db.query("INSERT INTO categories (name,slug) VALUES (?,?)",[name,slug]);
+    return Number(created.insertId);
+  };
+  const ensureSubcategory=async(categoryId,name,aliases=[])=>{
+    const [already]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(TRIM(name))=LOWER(?) ORDER BY id LIMIT 1",[categoryId,name]);
+    let targetId=Number(already[0]?.id||0);
+    const candidates=[name,...aliases];
+    const placeholders=candidates.map(()=>"?").join(",");
+    const [sources]=await db.query("SELECT id,category_id,name FROM subcategories WHERE LOWER(TRIM(name)) IN ("+placeholders+") ORDER BY id",[...candidates]);
+    if(!targetId&&sources.length){
+      targetId=Number(sources[0].id);
+      await db.query("UPDATE subcategories SET category_id=?,name=?,slug=? WHERE id=?",[categoryId,name,slugify(name),targetId]);
+      await db.query("UPDATE products SET category_id=? WHERE subcategory_id=?",[categoryId,targetId]);
+    }
+    if(!targetId){
+      let slug=slugify(name),n=2;
+      while((await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(slug)=LOWER(?) LIMIT 1",[categoryId,slug]))[0][0])slug=slugify(name)+"-"+n++;
+      const [created]=await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[categoryId,name,slug]);
+      targetId=Number(created.insertId);
+    }
+    for(const source of sources){
+      if(Number(source.id)===targetId)continue;
+      await db.query("UPDATE products SET category_id=?,subcategory_id=? WHERE subcategory_id=?",[categoryId,targetId,source.id]);
+      await db.query("DELETE FROM subcategories WHERE id=?",[source.id]);
+    }
+  };
+  const diningId=await ensureCategory("Dining Room");
+  await ensureSubcategory(diningId,"Dining Benches",["Dining Bench"]);
+  const barId=await ensureCategory("Bar Furniture");
+  await ensureSubcategory(barId,"Bar Cabinets",["Bar Cabinet","Bar Cabnites"]);
+  await ensureSubcategory(barId,"Bar Table Set",["Bar Table Sets","Bar Table"]);
+  await ensureSubcategory(barId,"Bar Chairs",["Bar Chair"]);
+  await ensureSubcategory(barId,"Bar Stool",["Bar Stools"]);
+  await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",[migrationName]);
+}
+
 async function ensureBedroomMenuTaxonomy(){
   await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
   const migrationName="align_bedroom_menu_taxonomy_v1";
@@ -1009,6 +1056,6 @@ app.use(express.static(dist));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
 app.listen(PORT,async()=>{
-  try{await ensureProductFields();await ensureSettings();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();await ensureBedroomMenuTaxonomy();await ensureDiningSetsMenuTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
+  try{await ensureProductFields();await ensureSettings();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();await ensureBedroomMenuTaxonomy();await ensureDiningSetsMenuTaxonomy();await ensureDiningBarFurnitureTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
   console.log("Balaji Handicraft server running on port "+PORT);
 });
