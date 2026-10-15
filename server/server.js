@@ -160,6 +160,36 @@ async function ensureSettings(){
   await db.query("INSERT IGNORE INTO store_settings (id) VALUES (1)");
 }
 
+async function ensureFurnitureTaxonomy(){
+  // Seed the exact category/subcategory structure used by the storefront and admin.
+  // Existing products and legacy categories are preserved; records are reused by name.
+  const taxonomy=[
+    {name:"Living Room",subs:["1 Seater Sofa","2 Seater Sofa","3 Seater Sofa","L-shaped Sofa","Sofa Cum Bed","Armchairs","Rocking Chairs","Folding Chairs","Stools & Ottomans","Coffee Tables","Side & End Tables","Console Tables","TV Units"]},
+    {name:"Bedroom",subs:["All Beds","King Size Beds","Queen Size Beds","Single Beds","Wardrobes","Trunks","Dressing Tables"]},
+    {name:"Dining Room",subs:["All Dining Sets","4 Seater Dining Sets","6 Seater Dining Sets","Dining Chairs","Dining Benches","Bar Furniture"]},
+    {name:"Storage & Study",subs:["Bookshelves","Sideboards & Crockery Units","Trunks & Storage Chests","Wall Shelves","Benches & Settees","Study Tables"]},
+    {name:"Office Furniture",subs:["Office Chairs","Office Stools","Workspace Tables","Desks","Filing Cabinets","Office Shelving"]}
+  ];
+  const slugify=value=>String(value||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  for(const item of taxonomy){
+    let [found]=await db.query("SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1",[item.name]);
+    let categoryId=found[0]?.id;
+    if(!categoryId){
+      let slug=slugify(item.name),n=2;
+      while((await db.query("SELECT id FROM categories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[slug]))[0][0])slug=slugify(item.name)+"-"+n++;
+      const [created]=await db.query("INSERT INTO categories (name,slug) VALUES (?,?)",[item.name,slug]);
+      categoryId=created.insertId;
+    }
+    for(const subName of item.subs){
+      const [existing]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(name)=LOWER(?) LIMIT 1",[categoryId,subName]);
+      if(existing[0])continue;
+      let slug=slugify(subName),n=2;
+      while((await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(slug)=LOWER(?) LIMIT 1",[categoryId,slug]))[0][0])slug=slugify(subName)+"-"+n++;
+      await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[categoryId,subName,slug]);
+    }
+  }
+}
+
 app.get("/api/health",(req,res)=>res.json({ok:true,service:"balaji-handicraft-api"}));
 app.get("/api/db-health",asyncHandler(async(req,res)=>{
   const [rows]=await db.query("SELECT 1 AS ok");
@@ -634,6 +664,6 @@ app.use(express.static(dist));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
 app.listen(PORT,async()=>{
-  try{await ensureProductFields();await ensureSettings();await ensureOrders();console.log("Store settings and orders ready");}catch(e){console.error("Store setup failed:",e.message);}
+  try{await ensureProductFields();await ensureSettings();await ensureOrders();await ensureFurnitureTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
   console.log("Balaji Handicraft server running on port "+PORT);
 });
