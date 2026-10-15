@@ -315,16 +315,18 @@ function Shop({add,toggleWish,wish}){
   if(!cat)return true;
   const wanted=clean(cat);
   const groups=categoryAliases[wanted];
-  if(liveCats.length){const selected=liveCategoryRecords.find(c=>clean(c.name)===wanted);return selected?Number(p.categoryId)===Number(selected.id):clean(p.category)===wanted;}
+  if(liveCats.length){const selected=liveCategoryRecords.find(c=>clean(c.name)===wanted);if(!selected)return clean(p.category)===wanted;return p.categoryId?Number(p.categoryId)===Number(selected.id):clean(p.category)===wanted;}
   if(groups)return typeGroups.filter(g=>groups.includes(g.id)).some(g=>groupMatches(p,g));
   return clean(p.category)===wanted;
  };
  const matchesSub=p=>{
   if(!sub)return true;
-  const wanted=clean(sub),actual=clean(p.sub);
+  const wanted=clean(sub),actual=clean(p.sub),name=clean(p.name);
   const selected=liveSubcategoryRecords.find(x=>clean(x.name)===wanted);
-  if(selected)return Number(p.subcategoryId)===Number(selected.id);
-  return actual===wanted;
+  if(selected&&p.subcategoryId)return Number(p.subcategoryId)===Number(selected.id);
+  if(actual===wanted)return true;
+  const singular=wanted.endsWith("ies")?wanted.slice(0,-3)+"y":wanted.endsWith("s")?wanted.slice(0,-1):wanted;
+  return Boolean(singular&&name.includes(singular));
  };
  const queryGroup=query=>{
   const normalized=clean(query);
