@@ -435,7 +435,7 @@ async function ensureDiningBarFurnitureTaxonomy(){
 
 async function ensureStorageStudyMenuTaxonomy(){
   await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-  const migrationName="align_storage_study_menu_taxonomy_v1";
+  const migrationName="align_storage_study_menu_taxonomy_v2";
   const [done]=await db.query("SELECT name FROM app_migrations WHERE name=?",[migrationName]);
   if(done.length)return;
 
@@ -483,13 +483,20 @@ async function ensureStorageStudyMenuTaxonomy(){
   await ensureSubcategory("Corner Table",["Corner Tables"]);
   await ensureSubcategory("Folding Table",["Folding Tables"]);
 
-  const removeNames=["Storage Chests","Wine & Liquor Cabinets","China Cabinets & Hutches","Storage & Entryway Benches","Benches & Settees","Vanities"];
+  const removeNames=["Storage Chests","Wine & Liquor Cabinets","China Cabinets & Hutches","Storage & Entryway Benches","Benches & Settees"];
   for(const name of removeNames){
     const [rows]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(TRIM(name))=LOWER(?)",[storageId,name]);
     for(const row of rows){
       await db.query("UPDATE products SET category_id=?,subcategory_id=NULL WHERE subcategory_id=?",[storageId,row.id]);
       await db.query("DELETE FROM subcategories WHERE id=?",[row.id]);
     }
+  }
+  // Remove the old "Vanities" menu leaf wherever the legacy migration placed it;
+  // retain the product and its category, but clear the obsolete subcategory link.
+  const [vanityRows]=await db.query("SELECT id FROM subcategories WHERE LOWER(TRIM(name))=LOWER(?)",["Vanities"]);
+  for(const row of vanityRows){
+    await db.query("UPDATE products SET subcategory_id=NULL WHERE subcategory_id=?",[row.id]);
+    await db.query("DELETE FROM subcategories WHERE id=?",[row.id]);
   }
   await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",[migrationName]);
 }
