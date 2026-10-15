@@ -172,6 +172,10 @@ async function ensureFurnitureTaxonomy(){
     {name:"Office Furniture",subs:["Office Chairs","Office Stools","Workspace Tables","Desks","Filing Cabinets","Office Shelving"]}
   ];
   const slugify=value=>String(value||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+  const [taxonomyMigrationRows]=await db.query("SELECT name FROM app_migrations WHERE name=?",["normalize_furniture_taxonomy_v1"]);
+  const runLegacyMigration=!taxonomyMigrationRows.length;
+  if(runLegacyMigration){
   // Replace the old Home Decor main category with Office Furniture without changing its ID.
   const [officeRows]=await db.query("SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1",["Office Furniture"]);
   const [homeRows]=await db.query("SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1",["Home Decor"]);
@@ -315,6 +319,8 @@ async function ensureFurnitureTaxonomy(){
         await db.query("DELETE FROM subcategories WHERE id=?",[old.id]);
       }
     }
+  }
+  await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",["normalize_furniture_taxonomy_v1"]);
   }
 }
 
