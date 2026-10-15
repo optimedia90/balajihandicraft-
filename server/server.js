@@ -164,7 +164,8 @@ async function ensureFurnitureTaxonomy(){
   // Seed the exact category/subcategory structure used by the storefront and admin.
   // Existing products and legacy categories are preserved; records are reused by name.
   const taxonomy=[
-    {name:"Living Room",subs:["1 Seater Sofa","2 Seater Sofa","3 Seater Sofa","L-shaped Sofa","Sofa Cum Bed","Armchairs","Rocking Chairs","Folding Chairs","Stools & Ottomans","Coffee Tables","Side & End Tables","Console Tables","TV Units"]},
+    {name:"Living Room",subs:["Armchairs","Rocking Chairs","Folding Chairs","Stools & Ottomans","Coffee Tables","Side & End Tables","Console Tables","TV Units"]},
+    {name:"Sofas",subs:["1 Seater Sofa","2 Seater Sofa","3 Seater Sofa","L-shaped Sofa","Sofa Cum Bed"]},
     {name:"Bedroom",subs:["All Beds","King Size Beds","Queen Size Beds","Single Beds","Wardrobes","Trunks","Dressing Tables"]},
     {name:"Dining Room",subs:["All Dining Sets","4 Seater Dining Sets","6 Seater Dining Sets","Dining Chairs","Dining Benches","Bar Furniture"]},
     {name:"Storage & Study",subs:["Bookshelves","Sideboards & Crockery Units","Trunks & Storage Chests","Wall Shelves","Benches & Settees","Study Tables"]},
@@ -203,6 +204,35 @@ async function ensureFurnitureTaxonomy(){
       while((await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(slug)=LOWER(?) LIMIT 1",[categoryId,slug]))[0][0])slug=slugify(subName)+"-"+n++;
       await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[categoryId,subName,slug]);
     }
+  }
+  // Keep sofa types under their own admin category, while the storefront nests
+  // that category as the "Sofas" group inside the Living Room mega-menu.
+  const [sofaCategoryRows]=await db.query("SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1",["Sofas"]);
+  const [livingRows]=await db.query("SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1",["Living Room"]);
+  if(sofaCategoryRows[0]&&livingRows[0]){
+    const sofaId=Number(sofaCategoryRows[0].id);
+    const sofaNames=["1 Seater Sofa","2 Seater Sofa","3 Seater Sofa","L-shaped Sofa","Sofa Cum Bed"];
+    for(const subName of sofaNames){
+      const [sources]=await db.query("SELECT id,category_id FROM subcategories WHERE LOWER(name)=LOWER(?) AND category_id<>?",[subName,sofaId]);
+      const [targetRows]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(name)=LOWER(?) LIMIT 1",[sofaId,subName]);
+      let targetId=targetRows[0]?.id;
+      if(!targetId){
+        const slug=slugify(subName);
+        const [created]=await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[sofaId,subName,slug]);
+        targetId=created.insertId;
+      }
+      for(const source of sources){
+        await db.query("UPDATE products SET subcategory_id=?,category_id=? WHERE subcategory_id=?",[targetId,sofaId,source.id]);
+        await db.query("DELETE FROM subcategories WHERE id=?",[source.id]);
+      }
+    }
+  }
+  // Remove the obsolete "Sofa Sets" leaf from all categories; keep products
+  // and their category assignment, but clear the deleted subcategory reference.
+  const [oldSofaSetRows]=await db.query("SELECT id FROM subcategories WHERE LOWER(TRIM(name))=LOWER(?)",["Sofa Sets"]);
+  for(const old of oldSofaSetRows){
+    await db.query("UPDATE products SET subcategory_id=NULL WHERE subcategory_id=?",[old.id]);
+    await db.query("DELETE FROM subcategories WHERE id=?",[old.id]);
   }
   // Remove the old Bedroom dresser label in favor of Trunks while preserving product links.
   const [bedroomRows]=await db.query("SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1",["Bedroom"]);
