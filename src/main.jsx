@@ -311,13 +311,13 @@ function Shop({add,toggleWish,wish}){
   "chairs":["chairs"],"tables":["tables","diningtables","bedside"],
   "storage":["storage","wardrobes","dressers","sideboards","tvunits"],
   "study":["tables","chairs","storage"],"homeoffice":["tables","chairs","storage"],
-  "homedecor":["decor"]
+  "homedecor":["decor"],"storageandstudy":["storage","wardrobes","dressers","sideboards","tvunits","tables","benches"],"officefurniture":["tables","chairs","storage"]
  };
  const matchesCategory=p=>{
   if(!cat)return true;
   const wanted=clean(cat);
   const groups=categoryAliases[wanted];
-  if(liveCats.length){const selected=liveCategoryRecords.find(c=>clean(c.name)===wanted);if(!selected)return clean(p.category)===wanted;return p.categoryId?Number(p.categoryId)===Number(selected.id):clean(p.category)===wanted;}
+  if(liveCats.length){const selected=liveCategoryRecords.find(c=>clean(c.name)===wanted);if(selected&&p.categoryId&&Number(p.categoryId)===Number(selected.id))return true;if(groups)return typeGroups.filter(g=>groups.includes(g.id)).some(g=>groupMatches(p,g));return selected?(clean(p.category)===wanted):clean(p.category)===wanted;}
   if(groups)return typeGroups.filter(g=>groups.includes(g.id)).some(g=>groupMatches(p,g));
   return clean(p.category)===wanted;
  };
@@ -325,7 +325,7 @@ function Shop({add,toggleWish,wish}){
   if(!sub)return true;
   const wanted=clean(sub),actual=clean(p.sub),name=clean(p.name);
   const selected=liveSubcategoryRecords.find(x=>clean(x.name)===wanted);
-  if(selected&&p.subcategoryId)return Number(p.subcategoryId)===Number(selected.id);
+  if(selected&&p.subcategoryId&&Number(p.subcategoryId)===Number(selected.id))return true;
   if(actual===wanted)return true;
   const singular=wanted.endsWith("ies")?wanted.slice(0,-3)+"y":wanted.endsWith("s")?wanted.slice(0,-1):wanted;
   return Boolean(singular&&name.includes(singular));
@@ -344,7 +344,7 @@ function Shop({add,toggleWish,wish}){
    const searchable=clean(textOf(p));
    const queryMatches=!rawTerms.length||rawTerms.every(term=>searchable.includes(clean(term)));
    const intentMatches=!intent||groupMatches(p,intent);
-   return matchesCategory(p)&&matchesSub(p)&&queryMatches&&intentMatches;
+   return (matchesCategory(p)||Boolean(sub&&matchesSub(p)))&&matchesSub(p)&&queryMatches&&intentMatches;
   });
   if(sort==="low")x.sort((a,b)=>a.price-b.price);
   if(sort==="high")x.sort((a,b)=>b.price-a.price);
