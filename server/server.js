@@ -84,10 +84,10 @@ async function sendOrderConfirmation({email,name,orderNumber,total,items,address
  const site=String(STORE_URL||"https://ivory-lemur-828776.hostingersite.com").replace(/\/$/,"");
  const from=MAIL_FROM||SMTP_USER;
  await transporter.sendMail({
-  from:{name:"Balaji Handicraft",address:from},to:email,
-  subject:"Order confirmed — "+orderNumber+" | Balaji Handicraft",
+  from:{name:"Woodenara",address:from},to:email,
+  subject:"Order confirmed — "+orderNumber+" | Woodenara",
   text:"Hi "+name+", thank you for your order "+orderNumber+". We have received your Cash on Delivery order for "+money(total)+". Delivery address: "+[address,city,state,postal].join(", ")+". We will keep you updated. "+site,
-  html:`<!doctype html><html><body style="margin:0;background:#f7f4ef;font-family:Arial,sans-serif;color:#211f1b"><div style="max-width:680px;margin:28px auto;background:#fff;border:1px solid #e8e2d9"><div style="background:#171511;color:#fff;padding:28px 32px"><div style="font-size:12px;letter-spacing:3px">BALAJI HANDICRAFT</div><h1 style="font-family:Georgia,serif;font-weight:normal;margin:22px 0 6px;font-size:30px">Thank you for your order.</h1><p style="margin:0;color:#d6c6ad">Your order has been received successfully.</p></div><div style="padding:28px 32px"><p>Hi <strong>${escapeHtml(name)}</strong>,</p><p>Thank you for choosing Balaji Handicraft. We have received your order and it is currently being processed.</p><div style="background:#f7f4ef;padding:16px;margin:22px 0"><div style="font-size:12px;color:#756b5f">ORDER NUMBER</div><div style="font-size:22px;font-weight:bold;margin-top:5px">${escapeHtml(orderNumber)}</div><div style="margin-top:10px">Payment: Cash on Delivery</div></div><h2 style="font-family:Georgia,serif;font-size:20px">Order summary</h2><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:10px 8px;border-bottom:2px solid #211f1b">Product</th><th style="padding:10px 8px;border-bottom:2px solid #211f1b">Qty</th><th style="text-align:right;padding:10px 8px;border-bottom:2px solid #211f1b">Amount</th></tr></thead><tbody>${rows}</tbody></table><div style="text-align:right;font-size:19px;font-weight:bold;padding:18px 8px">Total: ${money(total)}</div><h2 style="font-family:Georgia,serif;font-size:20px">Delivery address</h2><p style="line-height:1.7">${escapeHtml(name)}<br>${escapeHtml(address)}<br>${escapeHtml(city)}, ${escapeHtml(state)} ${escapeHtml(postal)}<br>${escapeHtml(process.env.CUSTOMER_SUPPORT_EMAIL||"")}</p><p style="line-height:1.6">We’ll send you updates as your order progresses. If you have questions, reply to this email.</p><p style="margin-top:28px"><a href="${escapeHtml(site)}" style="display:inline-block;background:#171511;color:#fff;text-decoration:none;padding:13px 20px">Visit Balaji Handicraft</a></p></div><div style="background:#f7f4ef;padding:18px 32px;color:#756b5f;font-size:12px">Handcrafted furniture made with care · Balaji Handicraft</div></div></body></html>`
+  html:`<!doctype html><html><body style="margin:0;background:#f7f4ef;font-family:Arial,sans-serif;color:#211f1b"><div style="max-width:680px;margin:28px auto;background:#fff;border:1px solid #e8e2d9"><div style="background:#171511;color:#fff;padding:28px 32px"><div style="font-size:12px;letter-spacing:3px">WOODENARA</div><h1 style="font-family:Georgia,serif;font-weight:normal;margin:22px 0 6px;font-size:30px">Thank you for your order.</h1><p style="margin:0;color:#d6c6ad">Your order has been received successfully.</p></div><div style="padding:28px 32px"><p>Hi <strong>${escapeHtml(name)}</strong>,</p><p>Thank you for choosing Woodenara. We have received your order and it is currently being processed.</p><div style="background:#f7f4ef;padding:16px;margin:22px 0"><div style="font-size:12px;color:#756b5f">ORDER NUMBER</div><div style="font-size:22px;font-weight:bold;margin-top:5px">${escapeHtml(orderNumber)}</div><div style="margin-top:10px">Payment: Cash on Delivery</div></div><h2 style="font-family:Georgia,serif;font-size:20px">Order summary</h2><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:10px 8px;border-bottom:2px solid #211f1b">Product</th><th style="padding:10px 8px;border-bottom:2px solid #211f1b">Qty</th><th style="text-align:right;padding:10px 8px;border-bottom:2px solid #211f1b">Amount</th></tr></thead><tbody>${rows}</tbody></table><div style="text-align:right;font-size:19px;font-weight:bold;padding:18px 8px">Total: ${money(total)}</div><h2 style="font-family:Georgia,serif;font-size:20px">Delivery address</h2><p style="line-height:1.7">${escapeHtml(name)}<br>${escapeHtml(address)}<br>${escapeHtml(city)}, ${escapeHtml(state)} ${escapeHtml(postal)}<br>${escapeHtml(process.env.CUSTOMER_SUPPORT_EMAIL||"")}</p><p style="line-height:1.6">We’ll send you updates as your order progresses. If you have questions, reply to this email.</p><p style="margin-top:28px"><a href="${escapeHtml(site)}" style="display:inline-block;background:#171511;color:#fff;text-decoration:none;padding:13px 20px">Visit Woodenara</a></p></div><div style="background:#f7f4ef;padding:18px 32px;color:#756b5f;font-size:12px">Handcrafted furniture made with care · Woodenara</div></div></body></html>`
  });
  return true;
 }
@@ -155,8 +155,20 @@ async function repairProductImages(rows){
   return rows;
 }
 
+async function ensureWoodenaraBranding(){
+  await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+  const migrationName="woodenara_branding_v1";
+  const [done]=await db.query("SELECT name FROM app_migrations WHERE name=?",[migrationName]);
+  if(done.length)return;
+  await db.query("UPDATE store_settings SET store_name=? WHERE id=1",["Woodenara"]);
+  await db.query("UPDATE store_settings SET seo_title=? WHERE id=1 AND (seo_title IS NULL OR TRIM(seo_title)=? OR LOWER(seo_title) LIKE ?)",["Woodenara | Furniture & Home Decor","","%balaji handicraft%"]);
+  await db.query("UPDATE store_settings SET meta_description=? WHERE id=1 AND (meta_description IS NULL OR TRIM(meta_description)=? OR LOWER(meta_description) LIKE ?)",["Woodenara — premium solid wood furniture and home decor, handcrafted for modern homes.","","%balaji handicraft%"]);
+  await db.query("UPDATE products SET brand=? WHERE LOWER(TRIM(brand))=LOWER(?)",["Woodenara","Balaji Handicraft"]);
+  await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",[migrationName]);
+}
+
 async function ensureSettings(){
-  await db.query("CREATE TABLE IF NOT EXISTS store_settings (id INT PRIMARY KEY DEFAULT 1, store_name VARCHAR(255) NOT NULL DEFAULT 'Balaji Handicraft', currency VARCHAR(10) NOT NULL DEFAULT 'INR', shipping_threshold DECIMAL(12,2) NOT NULL DEFAULT 42000, phone VARCHAR(100) DEFAULT '', email VARCHAR(255) DEFAULT '', address VARCHAR(500) DEFAULT '', announcement VARCHAR(500) DEFAULT 'Free shipping on orders over ₹42,000') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+  await db.query("CREATE TABLE IF NOT EXISTS store_settings (id INT PRIMARY KEY DEFAULT 1, store_name VARCHAR(255) NOT NULL DEFAULT 'Woodenara', currency VARCHAR(10) NOT NULL DEFAULT 'INR', shipping_threshold DECIMAL(12,2) NOT NULL DEFAULT 42000, phone VARCHAR(100) DEFAULT '', email VARCHAR(255) DEFAULT '', address VARCHAR(500) DEFAULT '', announcement VARCHAR(500) DEFAULT 'Free shipping on orders over ₹42,000') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
   await db.query("INSERT IGNORE INTO store_settings (id) VALUES (1)");
 }
 
@@ -1131,6 +1143,6 @@ app.use(express.static(dist));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
 app.listen(PORT,async()=>{
-  try{await ensureProductFields();await ensureSettings();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();await ensureBedroomMenuTaxonomy();await ensureDiningSetsMenuTaxonomy();await ensureDiningBarFurnitureTaxonomy();await ensureStorageStudyMenuTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
-  console.log("Balaji Handicraft server running on port "+PORT);
+  try{await ensureProductFields();await ensureSettings();await ensureAdminContent();await ensureWoodenaraBranding();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();await ensureBedroomMenuTaxonomy();await ensureDiningSetsMenuTaxonomy();await ensureDiningBarFurnitureTaxonomy();await ensureStorageStudyMenuTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
+  console.log("Woodenara server running on port "+PORT);
 });
