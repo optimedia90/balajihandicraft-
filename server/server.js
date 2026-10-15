@@ -303,6 +303,18 @@ async function ensureFurnitureTaxonomy(){
     if(targetId)await db.query("UPDATE products SET category_id=?,subcategory_id=NULL WHERE category_id=? AND (subcategory_id IS NULL OR subcategory_id NOT IN (SELECT id FROM subcategories))",[targetId,legacy.id]);
     await db.query("DELETE FROM categories WHERE id=?",[legacy.id]);
   }
+  // Final guard: no dresser label remains in Bedroom Storage after legacy categories merge.
+  const finalBedroomId=canonicalIds["Bedroom"];
+  if(finalBedroomId){
+    const [trunks]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(name)=LOWER(?) LIMIT 1",[finalBedroomId,"Trunks"]);
+    if(trunks[0]){
+      const [dresserRows]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(name) LIKE '%dresser%'",[finalBedroomId]);
+      for(const old of dresserRows){
+        await db.query("UPDATE products SET subcategory_id=?,category_id=? WHERE subcategory_id=?",[trunks[0].id,finalBedroomId,old.id]);
+        await db.query("DELETE FROM subcategories WHERE id=?",[old.id]);
+      }
+    }
+  }
 }
 
 app.get("/api/health",(req,res)=>res.json({ok:true,service:"balaji-handicraft-api"}));
