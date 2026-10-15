@@ -129,7 +129,7 @@ function App(){
        const subs=Array.isArray(c.subcategories)?c.subcategories:[];
        liveCategoryRecords=c.categories.filter(cat=>!["inactive","disabled","0"].includes(String(cat.status||"active").toLowerCase()));
        liveSubcategoryRecords=subs.filter(x=>!["inactive","disabled","0"].includes(String(x.status||"active").toLowerCase()));
-       liveCategoryMenus=liveCategoryRecords.map(cat=>({id:cat.id,name:cat.name,slug:cat.slug||cat.name,groups:[{title:cat.name,subs:liveSubcategoryRecords.filter(x=>Number(x.category_id)===Number(cat.id)).map(x=>x.name)}]}));
+       liveCategoryMenus=liveCategoryRecords.map(cat=>({id:cat.id,name:cat.name,label:String(cat.name).toLowerCase()==="dining room"?"Dining":cat.name,slug:cat.slug||cat.name,groups:[{title:cat.name,subs:liveSubcategoryRecords.filter(x=>Number(x.category_id)===Number(cat.id)).map(x=>x.name)}]}));
        liveCats=[["All Furniture",""],...liveCategoryRecords.map(cat=>[cat.name,cat.name])];
      }
      if(s&&s.settings)setStoreSettings({...s.settings,banners:b?.items||[]});
