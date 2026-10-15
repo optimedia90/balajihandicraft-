@@ -21,6 +21,8 @@ const demoProducts=[
 let products=[...demoProducts];
 let liveCategoryMenus=[];
 let liveCats=[];
+let liveCategoryRecords=[];
+let liveSubcategoryRecords=[];
 const originalImageUrl=(src)=>{try{const u=new URL(String(src||""),window.location.origin);if(u.pathname==="/api/image-proxy")return u.searchParams.get("url")||src;return src}catch{return src}};
 const imageErrorFallback=(e)=>{
  const img=e.currentTarget;
@@ -60,7 +62,7 @@ const resolveImage=(src)=>{
 };
 const normalizeProduct=(p)=>{
  const imgs=[p.image,p.image_2,p.image_3,p.image_4,p.image_5].map(resolveImage).filter(Boolean);
- return {id:Number(p.id),name:p.name||p.title||"Furniture Product",category:p.category_name||p.category||"Furniture",sub:p.subcategory_name||p.sub||"",price:Number(p.price||0),old:Number(p.old_price||p.old||p.price||0),rating:Number(p.rating||4.8),img:imgs[0]||p.img||"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900",gallery:imgs,description:p.description||p.short_description||"",short_description:p.short_description||"",brand:p.brand||"",material:p.material||"",color:p.color||"",finish:p.finish||"",care_instructions:p.care_instructions||"",assembly_info:p.assembly_info||"",length_in:p.length_in,width_in:p.width_in,height_in:p.height_in,length_cm:p.length_cm,width_cm:p.width_cm,height_cm:p.height_cm,weight_kg:p.weight_kg,tag:p.featured?"Featured":""};
+ return {id:Number(p.id),name:p.name||p.title||"Furniture Product",category:p.category_name||p.category||"Furniture",sub:p.subcategory_name||p.sub||"",categoryId:Number(p.category_id)||null,subcategoryId:Number(p.subcategory_id)||null,price:Number(p.price||0),old:Number(p.old_price||p.old||p.price||0),rating:Number(p.rating||4.8),img:imgs[0]||p.img||"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900",gallery:imgs,description:p.description||p.short_description||"",short_description:p.short_description||"",brand:p.brand||"",material:p.material||"",color:p.color||"",finish:p.finish||"",care_instructions:p.care_instructions||"",assembly_info:p.assembly_info||"",length_in:p.length_in,width_in:p.width_in,height_in:p.height_in,length_cm:p.length_cm,width_cm:p.width_cm,height_cm:p.height_cm,weight_kg:p.weight_kg,tag:p.featured?"Featured":""};
 };
 const cats=[["All Furniture",""],["Beds","Beds"],["Sofas","Sofas"],["Dining","Dining"],["Chairs","Chairs"],["Tables","Tables"],["Storage","Storage"]];
 const categoryCardProduct=(category)=>{
@@ -123,8 +125,10 @@ function App(){
      if(Array.isArray(p.products)&&p.products.length)products=p.products.map(normalizeProduct);
      if(Array.isArray(c.categories)){
        const subs=Array.isArray(c.subcategories)?c.subcategories:[];
-       liveCategoryMenus=c.categories.filter(cat=>!["inactive","disabled","0"].includes(String(cat.status||"active").toLowerCase())).map(cat=>({id:cat.id,name:cat.name,slug:cat.slug||cat.name,groups:[{title:cat.name,subs:subs.filter(x=>Number(x.category_id)===Number(cat.id)&&!["inactive","disabled","0"].includes(String(x.status||"active").toLowerCase())).map(x=>x.name)}]}));
-       liveCats=[["All Furniture",""],...c.categories.map(cat=>[cat.name,cat.name])];
+       liveCategoryRecords=c.categories.filter(cat=>!["inactive","disabled","0"].includes(String(cat.status||"active").toLowerCase()));
+       liveSubcategoryRecords=subs.filter(x=>!["inactive","disabled","0"].includes(String(x.status||"active").toLowerCase()));
+       liveCategoryMenus=liveCategoryRecords.map(cat=>({id:cat.id,name:cat.name,slug:cat.slug||cat.name,groups:[{title:cat.name,subs:liveSubcategoryRecords.filter(x=>Number(x.category_id)===Number(cat.id)).map(x=>x.name)}]}));
+       liveCats=[["All Furniture",""],...liveCategoryRecords.map(cat=>[cat.name,cat.name])];
      }
      if(s&&s.settings)setStoreSettings({...s.settings,banners:b?.items||[]});
      setStoreVersion(v=>v+1);
@@ -138,9 +142,11 @@ function App(){
 }
 function Header({cart,wish,currency,setCurrency,settings,menus=categoryMenus}){
  const [open,setOpen]=useState(false);const [search,setSearch]=useState(false);const [searchQuery,setSearchQuery]=useState("");const navigate=useNavigate();
+ const primaryMenus=menus.slice(0,4),overflowMenus=menus.slice(4);
+ const renderMenu=cat=><div className="navMenu" key={cat.id||cat.name}><Link className="navMenuTitle" to={"/shop?cat="+encodeURIComponent(cat.name)} onClick={()=>setOpen(false)}>{cat.name}{(cat.groups||[]).some(group=>group.subs?.length)?<ChevronDown/>:null}</Link>{(cat.groups||[]).some(group=>group.subs?.length)&&<div className="dropdownMenu megaMenu">{cat.groups.filter(group=>group.subs?.length).map(group=><div className="megaGroup" key={group.title}><b>{group.title}</b>{group.subs.map(sub=><Link key={sub} to={"/shop?cat="+encodeURIComponent(cat.name)+"&sub="+encodeURIComponent(sub)} onClick={()=>setOpen(false)}>{sub}</Link>)}</div>)}</div>}</div>;
  return <header className="header"><div className="topbar">{settings?.announcement||("Free shipping on orders over "+fmt(500))} <span>•</span> Handcrafted furniture, made to last</div>
  <div className="navwrap"><Link to="/" className="logo"><span className="logoMark">BH</span><span><b>BALAJI</b><small>HANDICRAFT</small></span></Link>
- <nav className={open?"mobile open":"mobile"}>{menus.map(cat=><div className="navMenu" key={cat.id||cat.name}><Link className="navMenuTitle" to={"/shop?cat="+encodeURIComponent(cat.name)} onClick={()=>setOpen(false)}>{cat.name}{(cat.groups||[]).some(group=>group.subs?.length)?<ChevronDown/>:null}</Link>{(cat.groups||[]).some(group=>group.subs?.length)&&<div className="dropdownMenu megaMenu">{cat.groups.filter(group=>group.subs?.length).map(group=><div className="megaGroup" key={group.title}><b>{group.title}</b>{group.subs.map(sub=><Link key={sub} to={"/shop?cat="+encodeURIComponent(cat.name)+"&sub="+encodeURIComponent(sub)} onClick={()=>setOpen(false)}>{sub}</Link>)}</div>)}</div>}</div>)}</nav>
+ <nav className={open?"mobile open":"mobile"}>{primaryMenus.map(renderMenu)}{overflowMenus.length>0&&<div className="navMenu moreMenu"><button className="navMenuTitle moreMenuButton" type="button">More <ChevronDown/></button><div className="dropdownMenu megaMenu moreMegaMenu">{overflowMenus.map(cat=><div className="megaGroup" key={cat.id||cat.name}><Link className="moreCategoryTitle" to={"/shop?cat="+encodeURIComponent(cat.name)} onClick={()=>setOpen(false)}>{cat.name}</Link>{(cat.groups||[]).flatMap(g=>g.subs||[]).map(sub=><Link key={sub} to={"/shop?cat="+encodeURIComponent(cat.name)+"&sub="+encodeURIComponent(sub)} onClick={()=>setOpen(false)}>{sub}</Link>)}</div>)}</div></div>}</nav>
  <div className="navicons"><div className="currencySwitcher"><span>{currency==="USD"?"🇺🇸":"🇮🇳"}</span><select aria-label="Currency" value={currency} onChange={e=>setCurrency(e.target.value)}><option value="USD">USD ($)</option><option value="INR">INR (₹)</option></select></div><button onClick={()=>setSearch(!search)}><Search/></button><Link to="/wishlist" className="countIcon"><Heart/><i>{wish}</i></Link><Link to="/account"><User/></Link><Link to="/cart" className="countIcon"><ShoppingBag/><i>{cart}</i></Link><button className="hamb" onClick={()=>setOpen(!open)}>{open?<X/>:<Menu/>}</button></div></div>
  {search&&<form className="searchbar" onSubmit={e=>{e.preventDefault();const query=searchQuery.trim();if(query){navigate("/shop?q="+encodeURIComponent(query));setSearch(false);setOpen(false)}}}><Search/><input autoFocus value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="Search beds, sofas, dining tables..." aria-label="Search products"/><button type="submit" aria-label="Submit product search"><ArrowRight size={18}/></button></form>}
  </header>
@@ -309,13 +315,15 @@ function Shop({add,toggleWish,wish}){
   if(!cat)return true;
   const wanted=clean(cat);
   const groups=categoryAliases[wanted];
-  if(liveCats.length)return clean(p.category)===wanted;
+  if(liveCats.length){const selected=liveCategoryRecords.find(c=>clean(c.name)===wanted);return selected?Number(p.categoryId)===Number(selected.id):clean(p.category)===wanted;}
   if(groups)return typeGroups.filter(g=>groups.includes(g.id)).some(g=>groupMatches(p,g));
   return clean(p.category)===wanted;
  };
  const matchesSub=p=>{
   if(!sub)return true;
-  const wanted=clean(sub),actual=clean(p.sub),combined=productText(p);
+  const wanted=clean(sub),actual=clean(p.sub);
+  const selected=liveSubcategoryRecords.find(x=>clean(x.name)===wanted);
+  if(selected)return Number(p.subcategoryId)===Number(selected.id);
   return actual===wanted;
  };
  const queryGroup=query=>{
