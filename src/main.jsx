@@ -89,9 +89,9 @@ const categoryMenus=[
   {title:"TV & Media",subs:["TV Units"]}
  ]},
  {name:"Bedroom",slug:"Bedroom",groups:[
-  {title:"Beds",subs:["All Beds","King Size Beds","Queen Size Beds","Single Beds"]},
-  {title:"Bedroom Storage",subs:["Wardrobes","Trunks"]},
-  {title:"Vanity",subs:["Dressing Tables"]}
+  {title:"Beds",subs:["All Beds","King Size Beds","Queen Size Beds","Single Beds"].map(name=>({name,categoryName:"Beds"}))},
+  {title:"Bedroom Storage",subs:["Wardrobes","Chests of Drawers","Bedside Tables","Console Tables","Trunks"].map(name=>({name,categoryName:"Bedroom Storage"}))},
+  {title:"Vanity",subs:[{name:"Dressing",categoryName:"Vanity",routeSubName:"Dressing"}]}
  ]},
  {name:"Dining Room",label:"Dining",slug:"Dining Room",groups:[
   {title:"Dining Sets",subs:["All Dining Sets","4 Seater Dining Sets","6 Seater Dining Sets"]},
@@ -205,6 +205,20 @@ function App(){
            {title:"Tables",subs:tables},
            {title:"TV & Media",subs:tv},
            {title:"Seating",subs:seating}
+         ];
+       }
+       // Keep Bedroom's mega-menu headings aligned with real admin categories.
+       const bedroomMenu=liveCategoryMenus.find(menu=>String(menu.name).toLowerCase()==="bedroom");
+       if(bedroomMenu){
+         const allBedroomSubs=liveCategoryMenus.flatMap(menu=>(menu.groups||[]).flatMap(group=>group.subs||[])).map(sub=>typeof sub==="string"?{name:sub}:sub);
+         const findBedroomSub=(name,categoryName,displayName=name)=> {
+           const found=allBedroomSubs.find(sub=>String(sub.name||"").trim().toLowerCase()===name.toLowerCase());
+           return {name:displayName,categoryName,routeSubName:found?.name||name};
+         };
+         bedroomMenu.groups=[
+           {title:"Beds",subs:["All Beds","King Size Beds","Queen Size Beds","Single Beds"].map(name=>findBedroomSub(name,"Beds"))},
+           {title:"Bedroom Storage",subs:["Wardrobes","Chests of Drawers","Bedside Tables","Console Tables","Trunks"].map(name=>findBedroomSub(name,"Bedroom Storage"))},
+           {title:"Vanity",subs:[findBedroomSub("Dressing","Vanity")]}
          ];
        }
        liveCats=[["All Furniture",""],...liveCategoryRecords.map(cat=>[cat.name,cat.name])];
