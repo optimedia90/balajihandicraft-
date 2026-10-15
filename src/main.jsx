@@ -189,14 +189,14 @@ function App(){
          const findSub=(names,categoryName= "Living Room",displayName=null,routeSubName=null)=>{
            const wanted=names.map(name=>name.toLowerCase());
            const found=[...allLivingSubs,...allMenuSubs].find(sub=>wanted.includes(String(sub.name||"").trim().toLowerCase()));
-           return {name:displayName||found?.name||names[0],categoryName:found?.categoryName||categoryName,...(routeSubName?{routeSubName}:{} )};
+           return {name:displayName||found?.name||names[0],categoryName:found?.categoryName||categoryName,routeSubName:routeSubName||found?.name||names[0]};
          };
          const sofas=["1 Seater Sofa","2 Seater Sofa","3 Seater Sofa","L-shaped Sofa","Sofa Cum Bed"].map(name=>findSub([name],"Sofas",name));
          const tables=[
            findSub(["Coffee Tables"],"Living Room","Coffee Tables"),
            findSub(["Console Tables"],"Living Room","Console Tables"),
            findSub(["Side Tables","Side & End Tables"],"Living Room","Side Tables"),
-           findSub(["End Tables","Study Tables"],"Living Room","End Tables", "Study Tables")
+           findSub(["End Tables","Study Tables"],"Living Room","End Tables")
          ];
          const seating=["Armchairs","Rocking Chairs","Folding Chairs","Stools & Ottomans"].map(name=>findSub([name],"Living Room",name));
          const tv=[findSub(["TV Units"],"Living Room","TV Units")];
