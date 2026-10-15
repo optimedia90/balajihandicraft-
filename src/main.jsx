@@ -347,6 +347,25 @@ function Home({add,toggleWish,wish,settings}){
    <div className="heroVisual"><div className="heroCard"><img onError={imageErrorFallback} src={settings?.homepage_image||settings?.banners?.[0]?.image||products[0].img}/><div><b>Sheesham Collection</b><span>Built for generations</span></div></div><div className="floatBadge">100%<small>Solid Wood</small></div></div>
   </section>
 
+  {/* 01A Quick collection links — styled to match the supplied reference */}
+  <section className="quickCollectionSection" aria-label="Shop collections">
+   <div className="quickCollectionRail">
+    {[
+     {name:"Living Room",cat:"Living Room",img:products[1]?.img},
+     {name:"Bedroom",cat:"Bedroom",img:products[0]?.img},
+     {name:"Dining",cat:"Dining Room",img:products[2]?.img},
+     {name:"Storage",cat:"Storage & Study",img:products[3]?.img},
+     {name:"Chairs",cat:"Chairs",img:products[4]?.img},
+     {name:"Home Decor",cat:"Home Decor",img:products[5]?.img},
+     {name:"Decorative",cat:"Decorative",img:products[6]?.img},
+     {name:"New Arrivals",cat:"",img:products[8]?.img}
+    ].map(item=><Link className="quickCollectionItem" to={item.cat?"/shop?cat="+encodeURIComponent(item.cat):"/shop?sort=newest"} key={item.name}>
+     <span className="quickCollectionImage"><img onError={imageErrorFallback} src={item.img||products[0]?.img} alt={item.name}/></span>
+     <span className="quickCollectionLabel">{item.name}</span>
+    </Link>)}
+   </div>
+  </section>
+
   {/* 02 Trust */}
   <section className="trust homeStagger"><div><Truck/><b>Free Delivery</b><span>On orders over $500</span></div><div><ShieldCheck/><b>Quality Assured</b><span>Crafted & checked by hand</span></div><div><RotateCcw/><b>Easy Returns</b><span>7-day return policy</span></div><div><Check/><b>Secure Payments</b><span>100% protected checkout</span></div></section>
 
