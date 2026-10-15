@@ -552,11 +552,27 @@ app.put("/api/admin/subcategories/:id",auth,asyncHandler(async(req,res)=>{
   res.json({ok:true});
 }));
 app.delete("/api/admin/subcategories/:id",auth,asyncHandler(async(req,res)=>{
-  await db.query("DELETE FROM subcategories WHERE id=?",[req.params.id]);
+  const id=Number(req.params.id);
+  const [rows]=await db.query("SELECT id FROM subcategories WHERE id=? LIMIT 1",[id]);
+  if(!rows.length)return res.status(404).json({message:"Subcategory not found."});
+  // Keep products intact; removing a subcategory only clears its assignment.
+  await db.query("UPDATE products SET subcategory_id=NULL WHERE subcategory_id=?",[id]);
+  await db.query("DELETE FROM subcategories WHERE id=?",[id]);
   res.json({ok:true});
 }));
 app.delete("/api/admin/categories/:id",auth,asyncHandler(async(req,res)=>{
-  await db.query("DELETE FROM categories WHERE id=?",[req.params.id]);
+  const id=Number(req.params.id);
+  const [rows]=await db.query("SELECT id FROM categories WHERE id=? LIMIT 1",[id]);
+  if(!rows.length)return res.status(404).json({message:"Category not found."});
+  const [subs]=await db.query("SELECT id FROM subcategories WHERE category_id=?",[id]);
+  const subIds=subs.map(x=>Number(x.id));
+  if(subIds.length){
+    await db.query("UPDATE products SET subcategory_id=NULL WHERE subcategory_id IN ("+subIds.map(()=>"?").join(",")+")",subIds);
+    await db.query("DELETE FROM subcategories WHERE category_id=?",[id]);
+  }
+  // Keep products intact but unassign them from the deleted category.
+  await db.query("UPDATE products SET category_id=NULL,subcategory_id=NULL WHERE category_id=?",[id]);
+  await db.query("DELETE FROM categories WHERE id=?",[id]);
   res.json({ok:true});
 }));
 
