@@ -203,12 +203,12 @@
 .listToolbar{padding:14px 16px;display:flex;justify-content:space-between;border-bottom:1px solid #eee9e1;align-items:center;font-size:11px}
 .listToolbar>div{display:flex;gap:8px}
 .listToolbar input,.listToolbar button{border:1px solid #ddd7ce;background:white;padding:9px;font-size:10px;outline:0}
-.productListRow,.simpleRow{display:grid;grid-template-columns:55px 1fr 100px 80px 60px 35px;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid #eee9e1;font-size:10px}
+.productListRow{display:grid;grid-template-columns:55px 1fr 100px 80px 60px 35px;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid #eee9e1;font-size:10px}.simpleRow{display:grid;grid-template-columns:minmax(150px,1fr) minmax(110px,auto) auto auto;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid #eee9e1;font-size:11px}
 .productListRow:last-child,.simpleRow:last-child{border-bottom:0}
 .productListRow img{width:48px;height:58px;object-fit:cover;border-radius:3px}
 .productListRow b,.productListRow span{display:block}
 .productListRow span{color:#8c867d;margin-top:4px}
-.productListRow>button,.simpleRow>button{border:1px solid #ddd7ce;background:#fff;padding:7px;font-size:9px;cursor:pointer}
+.productListRow>button,.simpleRow>button{border:1px solid #ddd7ce;background:#fff;padding:7px;font-size:9px;cursor:pointer}.simpleRow>button.btn.danger{display:inline-flex;align-items:center;justify-content:center;gap:5px;color:#b42318;border-color:#f0c8c4;background:#fff8f7;white-space:nowrap}.simpleRow>button.btn.danger:hover{background:#fde9e7}
 .pill{background:#edf4ed;color:#46704d;padding:5px 8px;border-radius:20px;width:max-content}
 .adminLoading,.adminEmpty{padding:60px;text-align:center;color:#8b857c;font-size:11px}
 .quickEdit{padding:16px;border-bottom:1px solid #eee9e1;background:#fbfaf7}
