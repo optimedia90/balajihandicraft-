@@ -324,6 +324,64 @@ async function ensureFurnitureTaxonomy(){
   }
 }
 
+async function ensureMegaMenuCleanup(){
+  await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+  const [done]=await db.query("SELECT name FROM app_migrations WHERE name=?",["clean_furniture_mega_menu_v1"]);
+  if(done.length)return;
+
+  const removeSubcategory=async(row)=>{
+    await db.query("UPDATE products SET subcategory_id=NULL WHERE subcategory_id=?",[row.id]);
+    await db.query("DELETE FROM subcategories WHERE id=?",[row.id]);
+  };
+  // Remove legacy sofa labels while retaining the five requested sofa types.
+  const sofaRemove=["Sofas","Sofa Sets","Wood Pull Out Sofa Cum Bed","Wooden Sofa","Sofa Set","Loveseat Sofas"];
+  for(const label of sofaRemove){
+    const [rows]=await db.query(
+      "SELECT s.id FROM subcategories s JOIN categories c ON c.id=s.category_id WHERE LOWER(TRIM(s.name))=LOWER(?) AND LOWER(c.name) IN (?,?,?)",
+      [label,"Living Room","Sofas","Sofa Sets"]
+    );
+    for(const row of rows)await removeSubcategory(row);
+  }
+
+  // Clean the Living Room tables menu. Preserve Storage & Study > Study Tables;
+  // in the old Tables/Living Room group, relabel Study Tables to End Tables.
+  const [studyRows]=await db.query(
+    "SELECT s.id,s.category_id FROM subcategories s JOIN categories c ON c.id=s.category_id WHERE LOWER(TRIM(s.name))=LOWER(?) AND LOWER(c.name) IN (?,?)",
+    ["Study Tables","Living Room","Tables"]
+  );
+  for(const study of studyRows){
+    const [existing]=await db.query(
+      "SELECT id FROM subcategories WHERE category_id=? AND LOWER(TRIM(name))=LOWER(?) AND id<>? LIMIT 1",
+      [study.category_id,"End Tables",study.id]
+    );
+    if(existing[0]){
+      await db.query("UPDATE products SET subcategory_id=? WHERE subcategory_id=?",[existing[0].id,study.id]);
+      await db.query("DELETE FROM subcategories WHERE id=?",[study.id]);
+    }else{
+      await db.query("UPDATE subcategories SET name=?,slug=? WHERE id=?",["End Tables","end-tables",study.id]);
+    }
+  }
+  const tableRemove=["Kitchen & Dining Room Tables","Accent Tables","Nightstands"];
+  for(const label of tableRemove){
+    const [rows]=await db.query(
+      "SELECT s.id FROM subcategories s JOIN categories c ON c.id=s.category_id WHERE LOWER(TRIM(s.name))=LOWER(?) AND LOWER(c.name) IN (?,?)",
+      [label,"Living Room","Tables"]
+    );
+    for(const row of rows)await removeSubcategory(row);
+  }
+
+  // Remove the requested extra seating labels from the Living Room/Chairs menu.
+  const seatingRemove=["Table & Bar Stools","Kitchen & Dining Room Chairs","Slipper Chairs","Armchairs, Recliners & Sleeper Chairs","Chaises"];
+  for(const label of seatingRemove){
+    const [rows]=await db.query(
+      "SELECT s.id FROM subcategories s JOIN categories c ON c.id=s.category_id WHERE LOWER(TRIM(s.name))=LOWER(?) AND LOWER(c.name) IN (?,?,?)",
+      [label,"Living Room","Chairs","Seating"]
+    );
+    for(const row of rows)await removeSubcategory(row);
+  }
+  await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",["clean_furniture_mega_menu_v1"]);
+}
+
 app.get("/api/health",(req,res)=>res.json({ok:true,service:"balaji-handicraft-api"}));
 app.get("/api/db-health",asyncHandler(async(req,res)=>{
   const [rows]=await db.query("SELECT 1 AS ok");
@@ -814,6 +872,6 @@ app.use(express.static(dist));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
 app.listen(PORT,async()=>{
-  try{await ensureProductFields();await ensureSettings();await ensureOrders();await ensureFurnitureTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
+  try{await ensureProductFields();await ensureSettings();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
   console.log("Balaji Handicraft server running on port "+PORT);
 });
