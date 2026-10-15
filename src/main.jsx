@@ -83,7 +83,7 @@ const categoryCardProduct=(category)=>{
 };
 const categoryMenus=[
  {name:"Living Room",slug:"Living Room",groups:[
-  {title:"Sofas",subs:["1 Seater Sofa","2 Seater Sofa","3 Seater Sofa","L-shaped Sofa","Sofa Cum Bed"]},
+  {title:"Sofas",subs:["1 Seater Sofa","2 Seater Sofa","3 Seater Sofa","L-shaped Sofa","Sofa Cum Bed"].map(name=>({name,categoryName:"Sofas"}))},
   {title:"Seating",subs:["Armchairs","Rocking Chairs","Folding Chairs","Stools & Ottomans"]},
   {title:"Tables",subs:["Coffee Tables","Side & End Tables","Console Tables"]},
   {title:"TV & Media",subs:["TV Units"]}
