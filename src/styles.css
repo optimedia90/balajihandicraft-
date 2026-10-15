@@ -534,7 +534,7 @@
 .navMenu{position:static}
 .navMenuTitle{display:inline-flex;align-items:center;gap:8px;padding:29px 0;white-space:nowrap;font-size:14px;font-weight:500}
 .navMenuTitle svg{width:15px;height:15px}
-.dropdownMenu.megaMenu{position:absolute;left:0;right:0;top:100%;width:100%;min-height:190px;padding:30px max(5%,calc((100vw - 1280px)/2));background:#fff;box-shadow:0 16px 28px #00000012;border-top:1px solid #eee;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px;visibility:hidden;opacity:0;pointer-events:none;transform:translateY(6px);transition:opacity .18s ease,transform .18s ease;z-index:30}
+.dropdownMenu.megaMenu{position:absolute;left:0;right:0;top:100%;width:100%;min-height:190px;padding:30px max(5%,calc((100vw - 1280px)/2));background:#fff;box-shadow:0 16px 28px #00000012;border-top:1px solid #eee;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:30px;visibility:hidden;opacity:0;pointer-events:none;transform:translateY(6px);transition:opacity .18s ease,transform .18s ease;z-index:30}
 .navMenu:hover .dropdownMenu.megaMenu,.navMenu:focus-within .dropdownMenu.megaMenu{visibility:visible;opacity:1;pointer-events:auto;transform:translateY(0)}
 .megaGroup{display:flex;flex-direction:column;align-items:flex-start;gap:13px;min-width:0}
 .megaGroup>b{font-size:15px;font-weight:700;margin-bottom:4px;color:#222}
