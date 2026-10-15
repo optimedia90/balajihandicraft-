@@ -178,15 +178,11 @@ async function ensureFurnitureTaxonomy(){
     await db.query("UPDATE categories SET name=?,slug=? WHERE id=?",["Office Furniture","office-furniture",homeRows[0].id]);
   }else if(officeRows[0]&&homeRows[0]){
     const officeId=officeRows[0].id,homeId=homeRows[0].id;
-    const [legacySubs]=await db.query("SELECT id,name FROM subcategories WHERE category_id=?",[homeId]);
+    const [legacySubs]=await db.query("SELECT id FROM subcategories WHERE category_id=?",[homeId]);
     for(const oldSub of legacySubs){
-      const [matching]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(name)=LOWER(?) LIMIT 1",[officeId,oldSub.name]);
-      if(matching[0]){
-        await db.query("UPDATE products SET subcategory_id=? WHERE subcategory_id=?",[matching[0].id,oldSub.id]);
-        await db.query("DELETE FROM subcategories WHERE id=?",[oldSub.id]);
-      }else{
-        await db.query("UPDATE subcategories SET category_id=? WHERE id=?",[officeId,oldSub.id]);
-      }
+      // Clear outdated decor subcategory links before removing those labels.
+      await db.query("UPDATE products SET subcategory_id=NULL WHERE subcategory_id=?",[oldSub.id]);
+      await db.query("DELETE FROM subcategories WHERE id=?",[oldSub.id]);
     }
     await db.query("UPDATE products SET category_id=? WHERE category_id=?",[officeId,homeId]);
     await db.query("DELETE FROM categories WHERE id=?",[homeId]);
