@@ -167,6 +167,14 @@ async function ensureWoodenaraBranding(){
   await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",[migrationName]);
 }
 
+async function ensureWoodenaraContactEmail(){
+  const migrationName="woodenara_contact_email_v1";
+  const [done]=await db.query("SELECT name FROM app_migrations WHERE name=?",[migrationName]);
+  if(done.length)return;
+  await db.query("UPDATE store_settings SET email=? WHERE id=1 AND (email IS NULL OR TRIM(email)=? OR LOWER(TRIM(email))=?)",["woodenarafurniture@gmail.com","","hello@balajihandicraft.com"]);
+  await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",[migrationName]);
+}
+
 async function ensureSettings(){
   await db.query("CREATE TABLE IF NOT EXISTS store_settings (id INT PRIMARY KEY DEFAULT 1, store_name VARCHAR(255) NOT NULL DEFAULT 'Woodenara', currency VARCHAR(10) NOT NULL DEFAULT 'INR', shipping_threshold DECIMAL(12,2) NOT NULL DEFAULT 42000, phone VARCHAR(100) DEFAULT '', email VARCHAR(255) DEFAULT '', address VARCHAR(500) DEFAULT '', announcement VARCHAR(500) DEFAULT 'Free shipping on orders over ₹42,000') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
   await db.query("INSERT IGNORE INTO store_settings (id) VALUES (1)");
@@ -1143,6 +1151,6 @@ app.use(express.static(dist));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
 app.listen(PORT,async()=>{
-  try{await ensureProductFields();await ensureSettings();await ensureAdminContent();await ensureWoodenaraBranding();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();await ensureBedroomMenuTaxonomy();await ensureDiningSetsMenuTaxonomy();await ensureDiningBarFurnitureTaxonomy();await ensureStorageStudyMenuTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
+  try{await ensureProductFields();await ensureSettings();await ensureAdminContent();await ensureWoodenaraBranding();await ensureWoodenaraContactEmail();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();await ensureBedroomMenuTaxonomy();await ensureDiningSetsMenuTaxonomy();await ensureDiningBarFurnitureTaxonomy();await ensureStorageStudyMenuTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
   console.log("Woodenara server running on port "+PORT);
 });
