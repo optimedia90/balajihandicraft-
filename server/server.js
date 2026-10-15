@@ -168,10 +168,11 @@ async function ensureWoodenaraBranding(){
 }
 
 async function ensureWoodenaraContactEmail(){
-  const migrationName="woodenara_contact_email_v1";
+  const migrationName="woodenara_contact_details_v2";
   const [done]=await db.query("SELECT name FROM app_migrations WHERE name=?",[migrationName]);
   if(done.length)return;
   await db.query("UPDATE store_settings SET email=? WHERE id=1 AND (email IS NULL OR TRIM(email)=? OR LOWER(TRIM(email))=?)",["woodenarafurniture@gmail.com","","hello@balajihandicraft.com"]);
+  await db.query("UPDATE store_settings SET phone=? WHERE id=1 AND (phone IS NULL OR TRIM(phone)=? OR TRIM(phone)=?)",["7300089505","","+91 00000 00000"]);
   await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",[migrationName]);
 }
 
