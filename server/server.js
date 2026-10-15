@@ -171,6 +171,12 @@ async function ensureFurnitureTaxonomy(){
     {name:"Office Furniture",subs:["Office Chairs","Office Stools","Workspace Tables","Desks","Filing Cabinets","Office Shelving"]}
   ];
   const slugify=value=>String(value||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  // Replace the old Home Decor main category with Office Furniture without changing its ID.
+  const [officeRows]=await db.query("SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1",["Office Furniture"]);
+  const [homeRows]=await db.query("SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1",["Home Decor"]);
+  if(!officeRows[0]&&homeRows[0]){
+    await db.query("UPDATE categories SET name=?,slug=? WHERE id=?",["Office Furniture","office-furniture",homeRows[0].id]);
+  }
   for(const item of taxonomy){
     let [found]=await db.query("SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1",[item.name]);
     let categoryId=found[0]?.id;
@@ -186,6 +192,25 @@ async function ensureFurnitureTaxonomy(){
       let slug=slugify(subName),n=2;
       while((await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(slug)=LOWER(?) LIMIT 1",[categoryId,slug]))[0][0])slug=slugify(subName)+"-"+n++;
       await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[categoryId,subName,slug]);
+    }
+  }
+  // Remove the old Bedroom dresser label in favor of Trunks while preserving product links.
+  const [bedroomRows]=await db.query("SELECT id FROM categories WHERE LOWER(name)=LOWER(?) LIMIT 1",["Bedroom"]);
+  if(bedroomRows[0]){
+    const bedroomId=bedroomRows[0].id;
+    const [oldRows]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(name) IN (?,?)",[bedroomId,"dressers & chests of drawers","dressers"]);
+    const [trunkRows]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(name)=LOWER(?) LIMIT 1",[bedroomId,"Trunks"]);
+    if(oldRows.length&&trunkRows[0]){
+      for(const old of oldRows){
+        await db.query("UPDATE products SET subcategory_id=? WHERE subcategory_id=?",[trunkRows[0].id,old.id]);
+        await db.query("DELETE FROM subcategories WHERE id=?",[old.id]);
+      }
+    }else if(oldRows.length){
+      await db.query("UPDATE subcategories SET name=?,slug=? WHERE id=?",["Trunks","trunks",oldRows[0].id]);
+      for(const old of oldRows.slice(1)){
+        await db.query("UPDATE products SET subcategory_id=? WHERE subcategory_id=?",[oldRows[0].id,old.id]);
+        await db.query("DELETE FROM subcategories WHERE id=?",[old.id]);
+      }
     }
   }
 }
