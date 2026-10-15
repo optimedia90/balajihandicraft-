@@ -207,6 +207,25 @@ function App(){
            {title:"Seating",subs:seating}
          ];
        }
+       // Keep Dining Sets grouped with the three requested links in the storefront mega-menu.
+       const diningMenu=liveCategoryMenus.find(menu=>["dining room","dining"].includes(String(menu.name).toLowerCase()));
+       if(diningMenu){
+         const allDiningSubs=liveCategoryMenus.flatMap(menu=>(menu.groups||[]).flatMap(group=>group.subs||[])).map(sub=>typeof sub==="string"?{name:sub,categoryName:diningMenu.name}:sub);
+         const findDiningSub=(names,displayName)=>{
+           const wanted=names.map(name=>name.toLowerCase());
+           const found=allDiningSubs.find(sub=>wanted.includes(String(sub.name||"").trim().toLowerCase()));
+           return {name:displayName,categoryName:diningMenu.name,routeSubName:found?.name||displayName};
+         };
+         const diningSetGroup={title:"Dining Sets",subs:[
+           findDiningSub(["All Dining Sets","Dining Sets"],"All Dining Sets"),
+           findDiningSub(["4 Seater Dining Sets","4 Seater Dining Set"],"4 Seater Dining Sets"),
+           findDiningSub(["6 Seater Dining Sets","6 Seater Dining Set"],"6 Seater Dining Sets")
+         ]};
+         const existingDiningGroup=diningMenu.groups.find(group=>group.title==="Dining Sets");
+         if(existingDiningGroup)Object.assign(existingDiningGroup,diningSetGroup);
+         else diningMenu.groups.unshift(diningSetGroup);
+         diningMenu.groups=diningMenu.groups.filter(group=>group.title!=="More");
+       }
        // Keep Bedroom's mega-menu headings aligned with real admin categories.
        const bedroomMenu=liveCategoryMenus.find(menu=>String(menu.name).toLowerCase()==="bedroom");
        if(bedroomMenu){
