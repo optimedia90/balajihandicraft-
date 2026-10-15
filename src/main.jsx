@@ -276,6 +276,13 @@ function App(){
              findStorageSub(["Study Tables"],"Study Tables"),
              findStorageSub(["Corner Table","Corner Tables"],"Corner Table"),
              findStorageSub(["Folding Table","Folding Tables"],"Folding Table")
+           ]},
+           {title:"More",subs:[
+             findStorageSub(["Bookcases & Standing Shelves","Bookcase & Standing Shelves"],"Bookcases & Standing Shelves"),
+             findStorageSub(["Wall Shelves & Ledges","Wall Shelf & Ledges"],"Wall Shelves & Ledges"),
+             findStorageSub(["Magazine Racks","Magazine Rack"],"Magazine Racks"),
+             findStorageSub(["Bookshelves","Book Shelf"],"Bookshelves"),
+             findStorageSub(["Wall Shelves","Wall Shelf"],"Wall Shelves")
            ]}
          ];
        }
