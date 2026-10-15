@@ -83,16 +83,17 @@ const categoryCardProduct=(category)=>{
 };
 const categoryMenus=[
  {name:"Living Room",slug:"Living Room",groups:[
-  {title:"Seating",subs:["Sofa Sets","Armchairs","Rocking Chairs","Folding Chairs","Stools & Ottomans"]},
+  {title:"Sofas",subs:["1 Seater Sofa","2 Seater Sofa","3 Seater Sofa","L-shaped Sofa","Sofa Cum Bed"]},
+  {title:"Seating",subs:["Armchairs","Rocking Chairs","Folding Chairs","Stools & Ottomans"]},
   {title:"Tables",subs:["Coffee Tables","Side & End Tables","Console Tables"]},
   {title:"TV & Media",subs:["TV Units"]}
  ]},
  {name:"Bedroom",slug:"Bedroom",groups:[
   {title:"Beds",subs:["All Beds","King Size Beds","Queen Size Beds","Single Beds"]},
-  {title:"Bedroom Storage",subs:["Wardrobes","Dressers & Chests of Drawers"]},
+  {title:"Bedroom Storage",subs:["Wardrobes","Trunks"]},
   {title:"Vanity",subs:["Dressing Tables"]}
  ]},
- {name:"Dining Room",slug:"Dining Room",groups:[
+ {name:"Dining Room",label:"Dining",slug:"Dining Room",groups:[
   {title:"Dining Sets",subs:["All Dining Sets","4 Seater Dining Sets","6 Seater Dining Sets"]},
   {title:"Dining Seating",subs:["Dining Chairs","Dining Benches"]},
   {title:"Bar",subs:["Bar Furniture"]}
@@ -102,9 +103,10 @@ const categoryMenus=[
   {title:"Seating",subs:["Benches & Settees"]},
   {title:"Study",subs:["Study Tables"]}
  ]},
- {name:"Home Decor",slug:"Home Decor",groups:[
-  {title:"Home Decor",subs:["Wall Art","Mirrors","Lighting","Vases & Planters"]},
-  {title:"Decorative Accessories",subs:["Decorative Objects","Rugs & Throws"]}
+ {name:"Office Furniture",slug:"Office Furniture",groups:[
+  {title:"Office Seating",subs:["Office Chairs","Office Stools"]},
+  {title:"Workspaces",subs:["Workspace Tables","Desks"]},
+  {title:"Office Storage",subs:["Filing Cabinets","Office Shelving"]}
  ]}
 ];
 let activeCurrency=localStorage.getItem("bh_currency")||"USD";
@@ -138,12 +140,12 @@ function App(){
  const toggleWish=p=>setWish(w=>w.some(x=>x.id===p.id)?w.filter(x=>x.id!==p.id):[...w,p]);
  const isAdmin=useLocation().pathname==="/admin";
  if(isAdmin)return <Admin/>;
- return <><Header cart={cart.length} wish={wish.length} currency={currency} setCurrency={setCurrency} settings={storeSettings} menus={liveCategoryMenus.length?liveCategoryMenus:categoryMenus}/><main><RoutesView cart={cart} setCart={setCart} wish={wish} toggleWish={toggleWish} add={add} settings={storeSettings}/></main><Footer/><a className="floatingWhatsApp" href="https://wa.me/919521089505" target="_blank" rel="noopener noreferrer" aria-label="Chat with us on WhatsApp" title="Chat with us on WhatsApp"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M19.11 17.21c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.71-1.34-1.6-1.5-1.87-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.47h-.52c-.18 0-.48.07-.73.34-.25.27-.96.93-.96 2.27s.98 2.63 1.12 2.81c.14.18 1.93 2.95 4.68 4.14.65.28 1.16.45 1.56.57.66.21 1.26.18 1.73.11.53-.08 1.6-.65 1.83-1.29.23-.63.23-1.18.16-1.29-.07-.11-.25-.18-.52-.32z"/><path fill="currentColor" d="M16.03 3.2C9.03 3.2 3.34 8.88 3.34 15.88c0 2.23.59 4.4 1.72 6.31L3.23 28.8l6.77-1.78a12.65 12.65 0 0 0 6.03 1.54h.01c7 0 12.68-5.69 12.68-12.68 0-3.39-1.32-6.57-3.72-8.96a12.6 12.6 0 0 0-8.97-3.72zm0 22.98h-.01c-1.91 0-3.78-.51-5.42-1.48l-.39-.23-4.02 1.06 1.07-3.92-.25-.4a10.52 10.52 0 0 1-1.62-5.63c0-5.87 4.77-10.64 10.64-10.64 2.84 0 5.51 1.11 7.52 3.12a10.57 10.57 0 0 1 3.12 7.53c0 5.87-4.77 10.64-10.64 10.64z"/></svg></a></>
+ return <><Header cart={cart.length} wish={wish.length} currency={currency} setCurrency={setCurrency} settings={storeSettings} menus={categoryMenus}/><main><RoutesView cart={cart} setCart={setCart} wish={wish} toggleWish={toggleWish} add={add} settings={storeSettings}/></main><Footer/><a className="floatingWhatsApp" href="https://wa.me/919521089505" target="_blank" rel="noopener noreferrer" aria-label="Chat with us on WhatsApp" title="Chat with us on WhatsApp"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M19.11 17.21c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.71-1.34-1.6-1.5-1.87-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.47h-.52c-.18 0-.48.07-.73.34-.25.27-.96.93-.96 2.27s.98 2.63 1.12 2.81c.14.18 1.93 2.95 4.68 4.14.65.28 1.16.45 1.56.57.66.21 1.26.18 1.73.11.53-.08 1.6-.65 1.83-1.29.23-.63.23-1.18.16-1.29-.07-.11-.25-.18-.52-.32z"/><path fill="currentColor" d="M16.03 3.2C9.03 3.2 3.34 8.88 3.34 15.88c0 2.23.59 4.4 1.72 6.31L3.23 28.8l6.77-1.78a12.65 12.65 0 0 0 6.03 1.54h.01c7 0 12.68-5.69 12.68-12.68 0-3.39-1.32-6.57-3.72-8.96a12.6 12.6 0 0 0-8.97-3.72zm0 22.98h-.01c-1.91 0-3.78-.51-5.42-1.48l-.39-.23-4.02 1.06 1.07-3.92-.25-.4a10.52 10.52 0 0 1-1.62-5.63c0-5.87 4.77-10.64 10.64-10.64 2.84 0 5.51 1.11 7.52 3.12a10.57 10.57 0 0 1 3.12 7.53c0 5.87-4.77 10.64-10.64 10.64z"/></svg></a></>
 }
 function Header({cart,wish,currency,setCurrency,settings,menus=categoryMenus}){
  const [open,setOpen]=useState(false);const [search,setSearch]=useState(false);const [searchQuery,setSearchQuery]=useState("");const navigate=useNavigate();
- const primaryMenus=menus.slice(0,4),overflowMenus=menus.slice(4);
- const renderMenu=cat=><div className="navMenu" key={cat.id||cat.name}><Link className="navMenuTitle" to={"/shop?cat="+encodeURIComponent(cat.name)} onClick={()=>setOpen(false)}>{cat.name}{(cat.groups||[]).some(group=>group.subs?.length)?<ChevronDown/>:null}</Link>{(cat.groups||[]).some(group=>group.subs?.length)&&<div className="dropdownMenu megaMenu">{cat.groups.filter(group=>group.subs?.length).map(group=><div className="megaGroup" key={group.title}><b>{group.title}</b>{group.subs.map(sub=><Link key={sub} to={"/shop?cat="+encodeURIComponent(cat.name)+"&sub="+encodeURIComponent(sub)} onClick={()=>setOpen(false)}>{sub}</Link>)}</div>)}</div>}</div>;
+ const primaryMenus=menus.slice(0,5),overflowMenus=menus.slice(5);
+ const renderMenu=cat=><div className="navMenu" key={cat.id||cat.name}><Link className="navMenuTitle" to={"/shop?cat="+encodeURIComponent(cat.name)} onClick={()=>setOpen(false)}>{cat.label||cat.name}{(cat.groups||[]).some(group=>group.subs?.length)?<ChevronDown/>:null}</Link>{(cat.groups||[]).some(group=>group.subs?.length)&&<div className="dropdownMenu megaMenu">{cat.groups.filter(group=>group.subs?.length).map(group=><div className="megaGroup" key={group.title}><b>{group.title}</b>{group.subs.map(sub=><Link key={sub} to={"/shop?cat="+encodeURIComponent(cat.name)+"&sub="+encodeURIComponent(sub)} onClick={()=>setOpen(false)}>{sub}</Link>)}</div>)}</div>}</div>;
  return <header className="header"><div className="topbar">{settings?.announcement||("Free shipping on orders over "+fmt(500))} <span>•</span> Handcrafted furniture, made to last</div>
  <div className="navwrap"><Link to="/" className="logo"><span className="logoMark">BH</span><span><b>BALAJI</b><small>HANDICRAFT</small></span></Link>
  <nav className={open?"mobile open":"mobile"}>{primaryMenus.map(renderMenu)}{overflowMenus.length>0&&<div className="navMenu moreMenu"><button className="navMenuTitle moreMenuButton" type="button">More <ChevronDown/></button><div className="dropdownMenu megaMenu moreMegaMenu">{overflowMenus.map(cat=><div className="megaGroup" key={cat.id||cat.name}><Link className="moreCategoryTitle" to={"/shop?cat="+encodeURIComponent(cat.name)} onClick={()=>setOpen(false)}>{cat.name}</Link>{(cat.groups||[]).flatMap(g=>g.subs||[]).map(sub=><Link key={sub} to={"/shop?cat="+encodeURIComponent(cat.name)+"&sub="+encodeURIComponent(sub)} onClick={()=>setOpen(false)}>{sub}</Link>)}</div>)}</div></div>}</nav>
