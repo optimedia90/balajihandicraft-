@@ -129,7 +129,32 @@ function App(){
        const subs=Array.isArray(c.subcategories)?c.subcategories:[];
        liveCategoryRecords=c.categories.filter(cat=>!["inactive","disabled","0"].includes(String(cat.status||"active").toLowerCase()));
        liveSubcategoryRecords=subs.filter(x=>!["inactive","disabled","0"].includes(String(x.status||"active").toLowerCase()));
-       liveCategoryMenus=liveCategoryRecords.map(cat=>({id:cat.id,name:cat.name,label:String(cat.name).toLowerCase()==="dining room"?"Dining":cat.name,slug:cat.slug||cat.name,groups:[{title:cat.name,subs:liveSubcategoryRecords.filter(x=>Number(x.category_id)===Number(cat.id)).map(x=>x.name)}]}));
+       const navRank=name=>{const n=String(name||"").toLowerCase();if(n==="living room")return 0;if(n==="bedroom")return 1;if(n==="dining room"||n==="dining")return 2;if(n==="storage & study"||n==="storage")return 3;if(n==="office furniture")return 4;return 10;};
+       const makeGroups=(cat,subs)=>{
+         const name=String(cat.name||"").toLowerCase();
+         const rules=name==="living room"?[
+           ["Sofas",/sofa|couch/i],["Seating",/chair|seating|stool|ottoman|bench|settee/i],["Tables",/table|nightstand/i],["TV & Media",/tv|media/i]
+         ]:name==="bedroom"?[
+           ["Beds",/bed/i],["Bedroom Storage",/wardrobe|trunk|chest|dresser|storage|cabinet/i],["Vanity",/dressing|vanity/i]
+         ]:name==="dining room"||name==="dining"?[
+           ["Dining Sets",/dining set|\b[46]\s*seater/i],["Dining Seating",/dining chair|dining bench|seating/i],["Bar",/bar/i]
+         ]:name==="storage"||name==="storage & study"?[
+           ["Storage",/storage|bookshelf|shelf|cabinet|sideboard|trunk|chest/i],["Seating",/bench|settee|chair|stool/i],["Study",/study|desk|workspace|table/i]
+         ]:name==="office furniture"?[
+           ["Office Seating",/chair|seating|stool/i],["Workspaces",/table|desk|workspace/i],["Office Storage",/storage|cabinet|shelf|filing/i]
+         ]:[];
+         if(!rules.length)return [{title:cat.name,subs}];
+         const groups=rules.map(([title,pattern])=>({title,subs:subs.filter(sub=>pattern.test(sub.name||""))})).filter(g=>g.subs.length);
+         const used=new Set(groups.flatMap(g=>g.subs.map(x=>x.id)));
+         const other=subs.filter(x=>!used.has(x.id));
+         if(other.length)groups.push({title:"More",subs:other});
+         return groups;
+       };
+       const activeSubcats=cat=>liveSubcategoryRecords.filter(x=>Number(x.category_id)===Number(cat.id));
+       liveCategoryMenus=liveCategoryRecords.map(cat=>{
+         const subs=activeSubcats(cat);
+         return {id:cat.id,name:cat.name,label:String(cat.name).toLowerCase()==="dining room"?"Dining":String(cat.name).toLowerCase()==="storage"?"Storage & Study":cat.name,slug:cat.slug||cat.name,groups:makeGroups(cat,subs)};
+       }).sort((a,b)=>navRank(a.name)-navRank(b.name)||String(a.name).localeCompare(String(b.name)));
        liveCats=[["All Furniture",""],...liveCategoryRecords.map(cat=>[cat.name,cat.name])];
      }
      if(s&&s.settings)setStoreSettings({...s.settings,banners:b?.items||[]});
