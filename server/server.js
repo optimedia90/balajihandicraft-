@@ -324,6 +324,67 @@ async function ensureFurnitureTaxonomy(){
   }
 }
 
+async function ensureDiningSetsMenuTaxonomy(){
+  await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+  const migrationName="align_dining_sets_menu_taxonomy_v1";
+  const [done]=await db.query("SELECT name FROM app_migrations WHERE name=?",[migrationName]);
+  if(done.length)return;
+  const slugify=value=>String(value||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  const [diningRows]=await db.query("SELECT id FROM categories WHERE LOWER(TRIM(name)) IN (?,?) ORDER BY CASE WHEN LOWER(TRIM(name))=? THEN 0 ELSE 1 END LIMIT 1",["Dining Room","Dining","Dining Room"]);
+  let diningId=Number(diningRows[0]?.id||0);
+  if(!diningId){
+    let slug="dining-room",n=2;
+    while((await db.query("SELECT id FROM categories WHERE LOWER(slug)=LOWER(?) LIMIT 1",[slug]))[0][0])slug="dining-room-"+n++;
+    const [created]=await db.query("INSERT INTO categories (name,slug) VALUES (?,?)",["Dining Room",slug]);
+    diningId=Number(created.insertId);
+  }
+  const [sourceCategories]=await db.query("SELECT id,name FROM categories WHERE LOWER(TRIM(name)) IN (?,?,?)",["Dining Sets","Dining Set","Dining"]);
+  for(const sourceCategory of sourceCategories){
+    if(Number(sourceCategory.id)===diningId)continue;
+    const [sourceSubs]=await db.query("SELECT id,name FROM subcategories WHERE category_id=?",[sourceCategory.id]);
+    for(const source of sourceSubs){
+      let targetName=String(source.name||"").trim();
+      if(/^dining sets?$/i.test(targetName))targetName="All Dining Sets";
+      const [existing]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(TRIM(name))=LOWER(?) LIMIT 1",[diningId,targetName]);
+      if(existing[0]){
+        await db.query("UPDATE products SET category_id=?,subcategory_id=? WHERE subcategory_id=?",[diningId,existing[0].id,source.id]);
+        await db.query("DELETE FROM subcategories WHERE id=?",[source.id]);
+      }else{
+        await db.query("UPDATE subcategories SET category_id=?,name=?,slug=? WHERE id=?",[diningId,targetName,slugify(targetName),source.id]);
+        await db.query("UPDATE products SET category_id=? WHERE subcategory_id=?",[diningId,source.id]);
+      }
+    }
+    await db.query("UPDATE products SET category_id=?,subcategory_id=NULL WHERE category_id=? AND (subcategory_id IS NULL OR subcategory_id NOT IN (SELECT id FROM subcategories))",[diningId,sourceCategory.id]);
+    await db.query("DELETE FROM categories WHERE id=?",[sourceCategory.id]);
+  }
+  const ensureSub=async(name,aliases=[])=>{
+    const names=[name,...aliases];
+    const [targetRows]=await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(TRIM(name))=LOWER(?) LIMIT 1",[diningId,name]);
+    let targetId=Number(targetRows[0]?.id||0);
+    const placeholders=names.map(()=>"?").join(",");
+    const [sources]=await db.query("SELECT id,name FROM subcategories WHERE category_id=? AND LOWER(TRIM(name)) IN ("+placeholders+") ORDER BY id ASC",[diningId,...names]);
+    if(!targetId&&sources.length){
+      targetId=Number(sources[0].id);
+      await db.query("UPDATE subcategories SET name=?,slug=? WHERE id=?",[name,slugify(name),targetId]);
+    }
+    if(!targetId){
+      let slug=slugify(name),n=2;
+      while((await db.query("SELECT id FROM subcategories WHERE category_id=? AND LOWER(slug)=LOWER(?) LIMIT 1",[diningId,slug]))[0][0])slug=slugify(name)+"-"+n++;
+      const [created]=await db.query("INSERT INTO subcategories (category_id,name,slug) VALUES (?,?,?)",[diningId,name,slug]);
+      targetId=Number(created.insertId);
+    }
+    for(const source of sources){
+      if(Number(source.id)===targetId)continue;
+      await db.query("UPDATE products SET category_id=?,subcategory_id=? WHERE subcategory_id=?",[diningId,targetId,source.id]);
+      await db.query("DELETE FROM subcategories WHERE id=?",[source.id]);
+    }
+  };
+  await ensureSub("All Dining Sets",["Dining Sets","Dining Set"]);
+  await ensureSub("4 Seater Dining Sets",["4 Seater Dining Set"]);
+  await ensureSub("6 Seater Dining Sets",["6 Seater Dining Set"]);
+  await db.query("INSERT IGNORE INTO app_migrations (name) VALUES (?)",[migrationName]);
+}
+
 async function ensureBedroomMenuTaxonomy(){
   await db.query("CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(191) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
   const migrationName="align_bedroom_menu_taxonomy_v1";
@@ -948,6 +1009,6 @@ app.use(express.static(dist));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
 app.listen(PORT,async()=>{
-  try{await ensureProductFields();await ensureSettings();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();await ensureBedroomMenuTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
+  try{await ensureProductFields();await ensureSettings();await ensureOrders();await ensureFurnitureTaxonomy();await ensureMegaMenuCleanup();await ensureBedroomMenuTaxonomy();await ensureDiningSetsMenuTaxonomy();console.log("Store settings, orders and furniture taxonomy ready");}catch(e){console.error("Store setup failed:",e.message);}
   console.log("Balaji Handicraft server running on port "+PORT);
 });
