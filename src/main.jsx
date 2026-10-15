@@ -347,6 +347,9 @@ function Home({add,toggleWish,wish,settings}){
    <div className="heroVisual"><div className="heroCard"><img onError={imageErrorFallback} src={settings?.homepage_image||settings?.banners?.[0]?.image||products[0].img}/><div><b>Sheesham Collection</b><span>Built for generations</span></div></div><div className="floatBadge">100%<small>Solid Wood</small></div></div>
   </section>
 
+  {/* 02 Trust */}
+  <section className="trust homeStagger"><div><Truck/><b>Free Delivery</b><span>On orders over $500</span></div><div><ShieldCheck/><b>Quality Assured</b><span>Crafted & checked by hand</span></div><div><RotateCcw/><b>Easy Returns</b><span>7-day return policy</span></div><div><Check/><b>Secure Payments</b><span>100% protected checkout</span></div></section>
+
   {/* 01A Quick collection links — styled to match the supplied reference */}
   <section className="quickCollectionSection" aria-label="Shop collections">
    <div className="quickCollectionRail">
@@ -365,9 +368,6 @@ function Home({add,toggleWish,wish,settings}){
     </Link>)}
    </div>
   </section>
-
-  {/* 02 Trust */}
-  <section className="trust homeStagger"><div><Truck/><b>Free Delivery</b><span>On orders over $500</span></div><div><ShieldCheck/><b>Quality Assured</b><span>Crafted & checked by hand</span></div><div><RotateCcw/><b>Easy Returns</b><span>7-day return policy</span></div><div><Check/><b>Secure Payments</b><span>100% protected checkout</span></div></section>
 
   {/* 03 Categories */}
   <section className="homeSection categorySection">
