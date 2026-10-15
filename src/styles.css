@@ -640,3 +640,14 @@ body{min-height:100vh}
 .orderSaving{font-size:10px;color:#8c867d;margin-right:auto}
 @media(max-width:900px){.orderStats{grid-template-columns:repeat(2,minmax(0,1fr))}.orderModalBody{grid-template-columns:1fr}.orderModal{width:min(620px,100%)}}
 @media(max-width:600px){.orderManager .adminPageTitle{align-items:flex-start;gap:12px;flex-direction:column}.orderStats{gap:8px}.orderStats button{padding:13px}.orderToolbar{align-items:stretch;flex-direction:column}.orderSearch{width:100%;box-sizing:border-box}.orderModal>header{padding:20px}.orderModalBody{padding:14px}.orderModal>footer{padding:12px 14px}}
+
+/* Category-driven navigation: prevent large admin menus from overflowing the header. */
+.navwrap nav{gap:clamp(7px,1vw,14px);flex:1 1 auto;min-width:0}
+.navwrap nav .navMenu{flex:0 1 auto;min-width:0}
+.navwrap nav .navMenuTitle{font-size:clamp(10px,.88vw,13px);gap:4px}
+.moreMenuButton{border:0;background:transparent;color:inherit;font:inherit;cursor:pointer}
+.moreMegaMenu{max-height:min(68vh,560px);overflow:auto;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:24px!important}
+.moreMegaMenu .moreCategoryTitle{font-size:13px!important;font-weight:700!important;color:var(--ink)!important;white-space:normal!important;padding:0!important;margin-bottom:4px}
+.moreMegaMenu .moreCategoryTitle:hover{background:transparent!important;color:var(--accent)!important}
+@media(min-width:901px) and (max-width:1250px){.navwrap{gap:10px}.navwrap nav{gap:8px}.navwrap nav .navMenuTitle{font-size:10px}.navwrap .logo{flex-basis:145px;min-width:145px}}
+@media(max-width:900px){.navwrap nav .navMenuTitle{font-size:14px}.moreMegaMenu{max-height:55vh;grid-template-columns:1fr!important}.moreMenu .dropdownMenu.megaMenu{display:grid!important}}
