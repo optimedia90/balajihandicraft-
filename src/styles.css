@@ -678,3 +678,10 @@ body{min-height:100vh}
  .navwrap nav .navMenu.moreMenu{position:relative;}
  .navwrap nav .navMenu.moreMenu>.dropdownMenu.moreMegaMenu{width:100%;max-width:100%;max-height:45vh;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;padding:14px;grid-template-columns:1fr!important;}
 }
+
+/* Woodenara rebrand */
+.brandLogoImage{width:46px;height:46px;object-fit:cover;border-radius:50%;flex:0 0 46px;display:block}
+.logo small{font-size:6px;letter-spacing:.7px;white-space:nowrap}
+.adminBrandImage{width:34px;height:34px;object-fit:cover;border-radius:50%;flex:0 0 34px;display:block}
+.adminBrand small{font-size:5.5px;letter-spacing:.35px;white-space:nowrap}
+@media(max-width:600px){.brandLogoImage{width:34px;height:34px;flex-basis:34px}.logo small{font-size:5px;letter-spacing:.35px}.logo{gap:7px}}
