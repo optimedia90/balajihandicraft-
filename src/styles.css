@@ -801,3 +801,10 @@ body{min-height:100vh}
 @media(max-width:1000px){.premiumBuyRow{grid-template-columns:100px minmax(0,1fr) minmax(76px,.55fr) 45px}.premiumBuyNow{padding:0 8px}}
 @media(max-width:760px){.premiumBuyRow{grid-template-columns:100px minmax(0,1fr) minmax(75px,.55fr) 48px}.premiumBuyNow{font-size:11px;padding:0 7px}}
 @media(max-width:400px){.premiumBuyRow{grid-template-columns:76px minmax(0,1fr) 68px 40px}.premiumBuyNow{font-size:10px;padding:0 5px}.premiumAddCart{gap:4px}.premiumAddCart b{display:none}}
+
+/* Keep complete furniture product photos visible instead of cropping the edges */
+.premiumMainImage{background:#f7f4ee}
+.premiumMainImage>img{object-fit:contain;transform:none!important}
+.premiumMainImage:hover>img{transform:none!important}
+.premiumThumbs button{background:#f7f4ee}
+.premiumThumbs img{object-fit:contain}
