@@ -808,3 +808,7 @@ body{min-height:100vh}
 .premiumMainImage:hover>img{transform:none!important}
 .premiumThumbs button{background:#f7f4ee}
 .premiumThumbs img{object-fit:contain}
+
+/* Store listing product photos: show the full furniture item */
+.productImageLink>img{object-fit:contain;background:#f7f4ee}
+.product:hover .productImageLink>img{transform:none}
