@@ -812,3 +812,9 @@ body{min-height:100vh}
 /* Store listing product photos: show the full furniture item */
 .productImageLink>img{object-fit:contain;background:#f7f4ee}
 .product:hover .productImageLink>img{transform:none}
+/* Newsletter subscription form */
+.newsletter form{max-width:470px;margin:30px auto 0;background:#fff;display:flex;padding:5px;gap:0}
+.newsletter form input{min-width:0;flex:1;color:#171511;background:#fff}
+.newsletter form button{flex:0 0 auto;cursor:pointer}
+.newsletter form button:disabled{opacity:.65;cursor:wait}
+.newsletter .newsletterStatus{margin:14px auto 0;color:#f7f4ee;font-size:12px}
