@@ -1084,6 +1084,13 @@ async function ensureOrders(){
  const existing=new Set(await columns("orders"));
  for(const [name,type] of Object.entries(defs))if(!existing.has(name))await db.query("ALTER TABLE orders ADD COLUMN `"+name+"` "+type);
 }
+app.post("/api/store/newsletter",asyncHandler(async(req,res)=>{
+ const email=String(req.body?.email||"").trim().toLowerCase();
+ if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))return res.status(400).json({message:"Please enter a valid email address."});
+ await db.query("CREATE TABLE IF NOT EXISTS newsletter_subscribers (id INT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(254) NOT NULL UNIQUE, status VARCHAR(20) NOT NULL DEFAULT 'subscribed', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+ await db.query("INSERT INTO newsletter_subscribers (email,status) VALUES (?, 'subscribed') ON DUPLICATE KEY UPDATE status='subscribed', updated_at=CURRENT_TIMESTAMP",[email]);
+ res.status(200).json({ok:true,message:"Subscription saved"});
+}));
 app.post("/api/store/orders",asyncHandler(async(req,res)=>{
  const body=req.body||{},customer=body.customer||{},shipping=body.shipping||{},items=Array.isArray(body.items)?body.items:[];
  const name=String(customer.name||"").trim(),email=String(customer.email||"").trim(),phone=String(customer.phone||"").trim();
