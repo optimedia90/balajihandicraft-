@@ -118,7 +118,28 @@ function App(){
  const [,setStoreVersion]=useState(0);
  const [storeSettings,setStoreSettings]=useState(null);
  activeCurrency=currency;
- useEffect(()=>{if(storeSettings?.seo_title)document.title=storeSettings.seo_title; if(storeSettings?.meta_description){let m=document.querySelector('meta[name="description"]');if(!m){m=document.createElement("meta");m.name="description";document.head.appendChild(m)}m.content=storeSettings.meta_description}},[storeSettings?.seo_title,storeSettings?.meta_description]);
+ const location=useLocation();
+ useEffect(()=>{
+  const path=location.pathname||"/";
+  const pages={
+   "/":["Woodenara | Solid Wood Furniture & Home Decor","Shop handcrafted solid wood furniture, Sheesham wood beds, sofas, dining tables and home decor at Woodenara."],
+   "/shop":["Shop Solid Wood Furniture | Woodenara","Explore Woodenara furniture collections including beds, sofas, dining tables, chairs and storage for your home."],
+   "/product":["Furniture Details | Woodenara","Discover product details, materials, dimensions and pricing for Woodenara furniture."],
+   "/blog":["Woodenara Journal | Furniture & Home Ideas","Explore furniture care tips, home styling inspiration and ideas for choosing solid wood furniture."],
+   "/shipping-returns":["Shipping & Returns | Woodenara","Read Woodenara's shipping, delivery, cancellation and return guidance before placing your order."]
+  };
+  const isPrivate=/^\\/(cart|wishlist|checkout|account|login|register|signup|forgot-password|admin)(\\/|$)/.test(path);
+  const title=path.startsWith("/blog/")?"Home & Furniture Journal | Woodenara":(pages[path]?.[0]||"Woodenara | Furniture & Home Decor");
+  const description=path.startsWith("/blog/")?"Read home and furniture inspiration from the Woodenara Journal.":(pages[path]?.[1]||"Explore handcrafted furniture and home decor from Woodenara.");
+  const finalTitle=path==="/"&&storeSettings?.seo_title?storeSettings.seo_title:title;
+  const finalDescription=path==="/"&&storeSettings?.meta_description?storeSettings.meta_description:description;
+  document.title=finalTitle;
+  const meta=(key,value,attr="name")=>{let el=document.head.querySelector(`meta[${attr}="${key}"]`);if(!el){el=document.createElement("meta");el.setAttribute(attr,key);document.head.appendChild(el)}el.content=value};
+  meta("description",finalDescription);
+  meta("og:title",finalTitle,"property");meta("og:description",finalDescription,"property");meta("og:type","website","property");meta("og:site_name","Woodenara","property");
+  meta("twitter:card","summary_large_image");meta("twitter:title",finalTitle);meta("twitter:description",finalDescription);
+  meta("robots",isPrivate?"noindex,nofollow":"index,follow");
+ },[location.pathname,storeSettings?.seo_title,storeSettings?.meta_description]);
  useEffect(()=>{fetch("/woodenara-logo-base64.txt").then(r=>r.ok?r.text():"").then(data=>{const value=String(data||"").trim();if(value){woodenaraLogoSrc="data:image/webp;base64,"+value;setStoreVersion(v=>v+1)}}).catch(()=>{});},[]);
  useEffect(()=>localStorage.setItem("bh_currency",currency),[currency]);
  useEffect(()=>localStorage.setItem("bh_cart",JSON.stringify(cart)),[cart]);
