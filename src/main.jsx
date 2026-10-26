@@ -317,7 +317,6 @@ function App(){
  },[]);
  const add=p=>setCart(c=>{const x=c.find(i=>i.id===p.id);return x?c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...c,{...p,qty:1}]});
  const toggleWish=p=>setWish(w=>w.some(x=>x.id===p.id)?w.filter(x=>x.id!==p.id):[...w,p]);
- const location=useLocation();
   useEffect(()=>{window.scrollTo({top:0,left:0,behavior:"auto"});},[location.pathname,location.search]);
   const isAdmin=location.pathname==="/admin";
  if(isAdmin)return <Admin/>;
