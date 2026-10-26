@@ -910,3 +910,59 @@ body{min-height:100vh}
   .actions{gap:8px!important}
   .actions .btn{font-size:9px!important;padding:10px 6px!important}
 }
+
+
+/* Mobile-first header: menu left, logo mark centered, wishlist/cart right, search below */
+.mobileHeader{display:none}
+.mobileSearchbar{display:none}
+@media(max-width:600px){
+  .navwrap{
+    display:block!important;height:auto!important;min-height:0!important;
+    padding:0 12px 10px!important;gap:0!important;
+  }
+  .mobileHeader{
+    display:grid!important;grid-template-columns:40px minmax(0,1fr) 80px;
+    align-items:center;min-height:54px;width:100%;gap:8px;
+  }
+  .mobileHamb{
+    display:flex!important;align-items:center;justify-content:flex-start;
+    width:36px;height:40px;padding:0;border:0;background:transparent;color:var(--ink);cursor:pointer;
+  }
+  .mobileHamb svg{width:23px;height:23px}
+  .mobileBrand{display:flex;align-items:center;justify-content:center;min-width:0}
+  .mobileBrand .brandLogoImage{display:block;width:42px;height:42px;object-fit:contain}
+  .mobileHeaderActions{display:flex;align-items:center;justify-content:flex-end;gap:13px}
+  .mobileHeaderActions>a{display:flex;align-items:center;justify-content:center;width:30px;height:36px;position:relative;color:var(--ink)}
+  .mobileHeaderActions svg{width:21px;height:21px}
+  .mobileHeaderActions .countIcon i{top:-2px;right:-5px}
+  .desktopBrand,.navicons{display:none!important}
+  .navwrap nav.mobile{display:none!important}
+  .navwrap nav.mobile.open{
+    display:flex!important;position:static!important;max-height:calc(100vh - 170px)!important;
+    overflow:auto!important;width:100%!important;margin:6px 0 10px!important;padding:12px!important;
+    flex-direction:column!important;align-items:stretch!important;gap:0!important;
+    background:#fffdf9!important;border:1px solid var(--line);border-radius:8px;
+  }
+  .navwrap nav.mobile.open .navMenu{width:100%;padding:10px 4px;border-bottom:1px solid var(--line)}
+  .mobileSearchbar{
+    display:flex!important;align-items:center;gap:8px;box-sizing:border-box;width:100%;
+    min-height:42px;margin:0!important;padding:0 9px!important;background:#fff;
+    border:1px solid #e8e0d5;border-radius:5px;box-shadow:none;
+  }
+  .mobileSearchbar>svg{width:17px;height:17px;flex:0 0 17px;color:#756f66}
+  .mobileSearchbar input{flex:1;min-width:0;width:100%;padding:8px 0!important;font-size:12px!important;border:0!important;background:transparent!important}
+  .mobileSearchbar>button{display:flex;align-items:center;justify-content:center;width:27px;height:30px;padding:0!important;flex:0 0 27px}
+  .mobileCurrency{display:flex!important;flex:0 0 66px!important;width:66px!important;min-width:66px!important;height:29px!important;padding:0 3px!important;gap:2px!important;border:0!important;border-left:1px solid var(--line)!important;border-radius:0!important;background:transparent!important}
+  .mobileCurrency span{font-size:10px!important}
+  .mobileCurrency select{width:44px!important;min-width:0!important;max-width:44px!important;padding:0!important;font-size:8px!important}
+  .desktopSearchbar{display:none!important}
+  .hero{padding-top:34px!important}
+}
+@media(max-width:360px){
+  .navwrap{padding-left:9px!important;padding-right:9px!important}
+  .mobileHeader{grid-template-columns:34px minmax(0,1fr) 72px;gap:5px}
+  .mobileHeaderActions{gap:8px}
+  .mobileBrand .brandLogoImage{width:38px;height:38px}
+  .mobileCurrency{flex-basis:60px!important;width:60px!important;min-width:60px!important}
+  .mobileCurrency select{width:40px!important;max-width:40px!important}
+}
