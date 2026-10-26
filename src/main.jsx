@@ -128,7 +128,7 @@ function App(){
    "/blog":["Woodenara Journal | Furniture & Home Ideas","Explore furniture care tips, home styling inspiration and ideas for choosing solid wood furniture."],
    "/shipping-returns":["Shipping & Returns | Woodenara","Read Woodenara's shipping, delivery, cancellation and return guidance before placing your order."]
   };
-  const isPrivate=/^\\/(cart|wishlist|checkout|account|login|register|signup|forgot-password|admin)(\\/|$)/.test(path);
+  const isPrivate=/^\/(cart|wishlist|checkout|account|login|register|signup|forgot-password|admin)(\/|$)/.test(path);
   const title=path.startsWith("/blog/")?"Home & Furniture Journal | Woodenara":(pages[path]?.[0]||"Woodenara | Furniture & Home Decor");
   const description=path.startsWith("/blog/")?"Read home and furniture inspiration from the Woodenara Journal.":(pages[path]?.[1]||"Explore handcrafted furniture and home decor from Woodenara.");
   const finalTitle=path==="/"&&storeSettings?.seo_title?storeSettings.seo_title:title;
