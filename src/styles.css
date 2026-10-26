@@ -824,3 +824,18 @@ body{min-height:100vh}
 .newsletter form button{flex:0 0 auto;cursor:pointer}
 .newsletter form button:disabled{opacity:.65;cursor:wait}
 .newsletter .newsletterStatus{margin:14px auto 0;color:#f7f4ee;font-size:12px}
+
+/* Mobile header fix: keep the Woodenara wordmark visible beside currency switcher */
+@media(max-width:600px){
+  .navwrap{display:flex;justify-content:space-between;align-items:center;gap:5px;padding:0 10px;min-width:0}
+  .navwrap>.logo{flex:0 1 104px;width:104px;min-width:0;gap:5px;overflow:hidden}
+  .navwrap>.logo .brandLogoImage{width:29px;height:29px;flex:0 0 29px}
+  .navwrap>.logo b{font-size:10px;letter-spacing:1px;white-space:nowrap}
+  .navwrap>.logo small{font-size:4.5px;letter-spacing:.15px;white-space:nowrap}
+  .navicons{flex:0 0 auto;gap:0;min-width:0}
+  .navicons button,.navicons a{width:29px;height:32px;flex:0 0 29px}
+  .navicons svg{width:17px;height:17px}
+  .currencySwitcher{flex:0 0 70px;width:70px;min-width:70px;max-width:70px;height:31px;padding:0 3px!important;gap:2px!important;overflow:hidden}
+  .currencySwitcher span{font-size:11px}
+  .currencySwitcher select{width:49px;max-width:49px;min-width:0;font-size:8px!important;padding:0!important}
+}
