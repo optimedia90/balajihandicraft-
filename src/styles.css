@@ -839,3 +839,74 @@ body{min-height:100vh}
   .currencySwitcher span{font-size:11px}
   .currencySwitcher select{width:49px;max-width:49px;min-width:0;font-size:8px!important;padding:0!important}
 }
+
+
+/* Refined mobile header and hero actions */
+@media(max-width:600px){
+  .navwrap{
+    height:62px!important;
+    padding:0 8px!important;
+    gap:5px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+  }
+  .navwrap>.logo{
+    flex:0 1 104px!important;
+    width:104px!important;
+    min-width:0!important;
+    gap:5px!important;
+    overflow:hidden!important;
+  }
+  .navwrap>.logo .brandLogoImage{
+    width:27px!important;height:27px!important;flex:0 0 27px!important;
+    object-fit:contain!important;
+  }
+  .navwrap>.logo span{min-width:0!important;overflow:hidden!important}
+  .navwrap>.logo b{font-size:9px!important;letter-spacing:.7px!important;white-space:nowrap!important}
+  .navwrap>.logo small{font-size:4px!important;letter-spacing:0!important;white-space:nowrap!important}
+  .navicons{
+    display:flex!important;align-items:center!important;justify-content:flex-end!important;
+    flex:0 0 auto!important;gap:1px!important;min-width:0!important;
+  }
+  .navicons button,.navicons>a{
+    width:27px!important;min-width:27px!important;height:32px!important;flex:0 0 27px!important;
+    padding:0!important;margin:0!important;
+  }
+  .navicons svg{width:16px!important;height:16px!important}
+  .currencySwitcher{
+    box-sizing:border-box!important;flex:0 0 67px!important;width:67px!important;min-width:67px!important;max-width:67px!important;
+    height:30px!important;padding:0 3px!important;gap:2px!important;margin:0 1px!important;
+    justify-content:center!important;overflow:hidden!important;
+  }
+  .currencySwitcher span{font-size:10px!important}
+  .currencySwitcher select{
+    width:45px!important;min-width:0!important;max-width:45px!important;
+    padding:0!important;font-size:8px!important;letter-spacing:-.2px!important;
+  }
+  .hero{padding:42px 20px 36px!important;gap:26px!important;min-height:0!important}
+  .heroText{width:100%!important;max-width:none!important;min-width:0!important}
+  .hero h1{font-size:clamp(43px,12vw,54px)!important;line-height:.94!important;letter-spacing:-2.3px!important;margin:17px 0 18px!important}
+  .hero p{font-size:14px!important;line-height:1.7!important;margin:0!important}
+  .actions{
+    display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    align-items:center!important;gap:10px!important;margin-top:24px!important;width:100%!important;
+  }
+  .actions .btn{
+    min-width:0!important;width:100%!important;box-sizing:border-box!important;
+    min-height:48px!important;padding:11px 9px!important;gap:7px!important;
+    justify-content:center!important;text-align:center!important;font-size:10px!important;
+    white-space:nowrap!important;
+  }
+  .actions .btn svg{width:14px!important;flex:0 0 14px!important}
+}
+@media(max-width:360px){
+  .navwrap>.logo{flex-basis:92px!important;width:92px!important}
+  .navwrap>.logo .brandLogoImage{width:25px!important;height:25px!important;flex-basis:25px!important}
+  .navwrap>.logo b{font-size:8px!important;letter-spacing:.3px!important}
+  .navicons button,.navicons>a{width:25px!important;min-width:25px!important;flex-basis:25px!important}
+  .currencySwitcher{flex-basis:63px!important;width:63px!important;min-width:63px!important}
+  .currencySwitcher select{width:42px!important;max-width:42px!important}
+  .actions{gap:8px!important}
+  .actions .btn{font-size:9px!important;padding:10px 6px!important}
+}
