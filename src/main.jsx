@@ -1,6 +1,6 @@
 import React,{useEffect,useMemo,useState} from "react";
 import {createRoot} from "react-dom/client";
-import {HashRouter,useLocation,useNavigate,useParams,Link} from "react-router-dom";
+import {BrowserRouter,useLocation,useNavigate,useParams,Link} from "react-router-dom";
 import {Search,ShoppingBag,Heart,User,Menu,X,ChevronDown,ArrowRight,Star,SlidersHorizontal,Trash2,Minus,Plus,Check,Truck,ShieldCheck,RotateCcw,Instagram,Facebook,Youtube,Home as HomeIcon,LayoutDashboard,Package,ShoppingCart,Users,Image as ImageIcon,FileText,Tag,MessageSquare,Settings,BarChart3,LogOut,Sun,Moon,Bell,ExternalLink,Save,Video,FileImage,Boxes,Ticket,StarHalf,PanelLeftClose,PanelLeftOpen,CalendarDays,Info} from "lucide-react";
 import "./styles.css";
 
@@ -115,7 +115,7 @@ function App(){
  const [cart,setCart]=useState(()=>JSON.parse(localStorage.getItem("bh_cart")||"[]"));
  const [wish,setWish]=useState(()=>JSON.parse(localStorage.getItem("bh_wish")||"[]"));
  const [currency,setCurrency]=useState(()=>localStorage.getItem("bh_currency")||"USD");
- const [,setStoreVersion]=useState(0);
+ const [storeVersion,setStoreVersion]=useState(0);
  const [storeSettings,setStoreSettings]=useState(null);
  activeCurrency=currency;
  const location=useLocation();
@@ -128,18 +128,33 @@ function App(){
    "/blog":["Woodenara Journal | Furniture & Home Ideas","Explore furniture care tips, home styling inspiration and ideas for choosing solid wood furniture."],
    "/shipping-returns":["Shipping & Returns | Woodenara","Read Woodenara's shipping, delivery, cancellation and return guidance before placing your order."]
   };
-  const isPrivate=/^\/(cart|wishlist|checkout|account|login|register|signup|forgot-password|admin)(\/|$)/.test(path);
-  const title=path.startsWith("/blog/")?"Home & Furniture Journal | Woodenara":(pages[path]?.[0]||"Woodenara | Furniture & Home Decor");
-  const description=path.startsWith("/blog/")?"Read home and furniture inspiration from the Woodenara Journal.":(pages[path]?.[1]||"Explore handcrafted furniture and home decor from Woodenara.");
+  const isPrivate=/^\\/(cart|wishlist|checkout|account|login|register|signup|forgot-password|admin)(\\/|$)/.test(path);
+  const queryParams=new URLSearchParams(location.search);
+  const productId=queryParams.get("id");
+  const categoryName=queryParams.get("cat")||"";
+  const product=path==="/product"&&productId?products.find(item=>String(item.id)===String(productId)):null;
+  const categoryTitle=categoryName?categoryName.replace(/[-_]/g," ").replace(/\b\w/g,char=>char.toUpperCase()):"";
+  const blogSlug=path.startsWith("/blog/")?decodeURIComponent(path.replace(/\\/+$/, "").split("/").pop()||""):"";
+  const blogPost=blogSlug?journalPosts.find(item=>item.slug===blogSlug):null;
+  const title=product?(product.seo_title||`${product.name} | Woodenara`):(path==="/shop"&&categoryTitle?`${categoryTitle} Furniture | Woodenara`:(blogPost?blogPost.title+" | Woodenara Journal":(path.startsWith("/blog/")?"Woodenara Journal | Furniture & Home Ideas":(pages[path]?.[0]||"Woodenara | Furniture & Home Decor"))));
+  const description=product?(product.meta_description||product.short_description||product.short_desc||product.description||`Explore ${product.name} at Woodenara. View product details, material, dimensions, price and availability.`):(path==="/shop"&&categoryTitle?`Explore ${categoryTitle.toLowerCase()} furniture at Woodenara. Compare styles, materials, sizes and prices for your home.`:(blogPost?blogPost.excerpt:(path==="/blog"?"Explore furniture care tips, home styling inspiration and ideas for choosing solid wood furniture.":(pages[path]?.[1]||"Explore handcrafted furniture and home decor from Woodenara.")));
   const finalTitle=path==="/"&&storeSettings?.seo_title?storeSettings.seo_title:title;
   const finalDescription=path==="/"&&storeSettings?.meta_description?storeSettings.meta_description:description;
   document.title=finalTitle;
   const meta=(key,value,attr="name")=>{let el=document.head.querySelector(`meta[${attr}="${key}"]`);if(!el){el=document.createElement("meta");el.setAttribute(attr,key);document.head.appendChild(el)}el.content=value};
   meta("description",finalDescription);
-  meta("og:title",finalTitle,"property");meta("og:description",finalDescription,"property");meta("og:type","website","property");meta("og:site_name","Woodenara","property");
+  meta("og:title",finalTitle,"property");meta("og:description",finalDescription,"property");meta("og:type",product?"product":"website","property");meta("og:site_name","Woodenara","property");
   meta("twitter:card","summary_large_image");meta("twitter:title",finalTitle);meta("twitter:description",finalDescription);
   meta("robots",isPrivate?"noindex,nofollow":"index,follow");
- },[location.pathname,storeSettings?.seo_title,storeSettings?.meta_description]);
+  let canonical=document.head.querySelector('link[rel="canonical"]');
+  if(!canonical){canonical=document.createElement("link");canonical.rel="canonical";document.head.appendChild(canonical)}
+  canonical.href=product?new URL(`/product?id=${encodeURIComponent(product.id)}`,window.location.origin).href:(path.startsWith("/blog/")?new URL("/blog/"+encodeURIComponent(blogSlug),window.location.origin).href:new URL(path,window.location.origin).href);
+  let schema=document.head.querySelector('script[data-woodenara-seo-schema="true"]');
+  if(!schema){schema=document.createElement("script");schema.type="application/ld+json";schema.dataset.woodenaraSeoSchema="true";document.head.appendChild(schema)}
+  const organization={"@context":"https://schema.org","@type":"Organization","name":"Woodenara","url":"https://woodenara.com/","email":"info@woodenara.com","telephone":"+917300089505"};
+  const productSchema=product?{"@context":"https://schema.org","@type":"Product","name":product.name,"description":product.meta_description||product.short_description||product.short_desc||product.description||`Explore ${product.name} at Woodenara.`,"image":[product.img,product.image,product.image_2,product.image_3].filter(Boolean),"brand":{"@type":"Brand","name":product.brand||"Woodenara"},"offers":{"@type":"Offer","url":new URL(`/product?id=${encodeURIComponent(product.id)}`,window.location.origin).href,"priceCurrency":"INR","price":String(Number(product.price)||0),"availability":Number(product.qty)>0?"https://schema.org/InStock":"https://schema.org/OutOfStock"}}:null;
+  schema.textContent=JSON.stringify(productSchema||organization);
+ },[location.pathname,location.search,storeSettings?.seo_title,storeSettings?.meta_description,storeVersion]);
  useEffect(()=>{fetch("/woodenara-logo-base64.txt").then(r=>r.ok?r.text():"").then(data=>{const value=String(data||"").trim();if(value){woodenaraLogoSrc="data:image/webp;base64,"+value;setStoreVersion(v=>v+1)}}).catch(()=>{});},[]);
  useEffect(()=>localStorage.setItem("bh_currency",currency),[currency]);
  useEffect(()=>localStorage.setItem("bh_cart",JSON.stringify(cart)),[cart]);
@@ -888,4 +903,4 @@ function AuthPage({mode}){
 function ShippingReturns(){return <div className="container page policyPage"><span className="eyebrow">CUSTOMER CARE</span><h1>Shipping &amp; Returns</h1><p className="policyIntro">The details you need for a smooth delivery and a confident purchase from Woodenara.</p><section className="policySection"><h2>Shipping &amp; Delivery</h2><p>We aim to deliver your furniture safely and keep you informed throughout the process. Delivery timelines can vary depending on the product, availability, destination and the size of your order.</p><ul><li>Our team will confirm order and delivery details where needed.</li><li>Please provide a complete delivery address and an active contact number.</li><li>For large furniture, ensure the delivery route and entrance can accommodate the item.</li><li>Any shipping fee or delivery offer applicable to your order will be shown or confirmed before checkout.</li></ul></section><section className="policySection"><h2>Order Processing</h2><p>Orders are reviewed before dispatch. If there is a delay or we need additional information, our team will contact you using the details provided with your order.</p></section><section className="policySection"><h2>Returns &amp; Exchanges</h2><p>If your item arrives damaged, defective or incorrect, please contact us as soon as possible after delivery. Share your order details and clear photos of the product and packaging so our team can review the issue.</p><ul><li>Keep the original packaging until the issue has been reviewed, where practical.</li><li>Returns or exchanges must be approved by our team before an item is sent back.</li><li>Custom-made, personalized or used items may not be eligible for return unless required by applicable law or the item is faulty.</li><li>Refunds or replacements are assessed case by case and confirmed to you before the next steps.</li></ul></section><section className="policySection"><h2>Cancellation</h2><p>If you need to cancel or change an order, contact us as early as possible. Requests may not be possible once an item has entered production, been customized or dispatched.</p></section><section className="policySection"><h2>Need Help?</h2><p>For shipping, delivery, return or exchange questions, contact Woodenara Studio, Churu, Rajasthan, India.</p><p><strong>Email:</strong> hello@balajihandicraft.com<br/><strong>Phone:</strong> +91 00000 00000</p><p className="policyNote">Please confirm the final delivery estimate, applicable shipping charges and return eligibility with our team before placing an order. This page provides general guidance; any order-specific terms shared by our team will also apply.</p></section></div>}
 
 function Footer({settings}){return <footer><div className="footerMain"><div><Link to="/" className="logo lightLogo"><img className="brandLogoImage" src={woodenaraLogoSrc||undefined} alt="Woodenara logo"/><span><b>WOODENARA</b><small>FURNITURE &amp; HOME DECOR</small></span></Link><p>Handcrafted furniture made from honest materials, thoughtful design and skilled craftsmanship.</p><div className="social"><a href="https://www.instagram.com/woodenara?cplk=YzdsZno5b2J2M3Jm&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Woodenara on Instagram"><Instagram/></a><a href="https://www.facebook.com/share/1Dva1ZVLt5/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Woodenara on Facebook"><Facebook/></a></div></div><div><h4>Shop</h4><Link to="/shop?cat=Beds">Beds</Link><Link to="/shop?cat=Sofas">Sofas</Link><Link to="/shop?cat=Dining">Dining</Link><Link to="/shop?cat=Storage">Storage</Link></div><div><h4>Help</h4><Link to="/account">My Account</Link><Link to="/blog">Journal</Link><Link to="/shipping-returns">Shipping & Returns</Link><Link to="/checkout">Checkout</Link></div><div><h4>Contact</h4><span>Woodenara Studio</span><span>Churu, Rajasthan, India</span><a href={"tel:+917300089505"}>+91 73000 89505</a><a href="mailto:info@woodenara.com">info@woodenara.com</a></div></div><div className="footerBottom">© 2026 Woodenara <span>Made for homes with character.</span></div></footer>}
-createRoot(document.getElementById("root")).render(<HashRouter><App/></HashRouter>);
+createRoot(document.getElementById("root")).render(<BrowserRouter><App/></BrowserRouter>);
