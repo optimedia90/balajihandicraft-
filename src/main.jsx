@@ -115,7 +115,7 @@ function App(){
  const [cart,setCart]=useState(()=>JSON.parse(localStorage.getItem("bh_cart")||"[]"));
  const [wish,setWish]=useState(()=>JSON.parse(localStorage.getItem("bh_wish")||"[]"));
  const [currency,setCurrency]=useState(()=>localStorage.getItem("bh_currency")||"USD");
- const [,setStoreVersion]=useState(0);
+ const [storeVersion,setStoreVersion]=useState(0);
  const [storeSettings,setStoreSettings]=useState(null);
  activeCurrency=currency;
  const location=useLocation();
@@ -151,7 +151,7 @@ function App(){
   const organization={"@context":"https://schema.org","@type":"Organization","name":"Woodenara","url":"https://woodenara.com/","email":"info@woodenara.com","telephone":"+917300089505"};
   const productSchema=product?{"@context":"https://schema.org","@type":"Product","name":product.name,"description":product.meta_description||product.short_description||product.short_desc||product.description||`Explore ${product.name} at Woodenara.`,"image":[product.img,product.image,product.image_2,product.image_3].filter(Boolean),"brand":{"@type":"Brand","name":product.brand||"Woodenara"},"offers":{"@type":"Offer","url":new URL(`/product?id=${encodeURIComponent(product.id)}`,window.location.origin).href,"priceCurrency":"INR","price":String(Number(product.price)||0),"availability":Number(product.qty)>0?"https://schema.org/InStock":"https://schema.org/OutOfStock"}}:null;
   schema.textContent=JSON.stringify(productSchema||organization);
- },[location.pathname,storeSettings?.seo_title,storeSettings?.meta_description]);
+ },[location.pathname,location.search,storeSettings?.seo_title,storeSettings?.meta_description,storeVersion]);
  useEffect(()=>{fetch("/woodenara-logo-base64.txt").then(r=>r.ok?r.text():"").then(data=>{const value=String(data||"").trim();if(value){woodenaraLogoSrc="data:image/webp;base64,"+value;setStoreVersion(v=>v+1)}}).catch(()=>{});},[]);
  useEffect(()=>localStorage.setItem("bh_currency",currency),[currency]);
  useEffect(()=>localStorage.setItem("bh_cart",JSON.stringify(cart)),[cart]);
