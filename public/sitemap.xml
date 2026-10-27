@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://woodenara.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://woodenara.com/shop</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://woodenara.com/blog</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://woodenara.com/blog/dining-table-brings-everyone-together</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://woodenara.com/blog/style-a-warm-welcoming-living-room</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://woodenara.com/blog/simple-care-tips-solid-wood-furniture</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://woodenara.com/shipping-returns</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+</urlset>
