@@ -133,7 +133,7 @@ function App(){
   const productId=queryParams.get("id");
   const categoryName=queryParams.get("cat")||"";
   const product=path==="/product"&&productId?products.find(item=>String(item.id)===String(productId)):null;
-  const categoryTitle=categoryName?categoryName.replace(/[-_]/g," ").replace(/\\b\\w/g,char=>char.toUpperCase()):"";
+  const categoryTitle=categoryName?categoryName.replace(/[-_]/g," ").replace(/\b\w/g,char=>char.toUpperCase()):"";
   const blogSlug=path.startsWith("/blog/")?decodeURIComponent(path.replace(/\\/+$/, "").split("/").pop()||""):"";
   const blogPost=blogSlug?journalPosts.find(item=>item.slug===blogSlug):null;
   const title=product?(product.seo_title||`${product.name} | Woodenara`):(path==="/shop"&&categoryTitle?`${categoryTitle} Furniture | Woodenara`:(blogPost?blogPost.title+" | Woodenara Journal":(path.startsWith("/blog/")?"Woodenara Journal | Furniture & Home Ideas":(pages[path]?.[0]||"Woodenara | Furniture & Home Decor"))));
