@@ -129,12 +129,15 @@ function App(){
    "/shipping-returns":["Shipping & Returns | Woodenara","Read Woodenara's shipping, delivery, cancellation and return guidance before placing your order."]
   };
   const isPrivate=/^\\/(cart|wishlist|checkout|account|login|register|signup|forgot-password|admin)(\\/|$)/.test(path);
-  const productId=new URLSearchParams(location.search).get("id");
+  const queryParams=new URLSearchParams(location.search);
+  const productId=queryParams.get("id");
+  const categoryName=queryParams.get("cat")||"";
   const product=path==="/product"&&productId?products.find(item=>String(item.id)===String(productId)):null;
+  const categoryTitle=categoryName?categoryName.replace(/[-_]/g," ").replace(/\\b\\w/g,char=>char.toUpperCase()):"";
   const blogSlug=path.startsWith("/blog/")?decodeURIComponent(path.replace(/\\/+$/, "").split("/").pop()||""):"";
   const blogPost=blogSlug?journalPosts.find(item=>item.slug===blogSlug):null;
-  const title=product?(product.seo_title||`${product.name} | Woodenara`):(blogPost?blogPost.title+" | Woodenara Journal":(path.startsWith("/blog/")?"Woodenara Journal | Furniture & Home Ideas":(pages[path]?.[0]||"Woodenara | Furniture & Home Decor")));
-  const description=product?(product.meta_description||product.short_description||product.short_desc||product.description||`Explore ${product.name} at Woodenara. View product details, material, dimensions, price and availability.`):(blogPost?blogPost.excerpt:(path==="/blog"?"Explore furniture care tips, home styling inspiration and ideas for choosing solid wood furniture.":(pages[path]?.[1]||"Explore handcrafted furniture and home decor from Woodenara.")));
+  const title=product?(product.seo_title||`${product.name} | Woodenara`):(path==="/shop"&&categoryTitle?`${categoryTitle} Furniture | Woodenara`:(blogPost?blogPost.title+" | Woodenara Journal":(path.startsWith("/blog/")?"Woodenara Journal | Furniture & Home Ideas":(pages[path]?.[0]||"Woodenara | Furniture & Home Decor"))));
+  const description=product?(product.meta_description||product.short_description||product.short_desc||product.description||`Explore ${product.name} at Woodenara. View product details, material, dimensions, price and availability.`):(path==="/shop"&&categoryTitle?`Explore ${categoryTitle.toLowerCase()} furniture at Woodenara. Compare styles, materials, sizes and prices for your home.`:(blogPost?blogPost.excerpt:(path==="/blog"?"Explore furniture care tips, home styling inspiration and ideas for choosing solid wood furniture.":(pages[path]?.[1]||"Explore handcrafted furniture and home decor from Woodenara.")));
   const finalTitle=path==="/"&&storeSettings?.seo_title?storeSettings.seo_title:title;
   const finalDescription=path==="/"&&storeSettings?.meta_description?storeSettings.meta_description:description;
   document.title=finalTitle;
