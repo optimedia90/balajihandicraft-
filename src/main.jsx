@@ -122,7 +122,7 @@ function App(){
  useEffect(()=>{
   const path=location.pathname||"/";
   const pages={
-   "/":["Woodenara | Solid Wood Furniture & Home Decor","Shop handcrafted solid wood furniture, Sheesham wood beds, sofas, dining tables and home decor at Woodenara."],
+   "/":["Woodenara | Solid Wood Furniture & Home Decor Online","Shop solid Sheesham wood furniture at Woodenara, including beds, sofas, dining tables and home decor crafted for modern homes."],
    "/shop":["Shop Solid Wood Furniture | Woodenara","Explore Woodenara furniture collections including beds, sofas, dining tables, chairs and storage for your home."],
    "/product":["Furniture Details | Woodenara","Discover product details, materials, dimensions and pricing for Woodenara furniture."],
    "/blog":["Woodenara Journal | Furniture & Home Ideas","Explore furniture care tips, home styling inspiration and ideas for choosing solid wood furniture."],
