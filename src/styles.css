@@ -970,3 +970,22 @@ body{min-height:100vh}
 
 /* Keep accessible link descriptions available to assistive technology without displaying them. */
 .srOnly{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+
+
+/* Premium expandable homepage SEO content */
+.homeSeoReadMore{margin-top:20px}
+.homeSeoReadMore>summary{
+  display:inline-flex;align-items:center;gap:10px;list-style:none;cursor:pointer;
+  min-height:44px;padding:0 19px;border:1px solid #b68a50;border-radius:3px;
+  background:linear-gradient(135deg,#fffdf9 0%,#f6efe4 100%);color:#78501f;
+  font-size:12px;font-weight:700;letter-spacing:.045em;transition:background .2s ease,color .2s ease,border-color .2s ease,transform .2s ease;
+}
+.homeSeoReadMore>summary::-webkit-details-marker{display:none}
+.homeSeoReadMore>summary:before{content:"+";display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border:1px solid #c5a777;border-radius:50%;font-size:14px;font-weight:400;line-height:1}
+.homeSeoReadMore[open]>summary:before{content:"−"}
+.homeSeoReadMore>summary:hover{background:#211b14;color:#fff;border-color:#211b14;transform:translateY(-1px)}
+.homeSeoReadMore>summary:focus-visible{outline:2px solid #9a6b32;outline-offset:4px}
+.homeSeoReadMore[open]>summary{margin-bottom:22px}
+.homeSeoReadMore>div{animation:homeSeoReveal .24s ease both}
+@keyframes homeSeoReveal{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.homeSeoReadMore>summary{min-height:42px;padding:0 14px;font-size:11px;letter-spacing:.02em}}
