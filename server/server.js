@@ -12,7 +12,7 @@ dotenv.config();
 
 const app=express();
 // Compress eligible text responses (HTML, CSS, JavaScript, JSON, SVG) with gzip/deflate when supported.
-app.use(compression({threshold:0,level:6,filter:(req,res)=>{\n  const type=String(res.getHeader("Content-Type")||"");\n  return compression.filter(req,res)||/^(text\\/|application\\/(json|javascript|xml|manifest\\+json)|image\\/svg\\+xml)/i.test(type);\n}}));
+app.use(compression({threshold:0,level:6}));
 const __filename=fileURLToPath(import.meta.url);
 const __dirname=path.dirname(__filename);
 // Keep new uploads outside the deployed source tree when possible.
@@ -1158,7 +1158,10 @@ app.use((err,req,res,next)=>{
 });
 
 const dist=path.resolve(__dirname,"../dist");
-app.use(express.static(dist,{maxAge:"1y",immutable:true,setHeaders(res,filePath){\n  if(filePath.endsWith("index.html"))res.setHeader("Cache-Control","no-cache");\n  else if(/\\.(?:js|css|woff2?|ttf|svg|png|jpe?g|webp|avif|ico)$/i.test(filePath))res.setHeader("Cache-Control","public, max-age=31536000, immutable");\n}}));
+app.use(express.static(dist,{maxAge:"1y",immutable:true,setHeaders(res,filePath){
+  if(filePath.endsWith("index.html"))res.setHeader("Cache-Control","no-cache");
+  else if(/.(?:js|css|woff2?|ttf|svg|png|jpe?g|webp|avif|ico)$/i.test(filePath))res.setHeader("Cache-Control","public, max-age=31536000, immutable");
+}}));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
 app.listen(PORT,async()=>{
