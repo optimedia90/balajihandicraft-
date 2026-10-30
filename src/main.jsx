@@ -434,6 +434,29 @@ function Home({add,toggleWish,wish,settings}){
    </div>
   </section>
 
+  {/* Homepage buying guide: common questions answered in plain language */}
+  <section className="homeSection" aria-labelledby="woodenara-buying-help" style={{maxWidth:1120,margin:"0 auto",padding:"8px 24px 48px"}}>
+   <h2 id="woodenara-buying-help" style={{fontSize:"clamp(24px,2.6vw,34px)",lineHeight:1.2,margin:"0 0 20px"}}>Helpful tips before you choose</h2>
+   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:24,lineHeight:1.75,color:"var(--muted,#6f6a63)"}}>
+    <article>
+     <h3>How do I choose the right size?</h3>
+     <p>Measure the floor space where you plan to place the item. Leave room to walk around it and use drawers or doors. Check the listed height, width and depth, then compare them with your room measurements. Remember to measure doorways, stairs and lifts too, so delivery and setup are easier.</p>
+    </article>
+    <article>
+     <h3>What should I check on a product page?</h3>
+     <p>Review the price, material, finish, dimensions and any care notes before ordering. Product photos help you understand the style, while written specifications explain the size and key features. If a detail is not listed, contact the store before making your choice rather than guessing.</p>
+    </article>
+    <article>
+     <h3>How can I care for solid Sheesham furniture?</h3>
+     <p>Use a soft cloth to remove dust and clean spills promptly. Keep hot dishes, standing water and harsh cleaners away from the finish. Use coasters and avoid placing furniture in areas with constant dampness or strong direct sunlight. Follow the care instructions provided for your specific item.</p>
+    </article>
+    <article>
+     <h3>How do I match pieces across a room?</h3>
+     <p>Start with the main item, such as a bed, sofa or dining table. Choose other pieces that leave enough open space and suit the way you use the room. Similar finishes can create a joined-up look, while a different texture or colour can add contrast. Keep daily comfort and storage needs in mind.</p>
+    </article>
+   </div>
+  </section>
+
   {/* 03 Categories */}
   <section className="homeSection categorySection">
    <SectionTitle kicker="CURATED FOR YOUR HOME" title="Shop by category" link="/shop"/>
