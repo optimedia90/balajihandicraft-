@@ -413,50 +413,6 @@ function Home({add,toggleWish,wish,settings}){
    </div>
   </section>
 
-  {/* Homepage guide: clear, practical advice for visitors */}
-  <section className="homeSection" aria-labelledby="woodenara-home-guide" style={{maxWidth:1120,margin:"0 auto",padding:"52px 24px"}}>
-   <span className="eyebrow">A THOUGHTFUL HOME STARTS HERE</span>
-   <h2 id="woodenara-home-guide" style={{fontSize:"clamp(26px,3vw,40px)",lineHeight:1.15,margin:"12px 0 18px"}}>Furniture for everyday living</h2>
-   <div style={{maxWidth:900,lineHeight:1.8,color:"var(--muted,#6f6a63)"}}>
-    <p>Make your home feel warm, useful and easy to enjoy. Woodenara offers beds, sofas, dining tables, chairs, cabinets and desks for many kinds of rooms. You may be setting up a new home or giving one room a fresh look. Start by thinking about how you use the space each day. Choose pieces that feel good, fit well and meet your needs.</p>
-    <h3>Choose the right size and finish</h3>
-    <p>Measure your room before you buy. Leave enough space to walk around each item and open doors or drawers. Check the product dimensions and make sure the item can pass through your doorway and stairs. Look at the finish, colour and care details on each product page. These simple checks can help you choose with confidence.</p>
-    <p>Our Sheesham range shows the natural grain and warm tones of this hardwood. The grain may look different from one item to another. This is a natural feature of the material. Read the details for each product to learn about its build, finish and size before placing an order.</p>
-    <h3>Plan each room around your needs</h3>
-    <p>For the living room, start with seating and add a side or coffee table if you need a place for drinks, books or everyday items. In the bedroom, choose a bed that fits the room and leaves space to move. Bedside tables can keep a lamp, phone and book close by. For meals, pick a dining table with enough room for the people who use it most often.</p>
-    <p>Storage can also make a room easier to use. Cabinets and dressers help keep daily items in one place. A desk can give you a clear spot to work or study. Before choosing storage, think about what you need to keep and where the item will stand. A little planning can help reduce clutter.</p>
-    <h3>Simple care for your furniture</h3>
-    <p>Dust surfaces with a soft, dry cloth. Wipe spills as soon as you can. Use coasters under cups and keep hot items away from the finish. Try to avoid long periods of dampness and direct heat. Follow the care advice supplied with your product, as different finishes may need different care.</p>
-    <p>Natural grain and colour can vary, so each item may have its own look. Gentle cleaning and everyday care can help keep the finish in good condition. If you are unsure how to clean a surface, check the product care notes before using a cleaner.</p>
-    <h3>Shop with useful details in mind</h3>
-    <p>Use the collection pages to explore styles for different rooms. Open a product page to review its price, dimensions, material and other available details. Compare a few options and think about how each one will work in your home. If you need more ideas, visit the Woodenara Journal for simple room-planning tips and care guides.</p>
-    <p>Our aim is to help you make a clear, informed choice. Take your time, measure your space and choose pieces that suit your home and daily routine.</p>
-   </div>
-  </section>
-
-  {/* Homepage buying guide: common questions answered in plain language */}
-  <section className="homeSection" aria-labelledby="woodenara-buying-help" style={{maxWidth:1120,margin:"0 auto",padding:"8px 24px 48px"}}>
-   <h2 id="woodenara-buying-help" style={{fontSize:"clamp(24px,2.6vw,34px)",lineHeight:1.2,margin:"0 0 20px"}}>Helpful tips before you choose</h2>
-   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:24,lineHeight:1.75,color:"var(--muted,#6f6a63)"}}>
-    <article>
-     <h3>How do I choose the right size?</h3>
-     <p>Measure the floor space where you plan to place the item. Leave room to walk around it and use drawers or doors. Check the listed height, width and depth, then compare them with your room measurements. Remember to measure doorways, stairs and lifts too, so delivery and setup are easier.</p>
-    </article>
-    <article>
-     <h3>What should I check on a product page?</h3>
-     <p>Review the price, material, finish, dimensions and any care notes before ordering. Product photos help you understand the style, while written specifications explain the size and key features. If a detail is not listed, contact the store before making your choice rather than guessing.</p>
-    </article>
-    <article>
-     <h3>How can I care for solid Sheesham furniture?</h3>
-     <p>Use a soft cloth to remove dust and clean spills promptly. Keep hot dishes, standing water and harsh cleaners away from the finish. Use coasters and avoid placing furniture in areas with constant dampness or strong direct sunlight. Follow the care instructions provided for your specific item.</p>
-    </article>
-    <article>
-     <h3>How do I match pieces across a room?</h3>
-     <p>Start with the main item, such as a bed, sofa or dining table. Choose other pieces that leave enough open space and suit the way you use the room. Similar finishes can create a joined-up look, while a different texture or colour can add contrast. Keep daily comfort and storage needs in mind.</p>
-    </article>
-   </div>
-  </section>
-
   {/* 03 Categories */}
   <section className="homeSection categorySection">
    <SectionTitle kicker="CURATED FOR YOUR HOME" title="Shop by category" link="/shop"/>
@@ -539,6 +495,52 @@ function Home({add,toggleWish,wish,settings}){
     ["The details that make handcrafted furniture special",products[0]?.img,"CRAFT"]
     ].slice(0,3).map(x=><article className="journalCard" key={x[0]}><img onError={imageErrorFallback} src={x[1]} alt={x[0]}/><span>{x[2]}</span><h3>{x[0]}</h3><p>Explore practical ideas and simple tips in the Woodenara Journal.</p></article>)}</div>
   </section>
+
+  {/* Homepage guide: clear, practical advice for visitors */}
+  <section className="homeSection" aria-labelledby="woodenara-home-guide" style={{maxWidth:1120,margin:"0 auto",padding:"52px 24px"}}>
+   <span className="eyebrow">A THOUGHTFUL HOME STARTS HERE</span>
+   <h2 id="woodenara-home-guide" style={{fontSize:"clamp(26px,3vw,40px)",lineHeight:1.15,margin:"12px 0 18px"}}>Furniture for everyday living</h2>
+   <div style={{maxWidth:900,lineHeight:1.8,color:"var(--muted,#6f6a63)"}}>
+    <p>Make your home feel warm, useful and easy to enjoy. Woodenara offers beds, sofas, dining tables, chairs, cabinets and desks for many kinds of rooms. You may be setting up a new home or giving one room a fresh look. Start by thinking about how you use the space each day. Choose pieces that feel good, fit well and meet your needs.</p>
+    <h3>Choose the right size and finish</h3>
+    <p>Measure your room before you buy. Leave enough space to walk around each item and open doors or drawers. Check the product dimensions and make sure the item can pass through your doorway and stairs. Look at the finish, colour and care details on each product page. These simple checks can help you choose with confidence.</p>
+    <p>Our Sheesham range shows the natural grain and warm tones of this hardwood. The grain may look different from one item to another. This is a natural feature of the material. Read the details for each product to learn about its build, finish and size before placing an order.</p>
+    <h3>Plan each room around your needs</h3>
+    <p>For the living room, start with seating and add a side or coffee table if you need a place for drinks, books or everyday items. In the bedroom, choose a bed that fits the room and leaves space to move. Bedside tables can keep a lamp, phone and book close by. For meals, pick a dining table with enough room for the people who use it most often.</p>
+    <p>Storage can also make a room easier to use. Cabinets and dressers help keep daily items in one place. A desk can give you a clear spot to work or study. Before choosing storage, think about what you need to keep and where the item will stand. A little planning can help reduce clutter.</p>
+    <h3>Simple care for your furniture</h3>
+    <p>Dust surfaces with a soft, dry cloth. Wipe spills as soon as you can. Use coasters under cups and keep hot items away from the finish. Try to avoid long periods of dampness and direct heat. Follow the care advice supplied with your product, as different finishes may need different care.</p>
+    <p>Natural grain and colour can vary, so each item may have its own look. Gentle cleaning and everyday care can help keep the finish in good condition. If you are unsure how to clean a surface, check the product care notes before using a cleaner.</p>
+    <h3>Shop with useful details in mind</h3>
+    <p>Use the collection pages to explore styles for different rooms. Open a product page to review its price, dimensions, material and other available details. Compare a few options and think about how each one will work in your home. If you need more ideas, visit the Woodenara Journal for simple room-planning tips and care guides.</p>
+    <p>Our aim is to help you make a clear, informed choice. Take your time, measure your space and choose pieces that suit your home and daily routine.</p>
+   </div>
+  </section>
+
+  {/* Homepage buying guide: common questions answered in plain language */}
+  <section className="homeSection" aria-labelledby="woodenara-buying-help" style={{maxWidth:1120,margin:"0 auto",padding:"8px 24px 48px"}}>
+   <h2 id="woodenara-buying-help" style={{fontSize:"clamp(24px,2.6vw,34px)",lineHeight:1.2,margin:"0 0 20px"}}>Helpful tips before you choose</h2>
+   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:24,lineHeight:1.75,color:"var(--muted,#6f6a63)"}}>
+    <article>
+     <h3>How do I choose the right size?</h3>
+     <p>Measure the floor space where you plan to place the item. Leave room to walk around it and use drawers or doors. Check the listed height, width and depth, then compare them with your room measurements. Remember to measure doorways, stairs and lifts too, so delivery and setup are easier.</p>
+    </article>
+    <article>
+     <h3>What should I check on a product page?</h3>
+     <p>Review the price, material, finish, dimensions and any care notes before ordering. Product photos help you understand the style, while written specifications explain the size and key features. If a detail is not listed, contact the store before making your choice rather than guessing.</p>
+    </article>
+    <article>
+     <h3>How can I care for solid Sheesham furniture?</h3>
+     <p>Use a soft cloth to remove dust and clean spills promptly. Keep hot dishes, standing water and harsh cleaners away from the finish. Use coasters and avoid placing furniture in areas with constant dampness or strong direct sunlight. Follow the care instructions provided for your specific item.</p>
+    </article>
+    <article>
+     <h3>How do I match pieces across a room?</h3>
+     <p>Start with the main item, such as a bed, sofa or dining table. Choose other pieces that leave enough open space and suit the way you use the room. Similar finishes can create a joined-up look, while a different texture or colour can add contrast. Keep daily comfort and storage needs in mind.</p>
+    </article>
+   </div>
+  </section>
+
+
 
   {/* 16 Newsletter */}
   <NewsletterSection/>
