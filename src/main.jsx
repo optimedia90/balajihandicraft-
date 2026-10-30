@@ -387,7 +387,7 @@ function Home({add,toggleWish,wish,settings}){
  return <>
   {/* 01 Hero */}
   <section className="hero homeReveal">
-   <div className="heroText"><span className="eyebrow">THE ART OF BETTER LIVING</span><h1>{settings?.homepage_hero||"Furniture with character."}</h1><p>{settings?.homepage_subtitle||"Handcrafted solid wood pieces designed to bring warmth, comfort and timeless beauty into your home."}</p><div className="actions"><Link className="btn dark" to="/shop">Shop Furniture <ArrowRight/></Link><Link className="textlink" to="/blog">Our craftsmanship →</Link></div></div>
+   <div className="heroText"><span className="eyebrow">THE ART OF BETTER LIVING</span><h1>{settings?.homepage_hero||"Furniture with character."}</h1><p>{settings?.homepage_subtitle||"Discover handcrafted furniture made to bring comfort and warmth to your home."}</p><div className="actions"><Link className="btn dark" to="/shop">Shop Furniture <ArrowRight/></Link><Link className="textlink" to="/blog">Our craftsmanship →</Link></div></div>
    <div className="heroVisual"><div className="heroCard"><img onError={imageErrorFallback} src={settings?.homepage_image||settings?.banners?.[0]?.image||products[0].img}/><div><b>Sheesham Collection</b><span>Built for generations</span></div></div><div className="floatBadge">100%<small>Solid Wood</small></div></div>
   </section>
 
@@ -437,7 +437,7 @@ function Home({add,toggleWish,wish,settings}){
     <img className="craftPosterImage" src="/craft-poster.webp" alt="Woodenara solid wood furniture and craftsmanship" onError={(e)=>{e.currentTarget.onerror=null;e.currentTarget.src=products[9]?.img||products[0]?.img||"";}} />
     <span>HANDCRAFTED</span>
    </div>
-   <div className="craftCopy"><span className="eyebrow">MADE BY HAND</span><h2>Good furniture<br/><em>takes its time.</em></h2><p>From carefully selected timber to the final hand-finished surface, each Woodenara furniture is made with patience, precision and respect for the material.</p><div className="craftStats"><div><b>25+</b><span>Years of craft</span></div><div><b>100%</b><span>Solid wood focus</span></div><div><b>1-by-1</b><span>Quality checked</span></div></div><Link className="btn dark" to="/cart">Discover our craft <ArrowRight/></Link></div>
+   <div className="craftCopy"><span className="eyebrow">MADE BY HAND</span><h2>Good furniture<br/><em>takes its time.</em></h2><p>We choose each piece of timber with care. Our team shapes, sands and finishes every piece by hand, with a focus on quality and everyday use.</p><div className="craftStats"><div><b>25+</b><span>Years of craft</span></div><div><b>100%</b><span>Solid wood focus</span></div><div><b>1-by-1</b><span>Quality checked</span></div></div><Link className="btn dark" to="/blog">Discover our craft <ArrowRight/></Link></div>
   </section>
 
   {/* 07 Best sellers */}
