@@ -502,6 +502,7 @@ function Home({add,toggleWish,wish,settings}){
    <h2 id="woodenara-home-guide" style={{fontSize:"clamp(26px,3vw,40px)",lineHeight:1.15,margin:"12px 0 18px"}}>Furniture for everyday living</h2>
    <div style={{maxWidth:900,lineHeight:1.8,color:"var(--muted,#6f6a63)"}}>
     <p>Make your home feel warm, useful and easy to enjoy. Woodenara offers beds, sofas, dining tables, chairs, cabinets and desks for many kinds of rooms. You may be setting up a new home or giving one room a fresh look. Start by thinking about how you use the space each day. Choose pieces that feel good, fit well and meet your needs.</p>
+    <details className="homeSeoReadMore"><summary>Read more about choosing and caring for furniture</summary>
     <h3>Choose the right size and finish</h3>
     <p>Measure your room before you buy. Leave enough space to walk around each item and open doors or drawers. Check the product dimensions and make sure the item can pass through your doorway and stairs. Look at the finish, colour and care details on each product page. These simple checks can help you choose with confidence.</p>
     <p>Our Sheesham range shows the natural grain and warm tones of this hardwood. The grain may look different from one item to another. This is a natural feature of the material. Read the details for each product to learn about its build, finish and size before placing an order.</p>
@@ -514,12 +515,14 @@ function Home({add,toggleWish,wish,settings}){
     <h3>Shop with useful details in mind</h3>
     <p>Use the collection pages to explore styles for different rooms. Open a product page to review its price, dimensions, material and other available details. Compare a few options and think about how each one will work in your home. If you need more ideas, visit the Woodenara Journal for simple room-planning tips and care guides.</p>
     <p>Our aim is to help you make a clear, informed choice. Take your time, measure your space and choose pieces that suit your home and daily routine.</p>
+    </details>
    </div>
   </section>
 
   {/* Homepage buying guide: common questions answered in plain language */}
   <section className="homeSection" aria-labelledby="woodenara-buying-help" style={{maxWidth:1120,margin:"0 auto",padding:"8px 24px 48px"}}>
    <h2 id="woodenara-buying-help" style={{fontSize:"clamp(24px,2.6vw,34px)",lineHeight:1.2,margin:"0 0 20px"}}>Helpful tips before you choose</h2>
+   <details className="homeSeoReadMore"><summary>Read more: helpful tips before you choose</summary>
    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:24,lineHeight:1.75,color:"var(--muted,#6f6a63)"}}>
     <article>
      <h3>How do I choose the right size?</h3>
@@ -538,6 +541,7 @@ function Home({add,toggleWish,wish,settings}){
      <p>Start with the main item, such as a bed, sofa or dining table. Choose other pieces that leave enough open space and suit the way you use the room. Similar finishes can create a joined-up look, while a different texture or colour can add contrast. Keep daily comfort and storage needs in mind.</p>
     </article>
    </div>
+   </details>
   </section>
 
 
@@ -545,6 +549,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* Helpful shopping guide: adds practical, readable homepage content */}
   <section className="homeSection" aria-labelledby="woodenara-home-faq" style={{maxWidth:1120,margin:"0 auto",padding:"8px 24px 48px"}}>
    <h2 id="woodenara-home-faq" style={{fontSize:"clamp(24px,2.6vw,34px)",lineHeight:1.2,margin:"0 0 20px"}}>A few things to know before ordering</h2>
+   <details className="homeSeoReadMore"><summary>Read more: answers before ordering</summary>
    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:24,lineHeight:1.75,color:"var(--muted,#6f6a63)"}}>
     <article>
      <h3>Will the item fit my room?</h3>
@@ -563,6 +568,7 @@ function Home({add,toggleWish,wish,settings}){
      <p>Start with the product details and the Shipping & Returns information. If you still have a question about a size, finish or order, contact Woodenara before purchasing. You can also explore the Journal for room-planning ideas and simple care advice. A little research can make it easier to choose pieces that suit your space and routine.</p>
     </article>
    </div>
+   </details>
   </section>
 
   {/* 16 Newsletter */}
