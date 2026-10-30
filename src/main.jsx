@@ -541,28 +541,7 @@ function Home({add,toggleWish,wish,settings}){
    </div>
    </details>
 
-  {/* Helpful shopping guide: answers before ordering */}
-   <h2 id="woodenara-home-faq" style={{fontSize:"clamp(24px,2.6vw,34px)",lineHeight:1.2,margin:"0 0 20px"}}>A few things to know before ordering</h2>
-   <details className="homeSeoReadMore"><summary>Read more: answers before ordering</summary>
-   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:24,lineHeight:1.75,color:"var(--muted,#6f6a63)"}}>
-    <article>
-     <h3>Will the item fit my room?</h3>
-     <p>Check the full height, width and depth on the product page, then mark the footprint on your floor if possible. Leave enough space for doors, drawers and walking paths. Also check the route from the entrance to the room, including stairways, lifts and narrow turns. These steps can help avoid surprises on delivery day.</p>
-    </article>
-    <article>
-     <h3>Why can the grain look different?</h3>
-     <p>Solid timber has natural variations in grain, shade and pattern. These differences are part of the material, so the delivered piece may not look exactly like every detail in a product photograph. Read the product description for the listed finish and construction, and contact the team if you need clarification before ordering.</p>
-    </article>
-    <article>
-     <h3>How should I compare products?</h3>
-     <p>Compare more than the price. Review the dimensions, materials, finish, storage options and care notes, then think about how often you will use the item. For a shared space, consider the number of people who need to sit or dine comfortably. For a bedroom or study, leave room for movement and everyday essentials.</p>
-    </article>
-    <article>
-     <h3>Where can I get help?</h3>
-     <p>Start with the product details and the Shipping & Returns information. If you still have a question about a size, finish or order, contact Woodenara before purchasing. You can also explore the Journal for room-planning ideas and simple care advice. A little research can make it easier to choose pieces that suit your space and routine.</p>
-    </article>
-   </div>
-   </details>
+  {/* Keep the homepage buying guide concise; detailed questions are covered above. */}
   </section>
 
   {/* 16 Newsletter */}
