@@ -509,7 +509,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 11 Social proof */}
   <section className="homeSection reviewSection">
    <SectionTitle kicker="REAL HOMES. REAL STORIES." title="Loved by people who love home."/>
-   <div className="reviewGrid">{testimonials.slice(0,1).map((t,i)=><article className="reviewCard" key={t[1]}><div className="reviewStars">★★★★★</div><p>{t[0]}</p><b>{t[1]}</b><span>{t[2]}</span></article>)}</div>
+   <div className="reviewGrid">{testimonials.slice(0,3).map((t,i)=><article className="reviewCard" key={t[1]}><div className="reviewStars">★★★★★</div><p>{t[0]}</p><b>{t[1]}</b><span>{t[2]}</span></article>)}</div>
   </section>
 
   {/* 12 Process */}
