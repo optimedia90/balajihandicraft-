@@ -1067,7 +1067,7 @@ app.put("/api/admin/seo",auth,asyncHandler(async(req,res)=>{ await ensureAdminCo
 app.get("/api/store/blog",asyncHandler(async(req,res)=>{ const [items]=await db.query("SELECT * FROM blog_posts WHERE status IS NULL OR status='published' OR status='active' ORDER BY id DESC"); res.json({items}); }));
 app.get("/api/store/banners",asyncHandler(async(req,res)=>{ const [items]=await db.query("SELECT * FROM banners ORDER BY id DESC"); res.json({items}); }));
 app.get("/api/store/products",asyncHandler(async(req,res)=>{
-  await ensureProductFields();
+  // Product fields are ensured once during server startup; avoid SHOW COLUMNS/ALTER checks on every storefront request.
   const [rows]=await db.query("SELECT p.*, c.name AS category_name, s.name AS subcategory_name FROM products p LEFT JOIN categories c ON c.id=p.category_id LEFT JOIN subcategories s ON s.id=p.subcategory_id WHERE p.status IS NULL OR p.status=1 OR p.status=? ORDER BY p.id DESC",["active"]);
   await repairProductImages(rows);
   res.json({products:rows});
