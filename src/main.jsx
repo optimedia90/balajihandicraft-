@@ -517,10 +517,8 @@ function Home({add,toggleWish,wish,settings}){
     <p>Our aim is to help you make a clear, informed choice. Take your time, measure your space and choose pieces that suit your home and daily routine.</p>
     </details>
    </div>
-  </section>
 
   {/* Homepage buying guide: common questions answered in plain language */}
-  <section className="homeSection" aria-labelledby="woodenara-buying-help" style={{maxWidth:1120,margin:"0 auto",padding:"8px 24px 48px"}}>
    <h2 id="woodenara-buying-help" style={{fontSize:"clamp(24px,2.6vw,34px)",lineHeight:1.2,margin:"0 0 20px"}}>Helpful tips before you choose</h2>
    <details className="homeSeoReadMore"><summary>Read more: helpful tips before you choose</summary>
    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:24,lineHeight:1.75,color:"var(--muted,#6f6a63)"}}>
@@ -542,12 +540,8 @@ function Home({add,toggleWish,wish,settings}){
     </article>
    </div>
    </details>
-  </section>
 
-
-
-  {/* Helpful shopping guide: adds practical, readable homepage content */}
-  <section className="homeSection" aria-labelledby="woodenara-home-faq" style={{maxWidth:1120,margin:"0 auto",padding:"8px 24px 48px"}}>
+  {/* Helpful shopping guide: answers before ordering */}
    <h2 id="woodenara-home-faq" style={{fontSize:"clamp(24px,2.6vw,34px)",lineHeight:1.2,margin:"0 0 20px"}}>A few things to know before ordering</h2>
    <details className="homeSeoReadMore"><summary>Read more: answers before ordering</summary>
    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:24,lineHeight:1.75,color:"var(--muted,#6f6a63)"}}>
