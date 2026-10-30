@@ -387,7 +387,7 @@ function Home({add,toggleWish,wish,settings}){
  return <>
   {/* 01 Hero */}
   <section className="hero homeReveal">
-   <div className="heroText"><span className="eyebrow">THE ART OF BETTER LIVING</span><h1>{settings?.homepage_hero||"Furniture with character."}</h1><p>{settings?.homepage_subtitle||"Discover handcrafted furniture made to bring comfort and warmth to your home."}</p><div className="actions"><Link className="btn dark" to="/shop">Shop Furniture <ArrowRight/></Link><Link className="textlink" to="/blog">Our craftsmanship →</Link></div></div>
+   <div className="heroText"><span className="eyebrow">THE ART OF BETTER LIVING</span><h1>{settings?.homepage_hero||"Furniture with character."}</h1><p>{settings?.homepage_subtitle||"Shop solid Sheesham wood furniture, bedroom essentials and home decor made for comfortable everyday living."}</p><div className="actions"><Link className="btn dark" to="/shop">Shop Furniture <ArrowRight/></Link><Link className="textlink" to="/blog">Our craftsmanship →</Link></div></div>
    <div className="heroVisual"><div className="heroCard"><img onError={imageErrorFallback} src={settings?.homepage_image||settings?.banners?.[0]?.image||products[0].img}/><div><b>Sheesham Collection</b><span>Built for generations</span></div></div><div className="floatBadge">100%<small>Solid Wood</small></div></div>
   </section>
 
@@ -410,6 +410,17 @@ function Home({add,toggleWish,wish,settings}){
      <span className="quickCollectionImage"><img onError={imageErrorFallback} src={item.img||products[0]?.img} alt={item.name}/></span>
      <span className="quickCollectionLabel">{item.name}</span>
     </Link>)}
+   </div>
+  </section>
+
+  {/* Homepage SEO content: useful copy for visitors and search engines */}
+  <section className="homeSection" aria-labelledby="woodenara-home-guide" style={{maxWidth:1120,margin:"0 auto",padding:"52px 24px"}}>
+   <span className="eyebrow">A THOUGHTFUL HOME STARTS HERE</span>
+   <h2 id="woodenara-home-guide" style={{fontSize:"clamp(26px,3vw,40px)",lineHeight:1.15,margin:"12px 0 18px"}}>Solid wood furniture for everyday living</h2>
+   <div style={{maxWidth:820,lineHeight:1.8,color:"var(--muted,#6f6a63)"}}>
+    <p>Woodenara brings together furniture and home accents made to feel at home in your space. Explore beds, sofas, dining tables, storage pieces and desks for rooms of every size. Choose designs that suit your routine, your taste and the way you use your home.</p>
+    <p>Looking for a natural finish? Discover solid Sheesham wood furniture with distinctive grain and a warm, lasting look. Compare product details, dimensions and finishes to find the right fit for your room. Each piece is selected with comfort, useful storage and everyday function in mind.</p>
+    <p>Start with the room you want to refresh. Browse bedroom furniture for restful spaces, living room pieces for gathering with family, or dining furniture for shared meals. You can also explore home styling ideas in the Woodenara Journal for simple guidance on choosing materials, caring for furniture and making a room feel more inviting.</p>
    </div>
   </section>
 
