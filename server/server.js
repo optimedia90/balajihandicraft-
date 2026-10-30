@@ -1,4 +1,5 @@
 import express from "express";
+import compression from "compression";
 import path from "path";
 import {fileURLToPath} from "url";
 import dotenv from "dotenv";
@@ -10,6 +11,8 @@ import fs from "fs";
 dotenv.config();
 
 const app=express();
+// Compress eligible text responses (HTML, CSS, JavaScript, JSON, SVG) with gzip/deflate when supported.
+app.use(compression({threshold:1024,level:6}));
 const __filename=fileURLToPath(import.meta.url);
 const __dirname=path.dirname(__filename);
 // Keep new uploads outside the deployed source tree when possible.
@@ -1155,7 +1158,7 @@ app.use((err,req,res,next)=>{
 });
 
 const dist=path.resolve(__dirname,"../dist");
-app.use(express.static(dist));
+app.use(express.static(dist,{maxAge:"1y",immutable:true,setHeaders(res,filePath){if(filePath.endsWith("index.html")){res.setHeader("Cache-Control","no-cache");}}}));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
 app.listen(PORT,async()=>{
