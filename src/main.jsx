@@ -406,7 +406,7 @@ function Home({add,toggleWish,wish,settings}){
      {name:"Home Decor",cat:"Home Decor",img:products[5]?.img},
      {name:"Decorative",cat:"Decorative",img:products[6]?.img},
      {name:"New Arrivals",cat:"",img:products[8]?.img}
-     ].slice(0,4).map(item=><Link className="quickCollectionItem" to={item.cat?"/shop?cat="+encodeURIComponent(item.cat):"/shop?sort=newest"} key={item.name}>
+     ].slice(0,3).map(item=><Link className="quickCollectionItem" to={item.cat?"/shop?cat="+encodeURIComponent(item.cat):"/shop?sort=newest"} key={item.name}>
      <span className="quickCollectionImage"><img onError={imageErrorFallback} src={item.img||products[0]?.img} alt={item.name}/></span>
      <span className="quickCollectionLabel">{item.name}</span>
     </Link>)}
@@ -460,7 +460,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 03 Categories */}
   <section className="homeSection categorySection">
    <SectionTitle kicker="CURATED FOR YOUR HOME" title="Shop by category" link="/shop"/>
-   <div className="catGrid categoryReveal">{cats.slice(1).map(([n,c])=>{const product=categoryCardProduct(c);return <Link to={"/shop?cat="+c} className="catTile" key={n}>{product?.img?<img onError={imageErrorFallback} src={product.img} alt={product.name}/>:<div className="catTileNoImage" aria-label={"No "+n+" product image available"}/>}<div><b>{n}</b><span>Explore collection <ArrowRight/></span></div></Link>})}</div>
+   <div className="catGrid categoryReveal">{cats.slice(1,7).map(([n,c])=>{const product=categoryCardProduct(c);return <Link to={"/shop?cat="+c} className="catTile" key={n}>{product?.img?<img onError={imageErrorFallback} src={product.img} alt={product.name}/>:<div className="catTileNoImage" aria-label={"No "+n+" product image available"}/>}<div><b>{n}</b><span>Explore collection <ArrowRight/></span></div></Link>})}</div>
   </section>
 
   {/* 04 Featured products */}
@@ -472,7 +472,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 05 Room inspiration */}
   <section className="homeRooms">
    <div className="homeRoomsHead"><div><span className="eyebrow">DESIGNED AROUND YOU</span><h2>Find your room's<br/><em>signature piece.</em></h2></div><p>Explore furniture collections designed to work together, so every corner of your home feels intentional.</p></div>
-   <div className="roomGrid">{roomCards.slice(0,3).map((r,i)=><Link to={"/shop?cat="+["Sofas","Beds","Dining","Tables"][i]} className="roomCard" key={r.name}><img onError={imageErrorFallback} src={r.img}/><div><small>0{i+1}</small><b>{r.name}</b><span>{r.sub}</span></div></Link>)}</div>
+   <div className="roomGrid">{roomCards.slice(0,2).map((r,i)=><Link to={"/shop?cat="+["Sofas","Beds","Dining","Tables"][i]} className="roomCard" key={r.name}><img onError={imageErrorFallback} src={r.img}/><div><small>0{i+1}</small><b>{r.name}</b><span>{r.sub}</span></div></Link>)}</div>
   </section>
 
   {/* 06 Craftsmanship */}
@@ -503,7 +503,7 @@ function Home({add,toggleWish,wish,settings}){
   <section className="newArrivalSection">
    <div className="newArrivalVisual"><img src="/craft-poster.webp" alt="Woodenara solid wood furniture poster" onError={(e)=>{e.currentTarget.onerror=null;e.currentTarget.src=products[8]?.img||products[0]?.img||"";}}/><div><span>NEW ARRIVAL</span><b>Live Edge<br/>Collection</b></div></div>
    <div className="newArrivalCopy"><span className="eyebrow">JUST LANDED</span><h2>Fresh forms.<br/><em>Natural edges.</em></h2><p>New silhouettes inspired by organic shapes, expressive grain and modern living.</p><Link className="btn dark" to="/shop">Shop new arrivals <ArrowRight/></Link></div>
-   <div className="newArrivalMini">{products.slice(8,12).map(p=><Link to={"/product?id="+p.id} key={p.id}><img onError={imageErrorFallback} src={p.img}/><span>{p.name}</span><b>{fmt(p.price)}</b></Link>)}</div>
+   <div className="newArrivalMini">{products.slice(8,10).map(p=><Link to={"/product?id="+p.id} key={p.id}><img onError={imageErrorFallback} src={p.img}/><span>{p.name}</span><b>{fmt(p.price)}</b></Link>)}</div>
   </section>
 
   {/* 11 Social proof */}
