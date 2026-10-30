@@ -350,7 +350,7 @@ function Header({cart,wish,currency,setCurrency,settings,menus=categoryMenus}){
  </div>
  <Link to="/" className="logo desktopBrand"><img className="brandLogoImage" src={woodenaraLogoSrc||undefined} alt="Woodenara logo"/><span><b>WOODENARA</b><small>FURNITURE &amp; HOME DECOR</small></span></Link>
  <nav className={open?"mobile open":"mobile"}>{primaryMenus.map(renderMenu)}<div className="navMenu allFurnitureMenu"><Link className="navMenuTitle" to="/shop" onClick={()=>setOpen(false)}>All Furniture</Link></div></nav>
- <div className="navicons"><div className="currencySwitcher"><span>{currency==="USD"?"🇺🇸":"🇮🇳"}</span><select aria-label="Currency" value={currency} onChange={e=>setCurrency(e.target.value)}><option value="USD">USD ($)</option><option value="INR">INR (₹)</option></select></div><button className="desktopSearch" onClick={()=>setSearch(!search)} aria-label="Search"><Search/></button><Link to="/wishlist" className="countIcon desktopWishlist"><Heart/><i>{wish}</i></Link><Link to="/account" className="desktopAccount"><User/></Link><Link to="/cart" className="countIcon desktopCart"><ShoppingBag/><i>{cart}</i></Link><button className="hamb desktopHamb" onClick={()=>setOpen(!open)}>{open?<X/>:<Menu/>}</button></div></div>
+ <div className="navicons"><div className="currencySwitcher"><span>{currency==="USD"?"🇺🇸":"🇮🇳"}</span><select aria-label="Currency" value={currency} onChange={e=>setCurrency(e.target.value)}><option value="USD">USD ($)</option><option value="INR">INR (₹)</option></select></div><button className="desktopSearch" onClick={()=>setSearch(!search)} aria-label="Search"><Search/></button><Link to="/wishlist" className="countIcon desktopWishlist"><Heart/><i>{wish}</i></Link><Link to="/account" className="desktopAccount"><User/></Link><Link to="/cart" className="countIcon desktopCart" aria-label="Shopping bag"><ShoppingBag/><i>{cart}</i></Link><button className="hamb desktopHamb" onClick={()=>setOpen(!open)}>{open?<X/>:<Menu/>}</button></div></div>
  <form className="searchbar mobileSearchbar" onSubmit={e=>{e.preventDefault();const query=searchQuery.trim();if(query){navigate("/shop?q="+encodeURIComponent(query));setSearch(false);setOpen(false)}}}><Search/><input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="Search furniture..." aria-label="Search products"/><button type="submit" aria-label="Submit product search"><ArrowRight size={18}/></button><div className="mobileCurrency currencySwitcher"><span>{currency==="USD"?"🇺🇸":"🇮🇳"}</span><select aria-label="Currency" value={currency} onChange={e=>setCurrency(e.target.value)}><option value="USD">USD ($)</option><option value="INR">INR (₹)</option></select></div></form>
  {search&&<form className="searchbar desktopSearchbar" onSubmit={e=>{e.preventDefault();const query=searchQuery.trim();if(query){navigate("/shop?q="+encodeURIComponent(query));setSearch(false);setOpen(false)}}}><Search/><input autoFocus value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="Search beds, sofas, dining tables..." aria-label="Search products"/><button type="submit" aria-label="Submit product search"><ArrowRight size={18}/></button></form>}
  </header>
@@ -511,10 +511,10 @@ function Home({add,toggleWish,wish,settings}){
   <section className="homeSection journalSection">
    <SectionTitle kicker="FROM THE JOURNAL" title="Ideas for better living." link="/blog"/>
    <div className="journalGrid">{[
-    ["How to choose the right wood for your home",products[0]?.img,"MATERIAL GUIDE"],
+    ["How to choose the right material for your home",products[0]?.img,"MATERIAL GUIDE"],
     ["5 ways to make a living room feel warmer",products[1]?.img,"HOME EDIT"],
     ["The details that make handcrafted furniture special",products[0]?.img,"CRAFT"]
-   ].map(x=><Link to="/blog" className="journalCard" key={x[0]}><img onError={imageErrorFallback} src={x[1]}/><span>{x[2]}</span><h3>{x[0]}</h3><b>Read story <ArrowRight/></b></Link>)}</div>
+   ].map(x=><article className="journalCard" key={x[0]}><img onError={imageErrorFallback} src={x[1]} alt={x[0]}/><span>{x[2]}</span><h3>{x[0]}</h3><p>Explore practical ideas and simple tips in the Woodenara Journal.</p></article>)}</div>
   </section>
 
   {/* 16 Newsletter */}
