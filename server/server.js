@@ -1160,7 +1160,7 @@ app.use((err,req,res,next)=>{
 const dist=path.resolve(__dirname,"../dist");
 app.use(express.static(dist,{maxAge:"1y",immutable:true,setHeaders(res,filePath){
   if(filePath.endsWith("index.html"))res.setHeader("Cache-Control","no-cache");
-  else if(/.(?:js|css|woff2?|ttf|svg|png|jpe?g|webp|avif|ico)$/i.test(filePath))res.setHeader("Cache-Control","public, max-age=31536000, immutable");
+  else if(/[.](?:js|css|woff2?|ttf|svg|png|jpe?g|webp|avif|ico)$/i.test(filePath))res.setHeader("Cache-Control","public, max-age=31536000, immutable");
 }}));
 app.get("*",(req,res)=>res.sendFile(path.join(dist,"index.html")));
 
