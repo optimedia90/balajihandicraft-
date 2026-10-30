@@ -406,7 +406,7 @@ function Home({add,toggleWish,wish,settings}){
      {name:"Home Decor",cat:"Home Decor",img:products[5]?.img},
      {name:"Decorative",cat:"Decorative",img:products[6]?.img},
      {name:"New Arrivals",cat:"",img:products[8]?.img}
-    ].slice(0,6).map(item=><Link className="quickCollectionItem" to={item.cat?"/shop?cat="+encodeURIComponent(item.cat):"/shop?sort=newest"} key={item.name}>
+     ].slice(0,4).map(item=><Link className="quickCollectionItem" to={item.cat?"/shop?cat="+encodeURIComponent(item.cat):"/shop?sort=newest"} key={item.name}>
      <span className="quickCollectionImage"><img onError={imageErrorFallback} src={item.img||products[0]?.img} alt={item.name}/></span>
      <span className="quickCollectionLabel">{item.name}</span>
     </Link>)}
@@ -443,13 +443,13 @@ function Home({add,toggleWish,wish,settings}){
   {/* 04 Featured products */}
   <section className="homeSection featuredSection">
    <SectionTitle kicker="CURATED PICKS" title="Pieces worth coming home to." link="/shop"/>
-   <div className="productLift"><ProductGrid items={products.slice(0,3)} add={add} toggleWish={toggleWish} wish={wish}/></div>
+   <div className="productLift"><ProductGrid items={products.slice(0,2)} add={add} toggleWish={toggleWish} wish={wish}/></div>
   </section>
 
   {/* 05 Room inspiration */}
   <section className="homeRooms">
    <div className="homeRoomsHead"><div><span className="eyebrow">DESIGNED AROUND YOU</span><h2>Find your room's<br/><em>signature piece.</em></h2></div><p>Explore furniture collections designed to work together, so every corner of your home feels intentional.</p></div>
-   <div className="roomGrid">{roomCards.map((r,i)=><Link to={"/shop?cat="+["Sofas","Beds","Dining","Tables"][i]} className="roomCard" key={r.name}><img onError={imageErrorFallback} src={r.img}/><div><small>0{i+1}</small><b>{r.name}</b><span>{r.sub}</span></div></Link>)}</div>
+   <div className="roomGrid">{roomCards.slice(0,3).map((r,i)=><Link to={"/shop?cat="+["Sofas","Beds","Dining","Tables"][i]} className="roomCard" key={r.name}><img onError={imageErrorFallback} src={r.img}/><div><small>0{i+1}</small><b>{r.name}</b><span>{r.sub}</span></div></Link>)}</div>
   </section>
 
   {/* 06 Craftsmanship */}
@@ -464,7 +464,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 07 Best sellers */}
   <section className="homeSection bestSection">
    <SectionTitle kicker="MOST LOVED" title="Bestselling pieces" link="/shop"/>
-   <div className="productWave"><ProductGrid items={products.slice(4,6)} add={add} toggleWish={toggleWish} wish={wish}/></div>
+   <div className="productWave"><ProductGrid items={products.slice(4,5)} add={add} toggleWish={toggleWish} wish={wish}/></div>
   </section>
 
   {/* 08 Brand statement / marquee */}
@@ -473,7 +473,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 09 Materials */}
   <section className="homeSection materialSection">
    <SectionTitle kicker="THE MATERIAL STORY" title="Choose your character." link="/shop"/>
-   <div className="materialGrid">{materials.slice(0,3).map((m,i)=><Link to="/shop" className="materialCard" key={m.name}><div className="materialImg"><img onError={imageErrorFallback} src={m.img}/><span>0{i+1}</span></div><div><h3>{m.name}</h3><p>{m.text}</p><ArrowRight/></div></Link>)}</div>
+   <div className="materialGrid">{materials.slice(0,2).map((m,i)=><Link to="/shop" className="materialCard" key={m.name}><div className="materialImg"><img onError={imageErrorFallback} src={m.img}/><span>0{i+1}</span></div><div><h3>{m.name}</h3><p>{m.text}</p><ArrowRight/></div></Link>)}</div>
   </section>
 
   {/* 10 New arrivals */}
@@ -486,7 +486,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 11 Social proof */}
   <section className="homeSection reviewSection">
    <SectionTitle kicker="REAL HOMES. REAL STORIES." title="Loved by people who love home."/>
-   <div className="reviewGrid">{testimonials.slice(0,2).map((t,i)=><article className="reviewCard" key={t[1]}><div className="reviewStars">★★★★★</div><p>{t[0]}</p><b>{t[1]}</b><span>{t[2]}</span></article>)}</div>
+   <div className="reviewGrid">{testimonials.slice(0,1).map((t,i)=><article className="reviewCard" key={t[1]}><div className="reviewStars">★★★★★</div><p>{t[0]}</p><b>{t[1]}</b><span>{t[2]}</span></article>)}</div>
   </section>
 
   {/* 12 Process */}
@@ -504,7 +504,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 14 More to explore */}
   <section className="homeSection exploreSection">
    <SectionTitle kicker="MORE TO EXPLORE" title="Complete the room." link="/shop"/>
-   <div className="exploreGrid">{products.slice(0,3).map((p,i)=><Link to={"/product?id="+p.id} className="exploreCard" key={p.id}><img onError={imageErrorFallback} src={p.img||demoProducts[i]?.img||demoProducts[0]?.img} alt={p.name}/><div><span>0{i+1}</span><h3>{p.name}</h3><b>View piece <ArrowRight/></b></div></Link>)}</div>
+   <div className="exploreGrid">{products.slice(0,2).map((p,i)=><Link to={"/product?id="+p.id} className="exploreCard" key={p.id}><img onError={imageErrorFallback} src={p.img||demoProducts[i]?.img||demoProducts[0]?.img} alt={p.name}/><div><span>0{i+1}</span><h3>{p.name}</h3><b>View piece <ArrowRight/></b></div></Link>)}</div>
   </section>
 
   {/* 15 Journal */}
@@ -514,7 +514,7 @@ function Home({add,toggleWish,wish,settings}){
     ["How to choose the right material for your home",products[0]?.img,"MATERIAL GUIDE"],
     ["5 ways to make a living room feel warmer",products[1]?.img,"HOME EDIT"],
     ["The details that make handcrafted furniture special",products[0]?.img,"CRAFT"]
-   ].slice(0,2).map(x=><article className="journalCard" key={x[0]}><img onError={imageErrorFallback} src={x[1]} alt={x[0]}/><span>{x[2]}</span><h3>{x[0]}</h3><p>Explore practical ideas and simple tips in the Woodenara Journal.</p></article>)}</div>
+    ].slice(0,1).map(x=><article className="journalCard" key={x[0]}><img onError={imageErrorFallback} src={x[1]} alt={x[0]}/><span>{x[2]}</span><h3>{x[0]}</h3><p>Explore practical ideas and simple tips in the Woodenara Journal.</p></article>)}</div>
   </section>
 
   {/* 16 Newsletter */}
