@@ -25,6 +25,7 @@
     "mysql2": "3.14.3",
     "multer": "1.4.5-lts.1",
     "rollup": "4.34.8",
-    "nodemailer": "^6.10.1"
+    "nodemailer": "^6.10.1",
+    "compression": "^1.8.1"
   }
 }
