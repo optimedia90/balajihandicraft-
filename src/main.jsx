@@ -346,7 +346,7 @@ function Header({cart,wish,currency,setCurrency,settings,menus=categoryMenus}){
  <div className="mobileHeader">
   <button className="mobileHamb" onClick={()=>setOpen(!open)} aria-label="Toggle menu">{open?<X/>:<Menu/>}</button>
   <Link to="/" className="mobileBrand" aria-label="Woodenara home"><img className="brandLogoImage" src={woodenaraLogoSrc||undefined} alt="Woodenara logo"/></Link>
-  <div className="mobileHeaderActions"><Link to="/wishlist" className="countIcon" aria-label="Wishlist"><Heart/><i>{wish}</i></Link><Link to="/cart" className="countIcon" aria-label="Cart"><ShoppingBag/><i>{cart}</i></Link></div>
+  <div className="mobileHeaderActions"><Link to="/wishlist" className="countIcon" aria-label="Wishlist"><Heart/><i>{wish}</i></Link><Link to="/cart" className="countIcon" aria-label="Shopping bag"><ShoppingBag/><i>{cart}</i></Link></div>
  </div>
  <Link to="/" className="logo desktopBrand"><img className="brandLogoImage" src={woodenaraLogoSrc||undefined} alt="Woodenara logo"/><span><b>WOODENARA</b><small>FURNITURE &amp; HOME DECOR</small></span></Link>
  <nav className={open?"mobile open":"mobile"}>{primaryMenus.map(renderMenu)}<div className="navMenu allFurnitureMenu"><Link className="navMenuTitle" to="/shop" onClick={()=>setOpen(false)}>All Furniture</Link></div></nav>
@@ -416,11 +416,13 @@ function Home({add,toggleWish,wish,settings}){
   {/* Homepage SEO content: useful copy for visitors and search engines */}
   <section className="homeSection" aria-labelledby="woodenara-home-guide" style={{maxWidth:1120,margin:"0 auto",padding:"52px 24px"}}>
    <span className="eyebrow">A THOUGHTFUL HOME STARTS HERE</span>
-   <h2 id="woodenara-home-guide" style={{fontSize:"clamp(26px,3vw,40px)",lineHeight:1.15,margin:"12px 0 18px"}}>Solid wood furniture for everyday living</h2>
-   <div style={{maxWidth:820,lineHeight:1.8,color:"var(--muted,#6f6a63)"}}>
-    <p>Woodenara brings together furniture and home accents made to feel at home in your space. Explore beds, sofas, dining tables, storage pieces and desks for rooms of every size. Choose designs that suit your routine, your taste and the way you use your home.</p>
-    <p>Looking for a natural finish? Discover solid Sheesham wood furniture with distinctive grain and a warm, lasting look. Compare product details, dimensions and finishes to find the right fit for your room. Each piece is selected with comfort, useful storage and everyday function in mind.</p>
-    <p>Start with the room you want to refresh. Browse bedroom furniture for restful spaces, living room pieces for gathering with family, or dining furniture for shared meals. You can also explore home styling ideas in the Woodenara Journal for simple guidance on choosing materials, caring for furniture and making a room feel more inviting.</p>
+   <h2 id="woodenara-home-guide" style={{fontSize:"clamp(26px,3vw,40px)",lineHeight:1.15,margin:"12px 0 18px"}}>Furniture chosen for real life</h2>
+   <div style={{maxWidth:900,lineHeight:1.8,color:"var(--muted,#6f6a63)"}}>
+    <p>Woodenara brings together considered furniture and home accents for the way people live today. Browse beds, sofas, dining tables, cabinets, desks and finishing touches for rooms both large and small. Whether you are furnishing a new home or refreshing a familiar corner, start with pieces that balance comfort, practical use and a look you will enjoy for years.</p>
+    <p><strong>Find the right material and finish.</strong> Our Sheesham collection celebrates distinctive natural grain, sturdy construction and warm tones. Product pages help you compare dimensions, finishes and key details before choosing a piece. Check the measurements against your room, doorways and existing furniture so your selection feels right at home.</p>
+    <p><strong>Make every room work better.</strong> Create a welcoming living area with comfortable seating and useful side tables. Choose a bed and bedside storage to make the bedroom feel calm and organised. For shared meals, explore dining tables and chairs; for busy everyday spaces, consider cabinets, dressers and desks that keep essentials close at hand.</p>
+    <p><strong>Care that helps pieces last.</strong> Dust surfaces with a soft cloth, wipe spills promptly and use coasters to protect finishes. Avoid prolonged moisture and direct heat, and follow the care guidance supplied with your item. Natural grain and tone can vary from piece to piece, giving each finish its own character.</p>
+    <p>Need ideas before you decide? Visit the Woodenara Journal for room-planning tips, material guides and simple care advice. Explore the collections, review each product's specifications and choose furniture that fits your space, your routine and your personal style.</p>
    </div>
   </section>
 
