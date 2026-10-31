@@ -1064,3 +1064,14 @@ body{min-height:100vh}
  .sectionTitle>a{display:inline-flex!important;flex:0 0 auto!important;flex-wrap:nowrap!important;white-space:nowrap!important;word-break:keep-all!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important;width:auto!important;min-width:max-content!important;margin:0 0 7px 8px!important;padding:8px 0!important;font-size:11px!important;line-height:1!important;}
  .sectionTitle>a svg{flex:0 0 15px!important;width:15px!important;height:15px!important;}
 }
+
+/* Mobile room inspiration cards: keep product names readable without covering the photos */
+@media(max-width:600px){
+ .roomGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;padding:0 13px!important;}
+ .roomCard{height:205px!important;min-width:0!important;}
+ .roomCard:after{inset:42% 0 0!important;background:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.35) 35%,rgba(0,0,0,.82) 100%)!important;}
+ .roomCard div{left:12px!important;right:10px!important;bottom:12px!important;}
+ .roomCard small{font-size:8px!important;letter-spacing:1px!important;margin-bottom:5px!important;}
+ .roomCard b{font:600 14px/1.18 Georgia,serif!important;margin-bottom:5px!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:3!important;overflow:hidden!important;overflow-wrap:anywhere!important;}
+ .roomCard span{font-size:9px!important;line-height:1.25!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;}
+}
