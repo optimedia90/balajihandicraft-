@@ -921,7 +921,7 @@ body{min-height:100vh}
     padding:0 12px 10px!important;gap:0!important;
   }
   .mobileHeader{
-    display:grid!important;grid-template-columns:40px minmax(0,1fr) 80px;
+    display:grid!important;grid-template-columns:40px auto minmax(0,1fr);
     align-items:center;min-height:54px;width:100%;gap:8px;
   }
   .mobileHamb{
@@ -929,9 +929,9 @@ body{min-height:100vh}
     width:36px;height:40px;padding:0;border:0;background:transparent;color:var(--ink);cursor:pointer;
   }
   .mobileHamb svg{width:23px;height:23px}
-  .mobileBrand{display:flex;align-items:center;justify-content:center;min-width:0}
+  .mobileBrand{display:flex;align-items:center;justify-content:flex-start;min-width:0;justify-self:start}
   .mobileBrand .brandLogoImage{display:block;width:42px;height:42px;object-fit:contain}
-  .mobileHeaderActions{display:flex;align-items:center;justify-content:flex-end;gap:13px}
+  .mobileHeaderActions{display:flex;align-items:center;justify-content:flex-end;gap:13px;grid-column:3;justify-self:end}
   .mobileHeaderActions>a{display:flex;align-items:center;justify-content:center;width:30px;height:36px;position:relative;color:var(--ink)}
   .mobileHeaderActions svg{width:21px;height:21px}
   .mobileHeaderActions .countIcon i{top:-2px;right:-5px}
@@ -960,7 +960,7 @@ body{min-height:100vh}
 }
 @media(max-width:360px){
   .navwrap{padding-left:9px!important;padding-right:9px!important}
-  .mobileHeader{grid-template-columns:34px minmax(0,1fr) 72px;gap:5px}
+  .mobileHeader{grid-template-columns:34px auto minmax(0,1fr);gap:5px}
   .mobileHeaderActions{gap:8px}
   .mobileBrand .brandLogoImage{width:38px;height:38px}
   .mobileCurrency{flex-basis:60px!important;width:60px!important;min-width:60px!important}
@@ -1052,3 +1052,7 @@ body{min-height:100vh}
 @media(max-width:800px){.editorialHero{padding:44px 22px 60px;grid-template-columns:1fr;gap:28px}.editorialHeroImage{height:300px;margin-right:12px}.editorialPrinciples{padding:36px 22px 55px;gap:10px}.editorialPrinciples article{padding:22px 17px}.editorialWorkflow{padding:55px 22px;gap:30px}.editorialWorkflowImage{height:300px}.editorialCorrections{padding:55px 22px;align-items:flex-start;flex-direction:column}}
 @media(max-width:560px){.editorialHero{padding:35px 18px 52px;gap:22px}.editorialHeroCopy h1{font-size:46px;letter-spacing:-1.9px}.editorialHeroCopy>p,.editorialIntro>p,.editorialWorkflowCopy>p,.editorialCorrections p{font-size:13px;line-height:1.75}.editorialHeroImage{height:230px;margin-right:7px}.editorialHeroImage:after{inset:9px -7px -9px 9px}.editorialHeroMeta{font-size:7px;gap:8px;flex-wrap:wrap}.editorialIntro{padding:43px 18px 36px}.editorialIntro h2,.editorialWorkflow h2,.editorialCorrections h2{font-size:34px}.editorialPrinciples{grid-template-columns:1fr;padding:28px 18px 42px;gap:9px}.editorialPrinciples article{min-height:0;padding:20px}.editorialIcon{margin:13px 0 8px}.editorialWorkflow{padding:44px 18px;grid-template-columns:1fr;gap:23px}.editorialWorkflowImage{height:220px}.editorialCorrections{padding:45px 18px;gap:23px}.editorialContactDetails{display:grid;grid-template-columns:1fr 1fr;gap:18px}.editorialEmailButton{padding:14px 16px}.editorialClosing{padding:30px 15px}.editorialClosing p{font-size:16px}}
 
+
+/* Mobile header logo aligned to the left; remove hero secondary-link underline */
+@media(max-width:600px){.mobileBrand{justify-content:flex-start!important;justify-self:start!important}.mobileHeaderActions{grid-column:3!important;justify-self:end!important}}
+.hero .actions .textlink,.hero .actions a.textlink{border-bottom:0!important;text-decoration:none!important;box-shadow:none!important}
