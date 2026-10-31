@@ -4,6 +4,15 @@ import {BrowserRouter,useLocation,useNavigate,useParams,Link} from "react-router
 import {Search,ShoppingBag,Heart,User,Menu,X,ChevronDown,ArrowRight,Star,SlidersHorizontal,Trash2,Minus,Plus,Check,Truck,ShieldCheck,RotateCcw,Instagram,Facebook,Youtube,Home as HomeIcon,LayoutDashboard,Package,ShoppingCart,Users,Image as ImageIcon,FileText,Tag,MessageSquare,Settings,BarChart3,LogOut,Sun,Moon,Bell,ExternalLink,Save,Video,FileImage,Boxes,Ticket,StarHalf,PanelLeftClose,PanelLeftOpen,CalendarDays,Info} from "lucide-react";
 import "./styles.css";
 
+
+const responsiveUnsplashSrcSet=source=>{
+ try{
+  const url=new URL(source,window.location.origin);
+  if(url.hostname!=="images.unsplash.com")return undefined;
+  return [480,768,1200].map(width=>{const sized=new URL(url.href);sized.searchParams.set("w",String(width));sized.searchParams.set("auto","format");return sized.href+" "+width+"w";}).join(", ");
+ }catch{return undefined;}
+};
+
 const demoProducts=[
 {id:1,name:"Sheesham Wood Lattice Bed",category:"Beds",sub:"King Beds",price:699,old:899,rating:4.9,img:"https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=900",tag:"Bestseller"},
 {id:2,name:"Solid Wood Scandinavian Sofa",category:"Sofas",sub:"3 Seater Sofas",price:549,old:699,rating:4.8,img:"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900",tag:"New"},
@@ -336,6 +345,15 @@ function App(){
      setStoreVersion(v=>v+1);
    }).catch(()=>{});
  },[]);
+ useEffect(()=>{
+  if(location.pathname!=="/")return;
+  const source=storeSettings?.homepage_image||storeSettings?.banners?.[0]?.image||demoProducts[0]?.img;
+  if(!source)return;
+  let preload=document.querySelector('link[data-woodenara-lcp]');
+  if(!preload){preload=document.createElement("link");preload.rel="preload";preload.as="image";preload.dataset.woodenaraLcp="true";document.head.appendChild(preload);}
+  preload.href=source;preload.setAttribute("fetchpriority","high");
+  return ()=>preload?.remove();
+ },[location.pathname,storeSettings]);
  const add=p=>setCart(c=>{const x=c.find(i=>i.id===p.id);return x?c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...c,{...p,qty:1}]});
  const toggleWish=p=>setWish(w=>w.some(x=>x.id===p.id)?w.filter(x=>x.id!==p.id):[...w,p]);
   useEffect(()=>{window.scrollTo({top:0,left:0,behavior:"auto"});},[location.pathname,location.search]);
@@ -399,7 +417,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 01 Hero */}
   <section className="hero homeReveal">
    <div className="heroText"><span className="eyebrow">THE ART OF BETTER LIVING</span><h1>{settings?.homepage_hero||"Furniture with character."}</h1><p>{settings?.homepage_subtitle||"Shop solid Sheesham wood furniture, bedroom essentials and home decor made for comfortable everyday living."}</p><div className="actions"><Link className="btn dark" to="/shop">Shop Furniture <ArrowRight/></Link><Link className="textlink" to="/blog">Our craftsmanship →</Link></div></div>
-   <div className="heroVisual"><div className="heroCard"><img fetchPriority="high" loading="eager" decoding="async" onError={imageErrorFallback} src={settings?.homepage_image||settings?.banners?.[0]?.image||products[0].img} alt="Woodenara furniture collection featured on the homepage"/><div><b>Sheesham Collection</b><span>Built for generations</span></div></div><div className="floatBadge">100%<small>Solid Wood</small></div></div>
+   <div className="heroVisual"><div className="heroCard"><img fetchPriority="high" loading="eager" decoding="async" width="900" height="760" sizes="(max-width: 900px) 90vw, 45vw" srcSet={responsiveUnsplashSrcSet(settings?.homepage_image||settings?.banners?.[0]?.image||products[0].img)} onError={imageErrorFallback} src={settings?.homepage_image||settings?.banners?.[0]?.image||products[0].img} alt="Woodenara furniture collection featured on the homepage"/><div><b>Sheesham Collection</b><span>Built for generations</span></div></div><div className="floatBadge">100%<small>Solid Wood</small></div></div>
   </section>
 
   {/* 02 Trust */}
@@ -417,8 +435,8 @@ function Home({add,toggleWish,wish,settings}){
      {name:"Home Decor",cat:"Home Decor",img:products[5]?.img},
      {name:"Decorative",cat:"Decorative",img:products[6]?.img},
      {name:"New Arrivals",cat:"",img:products[8]?.img}
-     ].slice(0,6).map(item=><Link className="quickCollectionItem" to={item.cat?"/shop?cat="+encodeURIComponent(item.cat):"/shop?sort=newest"} key={item.name}>
-     <span className="quickCollectionImage"><img loading="lazy" decoding="async" onError={imageErrorFallback} src={item.img||products[0]?.img} alt={item.name}/></span>
+     ].slice(0,6).map((item,index)=><Link className="quickCollectionItem" to={item.cat?"/shop?cat="+encodeURIComponent(item.cat):"/shop?sort=newest"} key={item.name}>
+     <span className="quickCollectionImage"><img loading={index<3?"eager":"lazy"} fetchPriority={index<3?"high":"auto"} decoding="async" width="360" height="360" sizes="(max-width: 600px) 28vw, 140px" srcSet={responsiveUnsplashSrcSet(item.img||products[0]?.img)} onError={imageErrorFallback} src={item.img||products[0]?.img} alt={item.name}/></span>
      <span className="quickCollectionLabel">{item.name}</span>
     </Link>)}
    </div>
