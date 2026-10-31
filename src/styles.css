@@ -1075,3 +1075,15 @@ body{min-height:100vh}
  .roomCard b{font:600 14px/1.18 Georgia,serif!important;margin-bottom:5px!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:3!important;overflow:hidden!important;overflow-wrap:anywhere!important;}
  .roomCard span{font-size:9px!important;line-height:1.25!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;}
 }
+
+/* Correct mobile styling for the "Complete the room" explore cards */
+@media(max-width:600px){
+ .exploreGrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;}
+ .exploreCard{display:block!important;position:relative!important;aspect-ratio:4/5!important;min-width:0!important;overflow:hidden!important;}
+ .exploreCard:after{inset:38% 0 0!important;background:linear-gradient(to bottom,rgba(0,0,0,0) 0%,rgba(0,0,0,.35) 35%,rgba(0,0,0,.86) 100%)!important;}
+ .exploreCard>div{left:10px!important;right:9px!important;bottom:10px!important;z-index:3!important;}
+ .exploreCard>div>span{display:block!important;font-size:7px!important;line-height:1!important;margin-bottom:4px!important;}
+ .exploreCard h3{font:600 12px/1.18 Georgia,serif!important;letter-spacing:0!important;margin:4px 0 6px!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:3!important;overflow:hidden!important;overflow-wrap:anywhere!important;max-height:3.54em!important;}
+ .exploreCard b{font-size:8px!important;line-height:1.1!important;gap:4px!important;white-space:nowrap!important;}
+ .exploreCard svg{width:10px!important;height:10px!important;flex:0 0 10px!important;}
+}
