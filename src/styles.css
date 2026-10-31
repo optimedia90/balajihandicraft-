@@ -1056,3 +1056,11 @@ body{min-height:100vh}
 /* Mobile header logo aligned to the left; remove hero secondary-link underline */
 @media(max-width:600px){.mobileBrand{justify-content:flex-start!important;justify-self:start!important}.mobileHeaderActions{grid-column:3!important;justify-self:end!important}}
 .hero .actions .textlink,.hero .actions a.textlink{border-bottom:0!important;text-decoration:none!important;box-shadow:none!important}
+
+/* Keep the mobile section "View all" action on one line and easy to tap */
+@media(max-width:600px){
+ .sectionTitle{display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:12px!important;width:100%;}
+ .sectionTitle>div{flex:1 1 auto;min-width:0;}
+ .sectionTitle>a{display:inline-flex!important;flex:0 0 auto!important;flex-wrap:nowrap!important;white-space:nowrap!important;word-break:keep-all!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important;width:auto!important;min-width:max-content!important;margin:0 0 7px 8px!important;padding:8px 0!important;font-size:11px!important;line-height:1!important;}
+ .sectionTitle>a svg{flex:0 0 15px!important;width:15px!important;height:15px!important;}
+}
