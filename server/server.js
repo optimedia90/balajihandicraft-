@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import mysql from "mysql2/promise";
 import multer from "multer";
 import fs from "fs";
+import {brotliCompress,constants as zlibConstants} from "node:zlib";
 
 dotenv.config();
 
@@ -1177,6 +1178,36 @@ app.use((err,req,res,next)=>{
 });
 
 const dist=path.resolve(__dirname,"../dist");
+const brotliAssetCache=new Map();
+const brotliTextFile=/\\.(?:html|js|mjs|css|json|svg|xml|txt)$/i;
+app.use(async(req,res,next)=>{
+  if(!/\\bbr\\b/i.test(String(req.headers["accept-encoding"]||""))||!["GET","HEAD"].includes(req.method))return next();
+  try{
+    const pathname=decodeURIComponent(new URL(req.originalUrl,"http://localhost").pathname);
+    const relative=pathname==="/"?"index.html":pathname.replace(/^\\/+/, "");
+    const filePath=path.resolve(dist,relative);
+    if(filePath!==dist&&!filePath.startsWith(dist+path.sep))return next();
+    if(!brotliTextFile.test(filePath))return next();
+    const stat=await fs.promises.stat(filePath).catch(()=>null);
+    if(!stat?.isFile()||stat.size>8*1024*1024)return next();
+    const cacheKey=filePath+":"+stat.mtimeMs+":"+stat.size;
+    let compressed=brotliAssetCache.get(cacheKey);
+    if(!compressed){
+      const source=await fs.promises.readFile(filePath);
+      compressed=await new Promise((resolve,reject)=>brotliCompress(source,{params:{[zlibConstants.BROTLI_PARAM_QUALITY]:4}},(error,result)=>error?reject(error):resolve(result)));
+      if(brotliAssetCache.size>100)brotliAssetCache.clear();
+      brotliAssetCache.set(cacheKey,compressed);
+    }
+    res.status(200);
+    res.type(path.extname(filePath));
+    res.setHeader("Content-Encoding","br");
+    res.vary("Accept-Encoding");
+    res.setHeader("Content-Length",compressed.length);
+    res.setHeader("Cache-Control",filePath.endsWith("index.html")?"no-cache":"public, max-age=31536000, immutable");
+    if(req.method==="HEAD")return res.end();
+    return res.end(compressed);
+  }catch(error){return next(error);}
+});
 app.use(express.static(dist,{maxAge:"1y",immutable:true,setHeaders(res,filePath){
   if(filePath.endsWith("index.html"))res.setHeader("Cache-Control","no-cache");
   else if(/[.](?:js|css|woff2?|ttf|svg|png|jpe?g|webp|avif|ico)$/i.test(filePath))res.setHeader("Cache-Control","public, max-age=31536000, immutable");

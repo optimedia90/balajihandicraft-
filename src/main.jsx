@@ -177,6 +177,33 @@ function App(){
  useEffect(()=>{
    Promise.all([fetch("/api/store/products"),fetch("/api/store/categories"),fetch("/api/store/settings"),fetch("/api/store/banners")]).then(async([p,c,s,b])=>[await p.json(),await c.json(),await s.json(),await b.json()]).then(([p,c,s,b])=>{
      if(Array.isArray(p.products)&&p.products.length)products=p.products.map(normalizeProduct);
+      // Preload the exact homepage hero image before React paints it.
+      const heroImage=s?.settings?.homepage_image||b?.items?.[0]?.image||products[0]?.img||demoProducts[0]?.img;
+      if(heroImage){
+        try{
+          const heroUrl=new URL(heroImage,window.location.origin);
+          if(heroUrl.protocol==="https:"||heroUrl.origin===window.location.origin){
+            let heroPreload=document.querySelector('link[data-woodenara-lcp]');
+            if(!heroPreload){
+              heroPreload=document.createElement("link");
+              heroPreload.rel="preload";
+              heroPreload.as="image";
+              heroPreload.dataset.woodenaraLcp="true";
+              document.head.appendChild(heroPreload);
+            }
+            heroPreload.href=heroUrl.href;
+            heroPreload.setAttribute("fetchpriority","high");
+            const heroSrcSet=responsiveUnsplashSrcSet(heroUrl.href);
+            if(heroSrcSet){
+              heroPreload.setAttribute("imagesrcset",heroSrcSet);
+              heroPreload.setAttribute("imagesizes","(max-width: 900px) 90vw, 45vw");
+            }else{
+              heroPreload.removeAttribute("imagesrcset");
+              heroPreload.removeAttribute("imagesizes");
+            }
+          }
+        }catch(error){console.warn("Homepage image preload skipped:",error);}
+      }
      if(Array.isArray(c.categories)){
        const subs=Array.isArray(c.subcategories)?c.subcategories:[];
        liveCategoryRecords=c.categories.filter(cat=>!["inactive","disabled","0"].includes(String(cat.status||"active").toLowerCase()));
