@@ -348,7 +348,7 @@ function Header({cart,wish,currency,setCurrency,settings,menus=categoryMenus}){
   <Link to="/" className="mobileBrand" aria-label="Woodenara home"><img className="brandLogoImage" src={woodenaraLogoSrc||undefined} alt="Woodenara logo"/><span className="srOnly">Woodenara home</span></Link>
   <div className="mobileHeaderActions"><Link to="/wishlist" className="countIcon" aria-label="Wishlist"><Heart aria-hidden="true"/><span className="srOnly">View wishlist</span><i aria-hidden="true">{wish}</i></Link><Link to="/cart" className="countIcon" aria-label="Shopping bag"><ShoppingBag aria-hidden="true"/><span className="srOnly">View shopping bag</span><i aria-hidden="true">{cart}</i></Link></div>
  </div>
- <Link to="/" className="logo desktopBrand" aria-label="Woodenara home"><img className="brandLogoImage" src={woodenaraLogoSrc||undefined} alt=""/><span><b>WOODENARA</b><small>FURNITURE &amp; HOME DECOR</small></span></Link>
+ <Link to="/" className="logo desktopBrand" aria-label="Woodenara home"><img className="brandLogoImage" src={woodenaraLogoSrc||undefined} alt="Woodenara solid wood furniture and home decor logo"/><span><b>WOODENARA</b><small>FURNITURE &amp; HOME DECOR</small></span></Link>
  <nav className={open?"mobile open":"mobile"}>{primaryMenus.map(renderMenu)}<div className="navMenu allFurnitureMenu"><Link className="navMenuTitle" to="/shop" onClick={()=>setOpen(false)}>All Furniture</Link></div></nav>
  <div className="navicons"><div className="currencySwitcher"><span>{currency==="USD"?"🇺🇸":"🇮🇳"}</span><select aria-label="Currency" value={currency} onChange={e=>setCurrency(e.target.value)}><option value="USD">USD ($)</option><option value="INR">INR (₹)</option></select></div><button className="desktopSearch" onClick={()=>setSearch(!search)} aria-label="Search"><Search/></button><Link to="/wishlist" className="countIcon desktopWishlist" aria-label="Wishlist"><Heart aria-hidden="true"/><span className="srOnly">View wishlist</span><i aria-hidden="true">{wish}</i></Link><Link to="/account" className="desktopAccount" aria-label="My account"><User aria-hidden="true"/><span className="srOnly">My account</span></Link><Link to="/cart" className="countIcon desktopCart" aria-label="Shopping bag"><ShoppingBag aria-hidden="true"/><span className="srOnly">View shopping bag</span><i aria-hidden="true">{cart}</i></Link><button className="hamb desktopHamb" onClick={()=>setOpen(!open)}>{open?<X/>:<Menu/>}</button></div></div>
  <form className="searchbar mobileSearchbar" onSubmit={e=>{e.preventDefault();const query=searchQuery.trim();if(query){navigate("/shop?q="+encodeURIComponent(query));setSearch(false);setOpen(false)}}}><Search/><input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="Search furniture..." aria-label="Search products"/><button type="submit" aria-label="Submit product search"><ArrowRight size={18}/></button><div className="mobileCurrency currencySwitcher"><span>{currency==="USD"?"🇺🇸":"🇮🇳"}</span><select aria-label="Currency" value={currency} onChange={e=>setCurrency(e.target.value)}><option value="USD">USD ($)</option><option value="INR">INR (₹)</option></select></div></form>
@@ -416,7 +416,7 @@ function Home({add,toggleWish,wish,settings}){
   {/* 03 Categories */}
   <section className="homeSection categorySection">
    <SectionTitle kicker="CURATED FOR YOUR HOME" title="Shop by category" link="/shop"/>
-   <div className="catGrid categoryReveal">{cats.slice(1).map(([n,c])=>{const product=categoryCardProduct(c);return <Link to={"/shop?cat="+c} className="catTile" key={n}>{product?.img?<img onError={imageErrorFallback} src={product.img} alt={product.name}/>:<div className="catTileNoImage" aria-label={"No "+n+" product image available"}/>}<div><b>{n}</b><span>Explore collection <ArrowRight/></span></div></Link>})}</div>
+   <div className="catGrid categoryReveal">{cats.slice(1).map(([n,c])=>{const product=categoryCardProduct(c);return <Link to={"/shop?cat="+c} className="catTile" key={n}>{product?.img?<img onError={imageErrorFallback} src={product.img} alt={product.name}/>:<div className="catTileNoImage" aria-label={"No "+n+" product image available"}/>}<div><b>{n}</b><span>View category <ArrowRight/></span></div></Link>})}</div>
   </section>
 
   {/* 04 Featured products */}
@@ -476,7 +476,7 @@ function Home({add,toggleWish,wish,settings}){
 
   {/* 13 Collection showcase */}
   <section className="showcaseSection">
-   <div className="showcaseCopy"><span className="eyebrow">THE SHEESHHAM EDIT</span><h2>Natural wood.<br/><em>Beautifully lived in.</em></h2><p>Every grain tells a story. Our solid wood collection pairs traditional craftsmanship with clean, contemporary silhouettes.</p><Link className="btn light" to="/shop?cat=Storage">Explore the edit <ArrowRight/></Link></div>
+   <div className="showcaseCopy"><span className="eyebrow">THE SHEESHAM EDIT</span><h2>Natural wood.<br/><em>Beautifully lived in.</em></h2><p>Every grain tells a story. Our solid wood collection pairs traditional craftsmanship with clean, contemporary silhouettes.</p><Link className="btn light" to="/shop?cat=Storage">Explore the edit <ArrowRight/></Link></div>
    <div className="showcaseImage"><img src="/craft-poster.webp" alt="Solid wood furniture craftsmanship poster" onError={(e)=>{e.currentTarget.onerror=null;e.currentTarget.src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1400&q=85";}}/><span>01 / 04</span></div>
   </section>
 
@@ -542,6 +542,19 @@ function Home({add,toggleWish,wish,settings}){
    </details>
 
   {/* Keep the homepage buying guide concise; detailed questions are covered above. */}
+  </section>
+
+  {/* Helpful, visible homepage copy for furniture shoppers */}
+  <section className="homeSection" aria-labelledby="solid-wood-furniture-guide" style={{maxWidth:1120,margin:"0 auto",padding:"48px 24px"}}>
+   <span className="eyebrow">THE WOODENARA COLLECTION</span>
+   <h2 id="solid-wood-furniture-guide">Solid Wood Furniture for Every Room</h2>
+   <p>Woodenara brings together solid wood furniture and home decor for practical, welcoming spaces. Explore furniture for the living room, bedroom, dining area and workspace. From a statement bed to a useful storage cabinet, choose pieces by checking their dimensions, finish and everyday function. Our collection includes designs that pair natural wood character with considered details.</p>
+   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:24,lineHeight:1.75,marginTop:24}}>
+    <article><h3>Sheesham Wood Furniture</h3><p>Discover Sheesham wood furniture with distinctive natural grain and warm colour variation. The collection includes selected beds, tables, cabinets and other home furnishings. Each product page provides its own material, finish and dimension details, so review the specifications before ordering. Natural timber can show individual grain patterns, making every piece visually unique.</p></article>
+    <article><h3>Living Room and Dining Furniture</h3><p>Plan a comfortable living room with sofas, coffee tables, side tables and storage that suit the space you have. For dining areas, compare table sizes and seating options based on how many people use the room. Leave enough clearance to move chairs and walk around furniture. Matching finishes can create a coordinated look, while different textures add character.</p></article>
+    <article><h3>Bedroom Furniture and Home Decor</h3><p>Choose bedroom furniture that supports your routine, including beds, bedside tables, wardrobes and chests of drawers. Check the height and storage capacity as well as the width and depth. Finish the room with home decor that complements the wood tone without making the space feel crowded. Measure access points before arranging delivery.</p></article>
+   </div>
+   <p>Browse the Woodenara furniture collection to compare styles and product details. For long-lasting care, dust with a soft cloth, wipe spills promptly and use coasters to protect finished surfaces. Follow the care guidance listed with each product, especially when cleaning natural wood or a specialist finish.</p>
   </section>
 
   {/* 16 Newsletter */}
