@@ -1179,12 +1179,12 @@ app.use((err,req,res,next)=>{
 
 const dist=path.resolve(__dirname,"../dist");
 const brotliAssetCache=new Map();
-const brotliTextFile=/\\.(?:html|js|mjs|css|json|svg|xml|txt)$/i;
+const brotliTextFile=/\.(?:html|js|mjs|css|json|svg|xml|txt)$/i;
 app.use(async(req,res,next)=>{
-  if(!/\\bbr\\b/i.test(String(req.headers["accept-encoding"]||""))||!["GET","HEAD"].includes(req.method))return next();
+  if(!/\bbr\b/i.test(String(req.headers["accept-encoding"]||""))||!["GET","HEAD"].includes(req.method))return next();
   try{
     const pathname=decodeURIComponent(new URL(req.originalUrl,"http://localhost").pathname);
-    const relative=pathname==="/"?"index.html":pathname.replace(/^\\/+/, "");
+    const relative=pathname==="/"?"index.html":pathname.replace(/^\/+/, "");
     const filePath=path.resolve(dist,relative);
     if(filePath!==dist&&!filePath.startsWith(dist+path.sep))return next();
     if(!brotliTextFile.test(filePath))return next();
