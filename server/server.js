@@ -13,6 +13,17 @@ dotenv.config();
 const app=express();
 // Compress eligible text responses (HTML, CSS, JavaScript, JSON, SVG) with gzip/deflate when supported.
 app.use(compression({threshold:0,level:6}));
+
+// Baseline security headers for the HTTPS storefront.
+// HSTS is honored by browsers only when received over a valid HTTPS connection.
+app.use((req,res,next)=>{
+  res.setHeader("Strict-Transport-Security","max-age=31536000; includeSubDomains");
+  res.setHeader("X-Frame-Options","SAMEORIGIN");
+  res.setHeader("X-Content-Type-Options","nosniff");
+  res.setHeader("Permissions-Policy","camera=(), microphone=(), geolocation=()");
+  res.setHeader("Referrer-Policy","strict-origin-when-cross-origin");
+  next();
+});
 const __filename=fileURLToPath(import.meta.url);
 const __dirname=path.dirname(__filename);
 // Keep new uploads outside the deployed source tree when possible.
