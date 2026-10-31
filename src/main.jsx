@@ -345,15 +345,6 @@ function App(){
      setStoreVersion(v=>v+1);
    }).catch(()=>{});
  },[]);
- useEffect(()=>{
-  if(location.pathname!=="/")return;
-  const source=storeSettings?.homepage_image||storeSettings?.banners?.[0]?.image||demoProducts[0]?.img;
-  if(!source)return;
-  let preload=document.querySelector('link[data-woodenara-lcp]');
-  if(!preload){preload=document.createElement("link");preload.rel="preload";preload.as="image";preload.dataset.woodenaraLcp="true";document.head.appendChild(preload);}
-  preload.href=source;preload.setAttribute("fetchpriority","high");
-  return ()=>preload?.remove();
- },[location.pathname,storeSettings]);
  const add=p=>setCart(c=>{const x=c.find(i=>i.id===p.id);return x?c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...c,{...p,qty:1}]});
  const toggleWish=p=>setWish(w=>w.some(x=>x.id===p.id)?w.filter(x=>x.id!==p.id):[...w,p]);
   useEffect(()=>{window.scrollTo({top:0,left:0,behavior:"auto"});},[location.pathname,location.search]);
@@ -488,7 +479,7 @@ function Home({add,toggleWish,wish,settings}){
   <section className="newArrivalSection">
    <div className="newArrivalVisual"><img height="600" width="800" loading="lazy" decoding="async" src="/craft-poster.webp" alt="Woodenara solid wood furniture poster" onError={(e)=>{e.currentTarget.onerror=null;e.currentTarget.src=products[8]?.img||products[0]?.img||"";}}/><div><span>NEW ARRIVAL</span><b>Live Edge<br/>Collection</b></div></div>
    <div className="newArrivalCopy"><span className="eyebrow">JUST LANDED</span><h2>Fresh forms.<br/><em>Natural edges.</em></h2><p>New silhouettes inspired by organic shapes, expressive grain and modern living.</p><Link className="btn dark" to="/shop">Shop new arrivals <ArrowRight/></Link></div>
-   <div className="newArrivalMini">{products.slice(8,11).map(p=><Link to={"/product?id="+p.id} key={p.id}><img height="600" width="800" loading="lazy" decoding="async" onError={imageErrorFallback} src={p.img} alt={p.name}/><span>{p.name}</span><b>{fmt(p.price)}</b></Link>)}</div>
+   <div className="newArrivalMini">{products.slice(8,11).map(p=><Link to={"/product?id="+p.id} key={p.id}><img height="600" width="800" loading="lazy" decoding="async" sizes="(max-width: 600px) 88vw, (max-width: 1024px) 44vw, 320px" srcSet={responsiveUnsplashSrcSet(p.img)} onError={imageErrorFallback} src={p.img} alt={p.name}/><span>{p.name}</span><b>{fmt(p.price)}</b></Link>)}</div>
   </section>
 
   {/* 11 Social proof */}
