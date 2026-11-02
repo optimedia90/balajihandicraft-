@@ -176,7 +176,7 @@ function App(){
  useEffect(()=>localStorage.setItem("bh_cart",JSON.stringify(cart)),[cart]);
  useEffect(()=>localStorage.setItem("bh_wish",JSON.stringify(wish)),[wish]);
  useEffect(()=>{
-   Promise.all([fetch("/api/store/products"),fetch("/api/store/categories"),fetch("/api/store/settings"),fetch("/api/store/banners")]).then(async([p,c,s,b])=>[await p.json(),await c.json(),await s.json(),await b.json()]).then(([p,c,s,b])=>{
+   Promise.all([fetch("/api/store/products"),fetch("/api/store/categories"),fetch("/api/store/settings"),fetch("/api/store/banners")].map(request=>request.then(response=>response.ok?response.json():null).catch(error=>{console.warn("Woodenara store endpoint failed:",error);return null;}))).then(([p,c,s,b])=>{
      if(Array.isArray(p.products)&&p.products.length)products=p.products.map(normalizeProduct);
       // Preload the exact homepage hero image before React paints it.
       const heroImage=s?.settings?.homepage_image||b?.items?.[0]?.image||products[0]?.img||demoProducts[0]?.img;
@@ -684,7 +684,7 @@ function Shop({add,toggleWish,wish}){
   if(sort==="low")x.sort((a,b)=>a.price-b.price);
   if(sort==="high")x.sort((a,b)=>b.price-a.price);
   return x;
- },[cat,sub,q,sort,products.length]);
+ },[cat,sub,q,sort,products]);
  return <div className="container shop"><div className="crumb">Home / Shop</div><div className="shopHead"><div><span className="eyebrow">THE COLLECTION</span><h1>{sub||cat||(q?"Search results":"All Furniture")}</h1><p>{q?"Products matching “"+q+"”.":"Thoughtfully designed furniture for every room."}</p></div><select value={sort} onChange={e=>setSort(e.target.value)}><option value="featured">Sort: Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select></div><div className="shopBody"><aside><b>Categories</b>{categoryList.map(([n,c])=><Link className={cat===c&&!sub?"sel":""} to={"/shop"+(c?"?cat="+encodeURIComponent(c):"")} key={n}>{n}</Link>)}<div className="filterNote"><SlidersHorizontal/><b>Made to last</b><span>Solid wood • Handcrafted • Premium finishes</span></div></aside><section><div className="resultbar">{list.length} products <span>{q?"Search: "+q:sub?"Showing "+sub:"Showing the latest collection"}</span></div>{list.length?<ProductGrid items={list} add={add} toggleWish={toggleWish} wish={wish}/>:<div className="emptyState"><h3>No matching products found</h3><p>Try a different product name or browse all furniture.</p><Link className="btn dark" to="/shop">View all furniture <ArrowRight/></Link></div>}</section></div></div>
 }
 function Product({add,toggleWish,wish,cart=[]}){
