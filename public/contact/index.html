@@ -31,9 +31,57 @@ nav{display:flex;gap:15px;align-items:center;white-space:nowrap}nav a{font-size:
 .contactBottom{background:var(--contactInk);color:#fff;text-align:center;padding:34px 20px}.contactBottom>span{font:700 15px Georgia;letter-spacing:3px}.contactBottom p{font:italic 18px Georgia;color:#e5d8c6;margin:9px 0 14px}.contactBottom a{font-size:10px;color:#d7ad78;border-bottom:1px solid #9d784b;padding-bottom:4px}
 @media(max-width:800px){.site-header{padding:12px 22px;height:auto;align-items:flex-start;flex-direction:column}.contactHero{padding:42px 22px 58px;grid-template-columns:1fr;gap:27px}.contactHeroCopy{max-width:650px}.contactHeroPhoto{height:300px;margin-right:12px}.contactHeroTag{left:22px;bottom:19px}.contactChannels{padding:0 22px 42px}.contactChannel{padding:18px 14px;grid-template-columns:34px 1fr}.contactChannel b{font-size:14px}.contactHelp{padding:58px 22px;gap:35px}.contactHelpIntro img{height:180px}.contactOrderNote{padding:58px 22px}}
 @media(max-width:560px){nav{gap:12px;flex-wrap:wrap}.contactHero{padding:35px 18px 52px;gap:22px}.contactHero h1{font-size:44px;letter-spacing:-1.8px;margin:15px 0}.contactHeroCopy>p,.contactHelpIntro>p,.contactOrderNote p{font-size:13px;line-height:1.75}.contactHeroActions{gap:16px;flex-wrap:wrap;margin-top:21px}.contactDarkBtn{padding:14px 15px}.contactHeroPhoto{height:230px;margin-right:7px}.contactHeroPhoto:after{inset:9px -7px -9px 9px}.contactHeroTag{font-size:7px;bottom:15px}.contactChannels{grid-template-columns:1fr;padding:0 18px 38px;gap:9px}.contactChannel{min-height:105px;padding:16px}.contactHelp{padding:47px 18px;grid-template-columns:1fr;gap:24px}.contactHelpIntro img{height:190px;max-width:none}.contactHelpIntro h2,.contactOrderNote h2{font-size:34px}.contactHelpList article{padding:16px 0}.contactHelpList h3{font-size:17px}.contactOrderNote{padding:46px 18px;display:block}.contactOrderNote .contactDarkBtn{margin-top:17px}.contactBottom{padding:30px 15px}.contactBottom p{font-size:16px}}
+</style><style>
+/* Match the live React storefront header */
+.topline{height:34px;background:#171511;color:#fff;text-align:center;font-size:11px;letter-spacing:.4px;padding:9px}.topline span{margin:0 12px;color:#c8a97a}
+.site-header.liveHeader{position:relative;z-index:20;background:rgba(255,253,249,.97);border-bottom:1px solid #e9e1d6;backdrop-filter:blur(14px);height:auto;padding:0}
+.liveNavwrap{height:78px;max-width:1380px;margin:auto;padding:0 3%;display:flex;align-items:center;justify-content:space-between;gap:clamp(12px,1.8vw,26px);min-width:0}
+.liveBrand{flex:0 0 190px;display:flex;align-items:center;gap:10px;min-width:190px;color:#171511;text-decoration:none}
+.liveBrand img{width:46px;height:46px;object-fit:cover;border-radius:50%;flex:0 0 46px;display:block}
+.liveBrand b{display:block;letter-spacing:2.2px;font-size:15px}.liveBrand small{display:block;font-size:6px;letter-spacing:.7px;white-space:nowrap;color:#756f66;margin-top:3px}
+.liveMainNav{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:clamp(10px,1.5vw,22px);white-space:nowrap}
+.liveMainNav a{font-size:13px;font-weight:600;color:#171511;text-decoration:none;white-space:nowrap}.liveMainNav a:hover{color:#b18a58}.liveMainNav a span{font-size:13px;margin-left:2px}
+.liveNavActions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.liveNavActions a{width:38px;height:38px;border:0;background:transparent;display:grid;place-items:center;position:relative;color:#171511;text-decoration:none}
+.liveNavActions svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.liveCount i{position:absolute;right:0;top:1px;background:#171511;color:white;border-radius:20px;font:600 8px Arial;padding:3px 5px;font-style:normal}
+.liveCurrency{height:34px;display:flex;align-items:center;gap:4px;border:1px solid #e5dfd4;border-radius:3px;padding:0 7px;font-size:10px;color:#171511}
+.liveCurrency select{border:0;background:transparent;color:#171511;font-size:10px;outline:0;max-width:72px}
+.liveMobileMenu,.liveMobileSearch{display:none}
+@media(max-width:1100px){.liveNavwrap{gap:10px}.liveBrand{flex-basis:160px;min-width:160px}.liveBrand b{font-size:12px}.liveMainNav{gap:10px}.liveMainNav a{font-size:11px}.liveNavActions{gap:2px}.liveNavActions a{width:32px}}
+@media(max-width:760px){.topline{height:30px;padding:8px 4px;font-size:9px}.liveNavwrap{height:62px;padding:0 4%;gap:10px;justify-content:space-between}.liveMobileMenu{display:grid;place-items:center;width:34px;height:34px;border:0;background:transparent;padding:5px}.liveMobileMenu svg{width:22px;height:22px;fill:none;stroke:#171511;stroke-width:1.8;stroke-linecap:round}.liveBrand{flex:1;min-width:0;justify-content:center;gap:6px}.liveBrand img{width:34px;height:34px;flex-basis:34px}.liveBrand b{font-size:11px;letter-spacing:1.4px}.liveBrand small{font-size:5px;letter-spacing:.35px}.liveMainNav{display:none}.liveMainNav.isOpen{display:flex;position:absolute;top:62px;left:0;right:0;background:#fffdf9;border:1px solid #e9e1d6;padding:12px 18px;flex-direction:column;align-items:stretch;gap:0;z-index:30;box-shadow:0 8px 20px #17151112}.liveMainNav.isOpen a{padding:11px 4px;border-bottom:1px solid #eee8df;font-size:13px}.liveNavActions{gap:1px}.liveCurrency{display:none}.liveNavActions a{width:31px;height:34px}.liveNavActions svg{width:18px}.liveMobileSearch{display:block;padding:0 4% 9px}.liveMobileSearch a{height:34px;border:1px solid #e8e0d5;border-radius:4px;display:flex;align-items:center;gap:8px;padding:0 10px;color:#756f66;text-decoration:none;font-size:18px}.liveMobileSearch span{font-size:11px}.contactHero{padding-top:50px}}
+@media(max-width:390px){.liveBrand b{font-size:10px}.liveBrand img{width:30px;height:30px;flex-basis:30px}.liveNavActions a{width:27px}}
 </style></head><body>
-<div class="topline">Free shipping on orders over ₹42,000 &nbsp; · &nbsp; Handcrafted furniture, made to last</div>
-<header class="site-header"><a class="brand" href="/"><span class="brand-mark">W</span><span>WOODENARA<small style="display:block;font-size:5px;letter-spacing:1px;margin-top:3px">FURNITURE &amp; HOME DECOR</small></span></a><nav aria-label="Main navigation"><a href="/">Home</a><a href="/shop">Living Room</a><a href="/shop">Bedroom</a><a href="/shop">Dining</a><a href="/shop">Storage &amp; Study</a><a href="/shop">Office Furniture</a><a href="/shop">All Furniture</a></nav></header>
+<div class="topline">Free shipping on orders over ₹42,000 &nbsp; <span>•</span> &nbsp; Handcrafted furniture, made to last</div>
+<header class="site-header liveHeader">
+ <div class="liveNavwrap">
+  <button class="liveMobileMenu" id="mobileMenuToggle" aria-label="Open navigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <a class="liveBrand" href="/" aria-label="Woodenara home"><img id="woodenaraBrandLogo" src="/favicon.png" alt="Woodenara logo"><span><b>WOODENARA</b><small>FURNITURE &amp; HOME DECOR</small></span></a>
+  <nav class="liveMainNav" id="liveMainNav" aria-label="Main navigation">
+   <a href="/shop?cat=Living%20Room">Living Room <span>⌄</span></a><a href="/shop?cat=Bedroom">Bedroom <span>⌄</span></a><a href="/shop?cat=Dining">Dining <span>⌄</span></a><a href="/shop?cat=Storage%20%26%20Study">Storage &amp; Study <span>⌄</span></a><a href="/shop?cat=Office%20Furniture">Office Furniture <span>⌄</span></a><a href="/shop">All Furniture</a>
+  </nav>
+  <div class="liveNavActions">
+   <label class="liveCurrency"><span id="currencyFlag">🇮🇳</span><select id="currencySelect" aria-label="Currency"><option value="INR">INR (₹)</option><option value="USD">USD ($)</option></select></label>
+   <a class="liveIcon" href="/shop" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></a>
+   <a class="liveIcon liveCount" href="/wishlist" aria-label="Wishlist"><svg viewBox="0 0 24 24"><path d="M20.8 8.8c0 5.2-8.8 11-8.8 11s-8.8-5.8-8.8-11a4.7 4.7 0 0 1 8.8-2.2 4.7 4.7 0 0 1 8.8 2.2Z"/></svg><i>0</i></a>
+   <a class="liveIcon" href="/account" aria-label="My account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.4-4 3-6 7-6s6.6 2 7 6"/></svg></a>
+   <a class="liveIcon liveCount" href="/cart" aria-label="Shopping bag"><svg viewBox="0 0 24 24"><path d="M5 8h14l1 13H4L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg><i>0</i></a>
+  </div>
+ </div>
+ <div class="liveMobileSearch"><a href="/shop">⌕ <span>Search furniture...</span></a></div>
+</header>
+<script>
+(function(){
+ var logo=document.getElementById('woodenaraBrandLogo');
+ fetch('/woodenara-logo-base64.txt').then(function(r){return r.ok?r.text():''}).then(function(data){var v=(data||'').trim();if(v&&logo)logo.src='data:image/webp;base64,'+v}).catch(function(){});
+ var toggle=document.getElementById('mobileMenuToggle'),nav=document.getElementById('liveMainNav');
+ if(toggle&&nav)toggle.addEventListener('click',function(){var opened=nav.classList.toggle('isOpen');toggle.setAttribute('aria-expanded',String(opened))});
+ var currency=document.getElementById('currencySelect'),flag=document.getElementById('currencyFlag');
+ try{var saved=localStorage.getItem('bh_currency');if(saved==='USD'||saved==='INR')currency.value=saved}catch(e){}
+ function updateFlag(){flag.textContent=currency.value==='USD'?'🇺🇸':'🇮🇳';try{localStorage.setItem('bh_currency',currency.value)}catch(e){}}
+ currency.addEventListener('change',updateFlag);updateFlag();
+})();
+</script>
 <main class="contactExperience">
 <section class="contactHero"><div class="contactHeroCopy"><span class="contactEyebrow">WE'RE HERE FOR YOU</span><h1>Let's make your <em>next move</em> feel right.</h1><p>From choosing the right piece to checking on an order, our team is here to make your Woodenara experience smoother.</p><div class="contactHeroActions"><a class="contactDarkBtn" href="mailto:info@woodenara.com">Email our team <span>↗</span></a><a class="contactSimpleLink" href="tel:+917300089505">Call +91 73000 89505</a></div></div><div class="contactHeroPhoto"><img height="600" width="800" loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1200&amp;auto=format&amp;fit=crop&amp;q=85" alt="Warm and welcoming modern living room"></div><div class="contactHeroTag">WOODENARA CUSTOMER CARE</div></section>
 <section class="contactChannels"><a href="mailto:info@woodenara.com" class="contactChannel"><span class="contactChannelIcon">✉</span><span class="contactChannelLabel">WRITE TO US</span><b>info@woodenara.com</b><small>Product questions and order support</small><i>↗</i></a><a href="tel:+917300089505" class="contactChannel"><span class="contactChannelIcon">☎</span><span class="contactChannelLabel">GIVE US A CALL</span><b>+91 73000 89505</b><small>Speak with our customer support team</small><i>↗</i></a><div class="contactChannel"><span class="contactChannelIcon">⌖</span><span class="contactChannelLabel">OUR LOCATION</span><b>Churu, Rajasthan</b><small>India</small></div></section>
